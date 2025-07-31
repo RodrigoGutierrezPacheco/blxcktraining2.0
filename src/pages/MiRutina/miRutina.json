@@ -1,0 +1,902 @@
+{
+  "name": "Plan Transformación Total",
+  "phase": "Fase 1: Adaptación y Fuerza Base",
+  "load": "Progresiva (Ligera a Moderada)",
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "days": [
+        {
+          "dayNumber": 1,
+          "focus": "Pierna y Glúteo",
+          "exercises": [
+            {
+              "name": "Sentadilla con peso corporal",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Zancadas alternas",
+              "sets": 3,
+              "reps": "8-10 por pierna",
+              "rest": "60s"
+            },
+            {
+              "name": "Puente de glúteo",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Gemelos de pie",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Plancha",
+              "sets": 3,
+              "reps": "30-45s",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 2,
+          "focus": "Pecho y Tríceps",
+          "exercises": [
+            {
+              "name": "Flexiones de pecho",
+              "sets": 3,
+              "reps": "8-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Press de hombros con mancuernas",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Fondos en paralelas (asistidos)",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "60s"
+            },
+            {
+              "name": "Extensiones de tríceps con banda",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Plancha lateral",
+              "sets": 3,
+              "reps": "30s por lado",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "focus": "Cardio HIIT",
+          "exercises": [
+            {
+              "name": "Burpees",
+              "sets": 4,
+              "reps": "10",
+              "rest": "60s"
+            },
+            {
+              "name": "Saltos de tijera",
+              "sets": 4,
+              "reps": "30s",
+              "rest": "30s"
+            },
+            {
+              "name": "Mountain climbers",
+              "sets": 4,
+              "reps": "30s",
+              "rest": "30s"
+            },
+            {
+              "name": "Rodillas al pecho",
+              "sets": 4,
+              "reps": "30s",
+              "rest": "30s"
+            },
+            {
+              "name": "Sprint en el sitio",
+              "sets": 4,
+              "reps": "30s",
+              "rest": "60s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 4,
+          "focus": "Espalda y Bíceps",
+          "exercises": [
+            {
+              "name": "Remo con mancuernas",
+              "sets": 3,
+              "reps": "10-12 por brazo",
+              "rest": "60s"
+            },
+            {
+              "name": "Dominadas (asistidas)",
+              "sets": 3,
+              "reps": "6-8",
+              "rest": "90s"
+            },
+            {
+              "name": "Curl de bíceps con mancuernas",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Superman",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Crunch abdominal",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 5,
+          "focus": "Hombro y Abdomen",
+          "exercises": [
+            {
+              "name": "Press militar con mancuernas",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Elevaciones laterales",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Face pulls con banda",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Russian twists",
+              "sets": 3,
+              "reps": "15-20 por lado",
+              "rest": "45s"
+            },
+            {
+              "name": "Elevación de piernas colgado",
+              "sets": 3,
+              "reps": "10-15",
+              "rest": "60s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weekNumber": 2,
+      "days": [
+        {
+          "dayNumber": 1,
+          "focus": "Pierna y Glúteo (Intensidad)",
+          "exercises": [
+            {
+              "name": "Sentadilla búlgara",
+              "sets": 3,
+              "reps": "8-10 por pierna",
+              "rest": "75s"
+            },
+            {
+              "name": "Peso muerto rumano (mancuernas)",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "75s"
+            },
+            {
+              "name": "Hip thrust",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "60s"
+            },
+            {
+              "name": "Prensa de piernas (máquina)",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Abducción de cadera (banda)",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "45s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 2,
+          "focus": "Pecho y Tríceps (Volumen)",
+          "exercises": [
+            {
+              "name": "Press de banca con mancuernas",
+              "sets": 4,
+              "reps": "8-12",
+              "rest": "75s"
+            },
+            {
+              "name": "Aperturas con mancuernas",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "60s"
+            },
+            {
+              "name": "Press francés con mancuernas",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Extensiones de tríceps en polea alta",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Plancha con elevación de pierna",
+              "sets": 3,
+              "reps": "30s por lado",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "focus": "Cardio Moderado",
+          "exercises": [
+            {
+              "name": "Elíptica",
+              "sets": 1,
+              "reps": "30 min",
+              "rest": "N/A"
+            },
+            {
+              "name": "Cinta de correr (inclinación)",
+              "sets": 1,
+              "reps": "20 min",
+              "rest": "N/A"
+            },
+            {
+              "name": "Saltar la cuerda",
+              "sets": 5,
+              "reps": "60s",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 4,
+          "focus": "Espalda y Bíceps (Fuerza)",
+          "exercises": [
+            {
+              "name": "Remo con barra",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "75s"
+            },
+            {
+              "name": "Jalón al pecho (máquina)",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Curl martillo",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Remo en máquina",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Elevaciones de piernas en suelo",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 5,
+          "focus": "Hombro y Abdomen (Definición)",
+          "exercises": [
+            {
+              "name": "Press Arnold",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Elevaciones frontales",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Encogimientos abdominales",
+              "sets": 3,
+              "reps": "20-25",
+              "rest": "30s"
+            },
+            {
+              "name": "Elevaciones de rodillas colgado",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "60s"
+            },
+            {
+              "name": "Crunch bicicleta",
+              "sets": 3,
+              "reps": "15-20 por lado",
+              "rest": "45s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weekNumber": 3,
+      "days": [
+        {
+          "dayNumber": 1,
+          "focus": "Pierna y Glúteo (Hipertrofia)",
+          "exercises": [
+            {
+              "name": "Sentadilla goblet",
+              "sets": 4,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Prensa de piernas",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Curl femoral sentado",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Extensiones de cuádriceps",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Elevación de talones en máquina",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 2,
+          "focus": "Pecho y Tríceps (Fuerza)",
+          "exercises": [
+            {
+              "name": "Press de banca con barra",
+              "sets": 4,
+              "reps": "6-8",
+              "rest": "90s"
+            },
+            {
+              "name": "Press inclinado con mancuernas",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "75s"
+            },
+            {
+              "name": "Fondos en paralelas",
+              "sets": 3,
+              "reps": "8-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Extensiones de tríceps por encima de la cabeza",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Plancha con toque de hombro",
+              "sets": 3,
+              "reps": "10-12 por lado",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "focus": "Cardio y Core",
+          "exercises": [
+            {
+              "name": "Burpees con salto",
+              "sets": 4,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Escaladores",
+              "sets": 4,
+              "reps": "45s",
+              "rest": "30s"
+            },
+            {
+              "name": "Crunches inversos",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Side plank",
+              "sets": 3,
+              "reps": "30s por lado",
+              "rest": "30s"
+            },
+            {
+              "name": "Bicicleta abdominal",
+              "sets": 3,
+              "reps": "20-25 por lado",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 4,
+          "focus": "Espalda y Bíceps (Volumen)",
+          "exercises": [
+            {
+              "name": "Dominadas",
+              "sets": 3,
+              "reps": "AMRAP",
+              "rest": "90s"
+            },
+            {
+              "name": "Remo en polea baja",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Curl de bíceps con barra",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Pull-overs con mancuerna",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Hiperextensiones",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "45s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 5,
+          "focus": "Hombro y Abdomen (Fuerza)",
+          "exercises": [
+            {
+              "name": "Press militar con barra",
+              "sets": 3,
+              "reps": "6-8",
+              "rest": "90s"
+            },
+            {
+              "name": "Remo al mentón",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Elevaciones laterales con cable",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Abdominales en V",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "60s"
+            },
+            {
+              "name": "Dragon flags (asistido)",
+              "sets": 3,
+              "reps": "6-8",
+              "rest": "90s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weekNumber": 4,
+      "days": [
+        {
+          "dayNumber": 1,
+          "focus": "Pierna y Glúteo (Resistencia)",
+          "exercises": [
+            {
+              "name": "Sentadilla sumo",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "45s"
+            },
+            {
+              "name": "Zancadas con salto",
+              "sets": 3,
+              "reps": "10-12 por pierna",
+              "rest": "60s"
+            },
+            {
+              "name": "Glute bridge con banda",
+              "sets": 3,
+              "reps": "20-25",
+              "rest": "30s"
+            },
+            {
+              "name": "Step-ups",
+              "sets": 3,
+              "reps": "12-15 por pierna",
+              "rest": "45s"
+            },
+            {
+              "name": "Wall sit",
+              "sets": 3,
+              "reps": "45-60s",
+              "rest": "30s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 2,
+          "focus": "Pecho y Tríceps (Resistencia)",
+          "exercises": [
+            {
+              "name": "Flexiones diamante",
+              "sets": 3,
+              "reps": "AMRAP",
+              "rest": "60s"
+            },
+            {
+              "name": "Press de banca inclinado (máquina)",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Fondos en banco",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Patada de tríceps con mancuerna",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Push-ups con palmada",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "60s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "focus": "Cardio de Larga Duración",
+          "exercises": [
+            {
+              "name": "Correr en cinta",
+              "sets": 1,
+              "reps": "45 min",
+              "rest": "N/A"
+            },
+            {
+              "name": "Bicicleta estática",
+              "sets": 1,
+              "reps": "45 min",
+              "rest": "N/A"
+            },
+            {
+              "name": "Remo (máquina)",
+              "sets": 1,
+              "reps": "30 min",
+              "rest": "N/A"
+            }
+          ]
+        },
+        {
+          "dayNumber": 4,
+          "focus": "Espalda y Bíceps (Resistencia)",
+          "exercises": [
+            {
+              "name": "Remo con banda",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "45s"
+            },
+            {
+              "name": "Jalón al pecho con agarre estrecho",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Curl de bíceps con banda",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Remo invertido",
+              "sets": 3,
+              "reps": "AMRAP",
+              "rest": "60s"
+            },
+            {
+              "name": "Plancha con remo",
+              "sets": 3,
+              "reps": "10-12 por lado",
+              "rest": "45s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 5,
+          "focus": "Hombro y Abdomen (Resistencia)",
+          "exercises": [
+            {
+              "name": "Press de hombros con banda",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "45s"
+            },
+            {
+              "name": "Elevaciones frontales con disco",
+              "sets": 3,
+              "reps": "12-15",
+              "rest": "45s"
+            },
+            {
+              "name": "Crunch con balón medicinal",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Leg raises",
+              "sets": 3,
+              "reps": "15-20",
+              "rest": "30s"
+            },
+            {
+              "name": "Plancha dinámica",
+              "sets": 3,
+              "reps": "45-60s",
+              "rest": "30s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weekNumber": 5,
+      "days": [
+        {
+          "dayNumber": 1,
+          "focus": "Pierna y Glúteo (Peak)",
+          "exercises": [
+            {
+              "name": "Sentadilla con barra",
+              "sets": 4,
+              "reps": "5-8",
+              "rest": "120s"
+            },
+            {
+              "name": "Peso muerto",
+              "sets": 3,
+              "reps": "5-8",
+              "rest": "120s"
+            },
+            {
+              "name": "Zancadas con barra",
+              "sets": 3,
+              "reps": "8-10 por pierna",
+              "rest": "90s"
+            },
+            {
+              "name": "Prensa de piernas pesada",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "90s"
+            },
+            {
+              "name": "Glute bridge con barra",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 2,
+          "focus": "Pecho y Tríceps (Peak)",
+          "exercises": [
+            {
+              "name": "Press de banca",
+              "sets": 4,
+              "reps": "5-8",
+              "rest": "120s"
+            },
+            {
+              "name": "Press inclinado con barra",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "90s"
+            },
+            {
+              "name": "Fondos lastrados",
+              "sets": 3,
+              "reps": "6-10",
+              "rest": "90s"
+            },
+            {
+              "name": "Press cerrado",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "75s"
+            },
+            {
+              "name": "Extensiones de tríceps en polea",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 3,
+          "focus": "Cardio y Agilidad",
+          "exercises": [
+            {
+              "name": "Saltos de caja",
+              "sets": 4,
+              "reps": "8-10",
+              "rest": "60s"
+            },
+            {
+              "name": "Burpees con salto largo",
+              "sets": 4,
+              "reps": "8-10",
+              "rest": "60s"
+            },
+            {
+              "name": "Conos de agilidad",
+              "sets": 5,
+              "reps": "30s",
+              "rest": "30s"
+            },
+            {
+              "name": "Sprint en colina",
+              "sets": 5,
+              "reps": "30s",
+              "rest": "90s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 4,
+          "focus": "Espalda y Bíceps (Peak)",
+          "exercises": [
+            {
+              "name": "Peso muerto rumano con barra",
+              "sets": 3,
+              "reps": "6-8",
+              "rest": "120s"
+            },
+            {
+              "name": "Remo con barra (pendlay)",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "90s"
+            },
+            {
+              "name": "Dominadas lastradas",
+              "sets": 3,
+              "reps": "AMRAP",
+              "rest": "120s"
+            },
+            {
+              "name": "Curl de bíceps con barra (pesado)",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "75s"
+            },
+            {
+              "name": "Face pulls pesados",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            }
+          ]
+        },
+        {
+          "dayNumber": 5,
+          "focus": "Hombro y Abdomen (Peak)",
+          "exercises": [
+            {
+              "name": "Press militar de pie",
+              "sets": 4,
+              "reps": "5-8",
+              "rest": "120s"
+            },
+            {
+              "name": "Elevaciones laterales pesadas",
+              "sets": 3,
+              "reps": "8-10",
+              "rest": "75s"
+            },
+            {
+              "name": "Abdominales con cable",
+              "sets": 3,
+              "reps": "10-12",
+              "rest": "60s"
+            },
+            {
+              "name": "Rueda abdominal",
+              "sets": 3,
+              "reps": "10-15",
+              "rest": "60s"
+            },
+            {
+              "name": "Plancha con peso",
+              "sets": 3,
+              "reps": "45-60s",
+              "rest": "60s"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

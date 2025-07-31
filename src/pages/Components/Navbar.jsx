@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Play, User } from "lucide-react";
 import { Button } from "./Button";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Verificar si hay usuario en localStorage al cargar el componente
+    const storedUser = localStorage.getItem("userBlck");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -50,11 +63,11 @@ export default function Navbar() {
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <a
-              href="/login"
+              href={user ? "/perfil" : "/login"}
               className="flex items-center text-gray-700 hover:text-black font-medium transition-colors duration-200 group"
             >
               <User className="h-5 w-5 mr-2" />
-              Iniciar Sesión
+              {user ? "Perfil" : "Iniciar Sesión"}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
             </a>
             <Button
@@ -101,12 +114,12 @@ export default function Navbar() {
             ))}
             <div className="pt-2">
               <a
-                href="/login"
+                href={user ? "/perfil" : "/login"}
                 className="flex items-center px-3 py-2 text-gray-700 hover:text-black hover:bg-gray-50 font-medium transition-colors duration-200 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <User className="h-5 w-5 mr-2" />
-                Iniciar Sesión
+                {user ? "Perfil" : "Iniciar Sesión"}
               </a>
             </div>
             <div className="pt-2">

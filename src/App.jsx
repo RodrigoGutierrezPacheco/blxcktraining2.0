@@ -6,6 +6,8 @@ import About from "./pages/About/About";
 import Planes from "./pages/Planes/Planes";
 import Entrenadores from "./pages/Entrenadores/Entrenadores";
 import Login from "./pages/Login/Login";
+import Perfil from "./pages/Perfil/Perfil";
+import Rutina from "./pages/MiRutina/Rutina";
 
 function App() {
   return (
@@ -43,6 +45,18 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/login" element={<Login />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/perfil" element={<Perfil />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/mi-rutina" element={<Rutina />} />
         </Route>
       </Routes>
     </Router>
