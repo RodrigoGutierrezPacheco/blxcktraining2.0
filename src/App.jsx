@@ -5,6 +5,7 @@ import Entrenamientos from "./pages/Entrenamientos/Entrenamientos";
 import About from "./pages/About/About";
 import Planes from "./pages/Planes/Planes";
 import Entrenadores from "./pages/Entrenadores/Entrenadores";
+import Login from "./pages/Login/Login";
 
 function App() {
   return (
@@ -36,6 +37,12 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/entrenadores" element={<Entrenadores />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
     </Router>

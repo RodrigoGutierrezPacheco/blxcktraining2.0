@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Play } from "lucide-react";
+import { Menu, X, Play, User } from "lucide-react";
 import { Button } from "./Button";
 
 export default function Navbar() {
@@ -47,8 +47,16 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA Button */}
+          {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <a
+              href="/login"
+              className="flex items-center text-gray-700 hover:text-black font-medium transition-colors duration-200 group"
+            >
+              <User className="h-5 w-5 mr-2" />
+              Iniciar Sesión
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
+            </a>
             <Button
               size="sm"
               className="bg-black text-white hover:bg-gray-800 px-6"
@@ -91,7 +99,17 @@ export default function Navbar() {
                 {link.name}
               </a>
             ))}
-            <div className="pt-4">
+            <div className="pt-2">
+              <a
+                href="/inicio-sesion"
+                className="flex items-center px-3 py-2 text-gray-700 hover:text-black hover:bg-gray-50 font-medium transition-colors duration-200 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <User className="h-5 w-5 mr-2" />
+                Iniciar Sesión
+              </a>
+            </div>
+            <div className="pt-2">
               <Button
                 size="sm"
                 className="w-full bg-black text-white hover:bg-gray-800"
