@@ -101,7 +101,7 @@ export default function Navbar() {
             ))}
             <div className="pt-2">
               <a
-                href="/inicio-sesion"
+                href="/login"
                 className="flex items-center px-3 py-2 text-gray-700 hover:text-black hover:bg-gray-50 font-medium transition-colors duration-200 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
