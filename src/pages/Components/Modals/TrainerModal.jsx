@@ -88,20 +88,6 @@ export default function TrainerModal({ isOpen, onClose, trainer }) {
             <p className="text-gray-700 leading-relaxed mb-6">
               {trainer.philosophy}
             </p>
-
-            <h4 className="text-xl font-semibold text-gray-900 mb-3">
-              Contacto:
-            </h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-gray-700 bg-gray-50 p-3 rounded-lg">
-                <Mail className="h-5 w-5 text-red-500 flex-shrink-0" />
-                <span className="truncate">{trainer.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-700 bg-gray-50 p-3 rounded-lg">
-                <Phone className="h-5 w-5 text-green-500 flex-shrink-0" />
-                <span>{trainer.phone}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

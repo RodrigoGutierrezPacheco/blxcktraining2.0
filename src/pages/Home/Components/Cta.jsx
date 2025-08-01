@@ -16,7 +16,10 @@ export default function Cta() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Button
             size="lg"
-            className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+            onClick={()=>{
+              window.location.href = "/planes";
+            }}
+            className="border-white border text-white hover:bg-white hover:text-black text-lg px-8 py-6 bg-transparent"
           >
             Empieza Ahora
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -24,6 +27,9 @@ export default function Cta() {
           <Button
             variant="outline"
             size="lg"
+            onClick={()=>{
+              window.location.href = "/planes";
+            }}
             className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-6 bg-transparent"
           >
             Conoce los Programas

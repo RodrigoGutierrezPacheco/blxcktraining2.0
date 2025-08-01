@@ -14,19 +14,19 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const navigationLinks = [
-    { name: "Inicio", href: "#inicio" },
-    { name: "Entrenamientos", href: "#entrenamientos" },
-    { name: "Sobre Nosotros", href: "#sobre-nosotros" },
-    { name: "Testimonios", href: "#testimonios" },
-    { name: "Contacto", href: "#contacto" },
+    { name: "Inicio", href: "/" },
+    { name: "Entrenamientos", href: "/entrenamientos" },
+    { name: "Sobre Nosotros", href: "/sobre-nosotros" },
+    { name: "Planes", href: "/planes" },
+    { name: "Entrenadores", href: "/entrenadores" },
   ];
 
   const trainingTypes = [
-    { name: "Entrenamiento en Casa", href: "#casa" },
-    { name: "Entrenamiento en Gimnasio", href: "#gimnasio" },
-    { name: "Entrenamiento Funcional", href: "#funcional" },
-    { name: "Cardio Intensivo", href: "#cardio" },
-    { name: "Fuerza y Resistencia", href: "#fuerza" },
+    { name: "Entrenamiento en Casa", href: "/entrenamientos-casa" },
+    { name: "Entrenamiento en Gimnasio", href: "/entrenamientos-gimnasio" },
+    { name: "Entrenamiento Funcional", href: "/entrenamiento-funcional" },
+    { name: "Cardio Intensivo", href: "/entrenamiento-cardiovascular" },
+    { name: "Fuerza y Resistencia", href: "/entrenamieto-fuerza" },
   ];
 
   const legalLinks = [
@@ -47,8 +47,8 @@ export default function Footer() {
     <footer className="bg-black text-white">
       {/* Newsletter Section */}
       <div className="border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          <div className="text-center max-w-2xl mx-auto">
+        <div className="max-w-6xl mx-auto px-4">
+          {/* <div className="text-center max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold mb-4">
               Mantente en Forma con Nosotros
             </h3>
@@ -62,11 +62,11 @@ export default function Footer() {
                 placeholder="Tu email"
                 className="flex-1 px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-white transition-colors"
               />
-              <Button className="bg-white text-black hover:bg-gray-100 px-6 py-3">
+              <Button className="border border-white text-black hover:bg-white hover:text-black px-6 py-3">
                 Suscribirse
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

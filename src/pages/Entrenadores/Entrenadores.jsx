@@ -1,13 +1,13 @@
-import { useState } from "react"
-import { Button } from "../Components/Button"
-import { Card, CardContent } from "../Components/Card"
-import { Badge } from "../Components/Badge"
-import { Users, Award, Calendar } from "lucide-react"
-import TrainerModal from "../Components/Modals/TrainerModal"
+import { useState } from "react";
+import { Button } from "../Components/Button";
+import { Card, CardContent } from "../Components/Card";
+import { Badge } from "../Components/Badge";
+import { Users, Award, Calendar } from "lucide-react";
+import TrainerModal from "../Components/Modals/TrainerModal";
 
 export default function Entrenadores() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedTrainer, setSelectedTrainer] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTrainer, setSelectedTrainer] = useState(null);
 
   const trainers = [
     {
@@ -94,24 +94,27 @@ export default function Entrenadores() {
       email: "sofia.castro@blxcktraining.com",
       phone: "+1 (555) 100-2003",
     },
-  ]
+  ];
 
   const openModal = (trainer) => {
-    setSelectedTrainer(trainer)
-    setIsModalOpen(true)
-  }
+    setSelectedTrainer(trainer);
+    setIsModalOpen(true);
+  };
 
   const closeModal = () => {
-    setIsModalOpen(false)
-    setSelectedTrainer(null)
-  }
+    setIsModalOpen(false);
+    setSelectedTrainer(null);
+  };
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative bg-black text-white py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <Badge variant="outline" className="border-white text-white hover:bg-white hover:text-black mb-6">
+          <Badge
+            variant="outline"
+            className="border-white text-white hover:bg-white hover:text-black mb-6"
+          >
             Nuestro Equipo
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold mb-6">
@@ -119,11 +122,21 @@ export default function Entrenadores() {
             <span className="block text-gray-300">Entrenadores Expertos</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-            Profesionales apasionados y certificados, listos para guiarte en cada paso de tu transformación.
+            Profesionales apasionados y certificados, listos para guiarte en
+            cada paso de tu transformación.
           </p>
-          <Button size="lg" className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6">
+          <Button
+            size="lg"
+            onClick={() =>
+              window.open(
+                "https://wa.me/2202341592?text=Hola!%20quisiera%20mi%20entrenamiento%20de%20prueba%20por%202%20semanas",
+                "_blank"
+              )
+            }
+            className="border-2 border-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+          >
             <Calendar className="mr-2 h-5 w-5" />
-            Agendar Consulta Gratuita
+            Agendar Entrenamiento de prueba
           </Button>
         </div>
       </section>
@@ -132,9 +145,12 @@ export default function Entrenadores() {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-black mb-4">Nuestros Entrenadores</h2>
+            <h2 className="text-4xl font-bold text-black mb-4">
+              Nuestros Entrenadores
+            </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Haz clic en cada entrenador para conocer más sobre su experiencia y especialidades.
+              Haz clic en cada entrenador para conocer más sobre su experiencia
+              y especialidades.
             </p>
           </div>
 
@@ -143,7 +159,9 @@ export default function Entrenadores() {
               <Card
                 key={trainer.id}
                 className="border-2 hover:border-black transition-colors duration-300 cursor-pointer"
-                onClick={() =>{ openModal(trainer)}}
+                onClick={() => {
+                  openModal(trainer);
+                }}
               >
                 <CardContent className="p-6 text-center">
                   <img
@@ -151,7 +169,9 @@ export default function Entrenadores() {
                     alt={trainer.name}
                     className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-2 border-gray-200"
                   />
-                  <h3 className="text-xl font-bold text-black mb-2">{trainer.name}</h3>
+                  <h3 className="text-xl font-bold text-black mb-2">
+                    {trainer.name}
+                  </h3>
                   <p className="text-gray-700 mb-4">{trainer.specialty}</p>
                   <div className="flex items-center justify-center gap-2 text-gray-600 text-sm mb-2">
                     <Award className="h-4 w-4" />
@@ -161,7 +181,11 @@ export default function Entrenadores() {
                     <Users className="h-4 w-4" />
                     <span>{trainer.clients} clientes</span>
                   </div>
-                  <Button variant="outline" size="sm" className="mt-6 w-full bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-6 w-full bg-transparent"
+                  >
                     Ver Perfil
                   </Button>
                 </CardContent>
@@ -174,13 +198,19 @@ export default function Entrenadores() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-black text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6">¿Listo Para Entrenar con los Mejores?</h2>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            ¿Listo Para Entrenar con los Mejores?
+          </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Nuestros entrenadores están listos para ayudarte a alcanzar tus metas. ¡Agenda tu primera sesión hoy!
+            Nuestros entrenadores están listos para ayudarte a alcanzar tus
+            metas. ¡Agenda tu primera sesión hoy!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6">
+            <Button
+              size="lg"
+              className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+            >
               <Calendar className="mr-2 h-5 w-5" />
               Agendar Sesión
             </Button>
@@ -194,13 +224,18 @@ export default function Entrenadores() {
           </div>
 
           <div className="text-sm text-gray-400">
-            Entrenadores certificados • Planes personalizados • Resultados garantizados
+            Entrenadores certificados • Planes personalizados • Resultados
+            garantizados
           </div>
         </div>
       </section>
 
       {/* Trainer Modal */}
-      <TrainerModal isOpen={isModalOpen} onClose={closeModal} trainer={selectedTrainer} />
+      <TrainerModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        trainer={selectedTrainer}
+      />
     </div>
-  )
+  );
 }

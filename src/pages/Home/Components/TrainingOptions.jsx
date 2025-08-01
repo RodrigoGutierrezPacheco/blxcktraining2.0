@@ -6,7 +6,9 @@ export default function TrainingOptions() {
     <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-black mb-4">Método BLXCK</h2>
+          <h2 className="text-4xl font-bold text-black mb-4">
+            Transforma tu Cuerpo, Mejora tu Rendimiento
+          </h2>{" "}
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Sistemas de entrenamiento basados en ciencia y adaptados a cada
             nivel.
