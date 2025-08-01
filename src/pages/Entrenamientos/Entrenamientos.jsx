@@ -7,7 +7,6 @@ import {
   Target,
   Heart,
   Zap,
-  Trophy,
   Clock,
   Users,
   CheckCircle,
@@ -17,8 +16,11 @@ import {
   Flame,
   Shield,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Entrenamientos() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("userBlck"));
   const locationTrainings = [
     {
       icon: Home,
@@ -26,10 +28,11 @@ export default function Entrenamientos() {
       description: "Transforma tu hogar en tu gimnasio personal",
       features: [
         "Sin equipos necesarios",
-        "Rutinas de 15-60 minutos",
+        "Rutinas de 30-90 minutos",
         "Adaptable a cualquier espacio",
         "Perfecto para principiantes",
       ],
+      href: "/entrenamiento-casa",
       benefits: "Ideal para quienes buscan comodidad y flexibilidad total",
       image:
         "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
@@ -44,9 +47,27 @@ export default function Entrenamientos() {
         "Técnicas avanzadas",
         "Supervisión profesional",
       ],
+      href: "/entrenamiento-gimnasio",
       benefits: "Perfecto para objetivos específicos y resultados acelerados",
       image:
         "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+    },
+    {
+      icon: Activity, // Asumiendo que tienes un icono Activity importado
+      title: "Entrenamiento Funcional",
+      description:
+        "Desarrolla fuerza, movilidad y resistencia para la vida diaria",
+      features: [
+        "Movimientos multiarticulares",
+        "Enfoque en patrones naturales",
+        "Mejora de equilibrio y coordinación",
+        "Uso de peso corporal y accesorios",
+      ],
+      href: "/entrenamiento-funcional",
+      benefits:
+        "Excelente para mejorar el rendimiento físico general y prevenir lesiones",
+      image:
+        "https://images.unsplash.com/photo-1576678927484-cc907957088c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
     },
   ];
 
@@ -91,48 +112,48 @@ export default function Entrenamientos() {
     },
   ];
 
-//   const sportsTrainings = [
-//     {
-//       sport: "Fútbol",
-//       icon: "⚽",
-//       focus: "Agilidad, resistencia y coordinación",
-//       description:
-//         "Mejora tu rendimiento en el campo con ejercicios específicos",
-//     },
-//     {
-//       sport: "Basketball",
-//       icon: "🏀",
-//       focus: "Salto vertical, velocidad y fuerza explosiva",
-//       description:
-//         "Desarrolla las habilidades físicas clave para dominar la cancha",
-//     },
-//     {
-//       sport: "Tenis",
-//       icon: "🎾",
-//       focus: "Rotación de core, agilidad lateral y resistencia",
-//       description:
-//         "Potencia tu juego con entrenamientos específicos para tenistas",
-//     },
-//     {
-//       sport: "Running",
-//       icon: "🏃",
-//       focus: "Resistencia cardiovascular y fuerza en piernas",
-//       description: "Mejora tu tiempo y resistencia con planes personalizados",
-//     },
-//     {
-//       sport: "Natación",
-//       icon: "🏊",
-//       focus: "Fuerza de core, flexibilidad y técnica",
-//       description:
-//         "Complementa tu entrenamiento acuático con ejercicios terrestres",
-//     },
-//     {
-//       sport: "Ciclismo",
-//       icon: "🚴",
-//       focus: "Potencia en piernas, core y resistencia",
-//       description: "Aumenta tu rendimiento sobre la bicicleta",
-//     },
-//   ];
+  //   const sportsTrainings = [
+  //     {
+  //       sport: "Fútbol",
+  //       icon: "⚽",
+  //       focus: "Agilidad, resistencia y coordinación",
+  //       description:
+  //         "Mejora tu rendimiento en el campo con ejercicios específicos",
+  //     },
+  //     {
+  //       sport: "Basketball",
+  //       icon: "🏀",
+  //       focus: "Salto vertical, velocidad y fuerza explosiva",
+  //       description:
+  //         "Desarrolla las habilidades físicas clave para dominar la cancha",
+  //     },
+  //     {
+  //       sport: "Tenis",
+  //       icon: "🎾",
+  //       focus: "Rotación de core, agilidad lateral y resistencia",
+  //       description:
+  //         "Potencia tu juego con entrenamientos específicos para tenistas",
+  //     },
+  //     {
+  //       sport: "Running",
+  //       icon: "🏃",
+  //       focus: "Resistencia cardiovascular y fuerza en piernas",
+  //       description: "Mejora tu tiempo y resistencia con planes personalizados",
+  //     },
+  //     {
+  //       sport: "Natación",
+  //       icon: "🏊",
+  //       focus: "Fuerza de core, flexibilidad y técnica",
+  //       description:
+  //         "Complementa tu entrenamiento acuático con ejercicios terrestres",
+  //     },
+  //     {
+  //       sport: "Ciclismo",
+  //       icon: "🚴",
+  //       focus: "Potencia en piernas, core y resistencia",
+  //       description: "Aumenta tu rendimiento sobre la bicicleta",
+  //     },
+  //   ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -157,13 +178,15 @@ export default function Entrenamientos() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+              onClick={() => (user ? navigate("/perfil") : navigate("/planes"))}
+              className="border border-white text-black hover:bg-white hover:text-black text-lg px-8 py-6"
             >
               <Play className="mr-2 h-5 w-5" />
               Comenzar Ahora
             </Button>
             <Button
               variant="outline"
+              onClick={() => navigate("/planes")}
               size="lg"
               className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-6 bg-transparent"
             >
@@ -227,8 +250,8 @@ export default function Entrenamientos() {
                           {training.benefits}
                         </p>
                       </div>
-                      <Button className="w-full bg-black text-white hover:bg-gray-800">
-                        Explorar Rutinas
+                      <Button onClick={() => navigate(`${training.href}`)} className="w-full bg-black text-white hover:bg-gray-800">
+                        Explorar Entrenamiento
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>

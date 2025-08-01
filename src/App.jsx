@@ -8,6 +8,9 @@ import Entrenadores from "./pages/Entrenadores/Entrenadores";
 import Login from "./pages/Login/Login";
 import Perfil from "./pages/Perfil/Perfil";
 import Rutina from "./pages/MiRutina/Rutina";
+import Funcional from "./pages/Ejemplos/Funcional/Funcional";
+import Casa from "./pages/Ejemplos/Casa/Casa";
+import Gimnasio from "./pages/Ejemplos/Gimnacio/Gimnasio";
 
 function App() {
   return (
@@ -57,6 +60,24 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/mi-rutina" element={<Rutina />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/entrenamiento-funcional" element={<Funcional />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/entrenamiento-casa" element={<Casa />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/entrenamiento-gimnasio" element={<Gimnasio />} />
         </Route>
       </Routes>
     </Router>
