@@ -10,11 +10,11 @@ import {
   Zap,
   Layers,
 } from "lucide-react";
-import routineData from "./miRutina.json"; // Import the routine data from the JSON file
+import routineData from "./miRutina.json";
 import RutinaInfo from "./RutinaInfo";
 
 export default function Rutina() {
-  const [expandedWeek, setExpandedWeek] = useState(1); // Start with the first week expanded
+  const [expandedWeek, setExpandedWeek] = useState(1);
   const weekRefs = useRef({});
 
   const toggleWeek = (weekNumber) => {
@@ -30,14 +30,12 @@ export default function Rutina() {
     }
   }, [expandedWeek]);
 
-  // Function to determine the theme based on the index
   const getWeekTheme = (index) => {
     return index % 2 === 0 ? "light" : "dark";
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-      {/* Hero Section */}
       <section className="relative bg-black text-white rounded-lg shadow-lg p-6 sm:p-8 lg:p-10 mb-8 max-w-6xl mx-auto text-center">
         <h1 className="text-3xl sm:text-4xl font-bold mb-2">
           Mi Rutina: {routineData.name}

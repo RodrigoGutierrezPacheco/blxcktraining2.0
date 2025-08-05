@@ -16,7 +16,7 @@ export default function RutinaInfo({
   expandedWeek,
 }) {
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
+    <div className="max-w-6xl mx-auto space-y-4 px-4">
       {routineData.weeks.map((week, index) => {
         const theme = getWeekTheme(index);
         const isDark = theme === "dark";
@@ -59,7 +59,7 @@ export default function RutinaInfo({
             >
               <CardContent className="p-4 flex justify-between items-center">
                 <h2
-                  className={`text-xl font-bold ${headerTextColorClass} flex items-center gap-2`}
+                  className={`text-lg sm:text-xl font-bold ${headerTextColorClass} flex items-center gap-2`}
                 >
                   <Calendar className={`h-5 w-5 ${headerIconColorClass}`} />
                   Semana {week.weekNumber}
@@ -72,7 +72,7 @@ export default function RutinaInfo({
               </CardContent>
             </button>
             {isExpanded && (
-              <div className={`p-6 pt-0 ${expandedContentClass}`}>
+              <div className={`p-4 sm:p-6 pt-0 ${expandedContentClass}`}>
                 <div className="space-y-6">
                   {week.days.map((day) => (
                     <div
@@ -80,14 +80,49 @@ export default function RutinaInfo({
                       className={`pb-6 last:pb-0 ${borderColorClass} border-b last:border-0`}
                     >
                       <h3
-                        className={`text-lg font-bold mb-4 flex items-center gap-2 ${headerTextColorClass}`}
+                        className={`text-base sm:text-lg font-bold mb-4 flex items-center gap-2 ${headerTextColorClass}`}
                       >
                         <Calendar
                           className={`h-5 w-5 ${headerIconColorClass}`}
                         />
                         Día {day.dayNumber}: {day.focus}
                       </h3>
-                      <div className="overflow-x-auto">
+                      
+                      {/* Mobile-friendly exercise list */}
+                      <div className="sm:hidden space-y-4">
+                        {day.exercises.map((exercise, exIndex) => (
+                          <div
+                            key={exIndex}
+                            className={`p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-50'} space-y-2`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Dumbbell
+                                className={`h-4 w-4 ${headerIconColorClass}`}
+                              />
+                              <span className={`font-medium ${headerTextColorClass}`}>
+                                {exercise.name}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-sm">
+                              <div className={`${secondaryTextClass}`}>
+                                <div className="font-semibold">Series</div>
+                                <div>{exercise.sets}</div>
+                              </div>
+                              <div className={`${secondaryTextClass}`}>
+                                <div className="font-semibold">Reps</div>
+                                <div>{exercise.reps}</div>
+                              </div>
+                              <div className={`${secondaryTextClass}`}>
+                                <div className="font-semibold">Descanso</div>
+                                <div>{exercise.rest}</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Desktop table (hidden on mobile) */}
+                      <div className="hidden sm:block">
                         <table className="w-full text-left border-collapse">
                           <thead>
                             <tr className={tableHeadBgClass}>
@@ -141,10 +176,12 @@ export default function RutinaInfo({
                           </tbody>
                         </table>
                       </div>
+                      
                       <div className="mt-4 text-right">
                         <Button
                           variant="outline"
                           className={`${buttonClass} bg-transparent text-sm`}
+                          size="sm"
                         >
                           <CheckCircle className="mr-2 h-4 w-4" />
                           Marcar día como completado
