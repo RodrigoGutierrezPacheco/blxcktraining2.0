@@ -14,31 +14,36 @@
               "name": "Sentadilla con peso corporal",
               "sets": 3,
               "reps": "10-12",
-              "rest": "60s"
+              "rest": "60s",
+              "help":""
             },
             {
               "name": "Zancadas alternas",
               "sets": 3,
               "reps": "8-10 por pierna",
-              "rest": "60s"
+              "rest": "60s",
+              "help":""
             },
             {
               "name": "Puente de glúteo",
               "sets": 3,
               "reps": "12-15",
-              "rest": "45s"
+              "rest": "45s",
+              "help":""
             },
             {
               "name": "Gemelos de pie",
               "sets": 3,
               "reps": "15-20",
-              "rest": "30s"
+              "rest": "30s",
+              "help":""
             },
             {
               "name": "Plancha",
               "sets": 3,
               "reps": "30-45s",
-              "rest": "30s"
+              "rest": "30s",
+              "help":""
             }
           ]
         },

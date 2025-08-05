@@ -7,8 +7,10 @@ import {
   Dumbbell,
   CheckCircle,
   Check,
+  Play,
 } from "lucide-react";
 import { Button } from "../Components/Button";
+import EjercicioModal from "../Components/Modals/EjercicioModal";
 
 export default function RutinaInfo({
   routineData,
@@ -20,6 +22,7 @@ export default function RutinaInfo({
   const [completedExercises, setCompletedExercises] = useState({});
   const [completedDays, setCompletedDays] = useState({});
   const [completedWeeks, setCompletedWeeks] = useState({});
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleExercise = (weekNum, dayNum, exIndex) => {
     const key = `${weekNum}-${dayNum}-${exIndex}`;
@@ -160,7 +163,9 @@ export default function RutinaInfo({
           >
             <div className="flex items-start">
               <button
-                onClick={() => {toggleWeek(week.weekNumber);}}
+                onClick={() => {
+                  toggleWeek(week.weekNumber);
+                }}
                 className={`w-full text-left transition-colors duration-200 ${hoverBgClass}`}
               >
                 <CardContent className="p-3 sm:p-4 flex justify-between items-center">
@@ -322,6 +327,12 @@ export default function RutinaInfo({
                                   >
                                     {exercise.name}
                                   </span>
+                                  <Play
+                                    onClick={() => {
+                                      setIsOpen(true);
+                                    }}
+                                    className="w-5 h-5 cursor-pointer"
+                                  />
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs pl-8">
                                   <div className={`${secondaryTextClass}`}>
@@ -490,6 +501,9 @@ export default function RutinaInfo({
           </Card>
         );
       })}
+      {isOpen && (
+        <EjercicioModal isOpen={isOpen} setIsOpen={setIsOpen} name={"prueba"} />
+      )}
     </div>
   );
 }
