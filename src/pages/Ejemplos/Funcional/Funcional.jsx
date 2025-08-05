@@ -166,7 +166,7 @@ export default function Funcional() {
               <Button
                 variant="outline"
                 className="bg-transparent text-black hover:bg-gray-100"
-                onClick={() => navigate("/entrenamientos")}
+                onClick={() => {navigate("/entrenamientos"); window.scrollTo(0, 0);}}
               >
                 Explorar Otros Entrenamientos
                 <ArrowRight className="ml-2 h-4 w-4" />

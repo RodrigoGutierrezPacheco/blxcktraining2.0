@@ -24,6 +24,7 @@ export default function Login() {
       setUsername("");
       setPassword("");
       navigate("/perfil");
+      window.scrollTo(0, 0);
     } catch (error) {
       setMessage("Error al guardar los datos. Inténtalo de nuevo.");
       console.error("Error saving to localStorage:", error);

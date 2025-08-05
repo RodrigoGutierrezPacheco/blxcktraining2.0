@@ -11,6 +11,7 @@ import Rutina from "./pages/MiRutina/Rutina";
 import Funcional from "./pages/Ejemplos/Funcional/Funcional";
 import Casa from "./pages/Ejemplos/Casa/Casa";
 import Gimnasio from "./pages/Ejemplos/Gimnacio/Gimnasio";
+import Cardio from "./pages/Ejemplos/Cardio/Cardio";
 
 function App() {
   return (
@@ -78,6 +79,12 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/entrenamiento-gimnasio" element={<Gimnasio />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/entrenamiento-cardiovascular" element={<Cardio />} />
         </Route>
       </Routes>
     </Router>

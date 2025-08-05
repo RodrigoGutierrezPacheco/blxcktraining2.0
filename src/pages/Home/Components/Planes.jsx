@@ -299,7 +299,7 @@ export default function PlanesComponent({ type }) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+              className="border border-white text-black hover:bg-white hover:text-black text-lg px-8 py-6"
               onClick={() =>
                 window.open(
                   `https://wa.me/5638686467?text=Hola,%20quiero%20asesoría%20para%20elegir%20mi%20plan%20de%20${type}`,
@@ -313,8 +313,11 @@ export default function PlanesComponent({ type }) {
             <Button
               variant="outline"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-6 bg-transparent"
-              onClick={() => navigate("/planes")}
+              className=" text-white bg-black hover:bg-white hover:text-black text-lg px-8 py-6 t"
+              onClick={() => {
+                navigate("/planes");
+                window.scrollTo(0, 0);
+              }}
             >
               Ver Todos los Planes
             </Button>

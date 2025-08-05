@@ -22,8 +22,8 @@ export default function Footer() {
   ];
 
   const trainingTypes = [
-    { name: "Entrenamiento en Casa", href: "/entrenamientos-casa" },
-    { name: "Entrenamiento en Gimnasio", href: "/entrenamientos-gimnasio" },
+    { name: "Entrenamiento en Casa", href: "/entrenamiento-casa" },
+    { name: "Entrenamiento en Gimnasio", href: "/entrenamiento-gimnasio" },
     { name: "Entrenamiento Funcional", href: "/entrenamiento-funcional" },
     { name: "Cardio Intensivo", href: "/entrenamiento-cardiovascular" },
     { name: "Fuerza y Resistencia", href: "/entrenamieto-fuerza" },

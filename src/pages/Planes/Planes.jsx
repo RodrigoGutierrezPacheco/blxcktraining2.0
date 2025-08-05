@@ -81,10 +81,10 @@ export default function Planes() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+              className="border border-white text-black hover:bg-white hover:text-black text-lg px-8 py-6"
             >
               <ArrowRight className="mr-2 h-5 w-5" />
-              Ver Todos los Planes
+              Comenzar ahora
             </Button>
             <Button
               variant="outline"
@@ -284,7 +284,7 @@ export default function Planes() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button
               size="lg"
-              className="bg-white text-black hover:bg-gray-100 text-lg px-8 py-6"
+              className="border border-white text-black hover:bg-white hover:text-black text-lg px-8 py-6"
             >
               Comprar Mi Plan Ahora
               <ArrowRight className="ml-2 h-5 w-5" />

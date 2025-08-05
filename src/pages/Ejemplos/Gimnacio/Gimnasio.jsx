@@ -178,7 +178,7 @@ export default function Gimnasio() {
               <Button
                 variant="outline"
                 className="bg-transparent text-black hover:bg-gray-100"
-                onClick={() => navigate("/entrenamientos")}
+                onClick={() => {navigate("/entrenamientos"); window.scrollTo(0, 0);}}
               >
                 Explorar Otros Entrenamientos
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -308,7 +308,7 @@ export default function Gimnasio() {
                 </ul>
                 <Button
                   className="w-full mt-4"
-                  onClick={() => navigate("/planes/fuerza")}
+                  onClick={() => {navigate("/planes/fuerza"); window.scrollTo(0, 0);}}
                 >
                   Ver Detalles
                 </Button>
@@ -328,7 +328,7 @@ export default function Gimnasio() {
                 </ul>
                 <Button
                   className="w-full mt-4"
-                  onClick={() => navigate("/planes/hipertrofia")}
+                  onClick={() => {navigate("/planes/hipertrofia"); window.scrollTo(0, 0);}}
                 >
                   Ver Detalles
                 </Button>
@@ -349,7 +349,7 @@ export default function Gimnasio() {
                 </ul>
                 <Button
                   className="w-full mt-4"
-                  onClick={() => navigate("/planes/definicion")}
+                  onClick={() => {navigate("/planes/definicion"); window.scrollTo(0, 0);}}
                 >
                   Ver Detalles
                 </Button>

@@ -53,8 +53,25 @@ export default function Entrenamientos() {
         "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
     },
     {
-      icon: Activity, // Asumiendo que tienes un icono Activity importado
+      icon: Activity,
       title: "Entrenamiento Funcional",
+      description:
+        "Desarrolla fuerza, movilidad y resistencia para la vida diaria",
+      features: [
+        "Movimientos multiarticulares",
+        "Enfoque en patrones naturales",
+        "Mejora de equilibrio y coordinación",
+        "Uso de peso corporal y accesorios",
+      ],
+      href: "/entrenamiento-funcional",
+      benefits:
+        "Excelente para mejorar el rendimiento físico general y prevenir lesiones",
+      image:
+        "https://images.unsplash.com/photo-1576678927484-cc907957088c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+    },
+    {
+      icon: Activity,
+      title: "Entrenamiento Cardiovascular",
       description:
         "Desarrolla fuerza, movilidad y resistencia para la vida diaria",
       features: [
@@ -186,7 +203,10 @@ export default function Entrenamientos() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate("/planes")}
+              onClick={() => {
+                navigate("/planes");
+                window.scrollTo(0, 0);
+              }}
               size="lg"
               className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-6 bg-transparent"
             >
@@ -250,7 +270,13 @@ export default function Entrenamientos() {
                           {training.benefits}
                         </p>
                       </div>
-                      <Button onClick={() => navigate(`${training.href}`)} className="w-full bg-black text-white hover:bg-gray-800">
+                      <Button
+                        onClick={() => {
+                          navigate(`${training.href}`);
+                          window.scrollTo(0, 0);
+                        }}
+                        className="w-full bg-black text-white hover:bg-gray-800"
+                      >
                         Explorar Entrenamiento
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>

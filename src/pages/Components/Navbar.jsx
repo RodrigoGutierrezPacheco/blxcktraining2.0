@@ -45,6 +45,7 @@ export default function Navbar() {
     localStorage.removeItem("userBlck");
     setUser(null);
     navigate("/");
+    window.scrollTo(0, 0);
     setIsMenuOpen(false);
     setIsProfileOpen(false);
   };
