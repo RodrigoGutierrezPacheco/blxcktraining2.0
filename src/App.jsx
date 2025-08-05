@@ -12,6 +12,7 @@ import Funcional from "./pages/Ejemplos/Funcional/Funcional";
 import Casa from "./pages/Ejemplos/Casa/Casa";
 import Gimnasio from "./pages/Ejemplos/Gimnacio/Gimnasio";
 import Cardio from "./pages/Ejemplos/Cardio/Cardio";
+import Registro from "./pages/Registro/Registro";
 
 function App() {
   return (
@@ -85,6 +86,12 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/entrenamiento-cardiovascular" element={<Cardio />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/registro" element={<Registro />} />
         </Route>
       </Routes>
     </Router>

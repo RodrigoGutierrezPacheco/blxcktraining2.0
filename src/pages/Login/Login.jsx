@@ -126,7 +126,7 @@ export default function Login() {
             </a>
             <p className="mt-2 text-gray-600">
               ¿No tienes cuenta?{" "}
-              <a href="#" className="text-black hover:underline font-medium">
+              <a href="/registro" className="text-black hover:underline font-medium">
                 Regístrate aquí
               </a>
             </p>
