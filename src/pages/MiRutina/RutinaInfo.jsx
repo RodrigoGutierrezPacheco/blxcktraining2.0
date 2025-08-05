@@ -331,7 +331,7 @@ export default function RutinaInfo({
                                     onClick={() => {
                                       setIsOpen(true);
                                     }}
-                                    className="w-5 h-5 cursor-pointer"
+                                    className="w-5 h-5 cursor-pointer ml-auto"
                                   />
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs pl-8">
@@ -427,13 +427,19 @@ export default function RutinaInfo({
                                       </button>
                                     </td>
                                     <td
-                                      className={`p-2 font-medium ${
+                                      className={`p-2 flex font-medium ${
                                         isCompleted
                                           ? "text-green-500"
                                           : headerTextColorClass
                                       }`}
                                     >
                                       {exercise.name}
+                                      <Play
+                                        onClick={() => {
+                                          setIsOpen(true);
+                                        }}
+                                        className="w-5 h-5 cursor-pointer ml-auto"
+                                      />
                                     </td>
                                     <td
                                       className={`p-2 ${
