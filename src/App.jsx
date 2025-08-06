@@ -13,6 +13,8 @@ import Casa from "./pages/Ejemplos/Casa/Casa";
 import Gimnasio from "./pages/Ejemplos/Gimnacio/Gimnasio";
 import Cardio from "./pages/Ejemplos/Cardio/Cardio";
 import Registro from "./pages/Registro/Registro";
+import RegistroEntrenadores from "./pages/Registro/RegistroEntrenadores";
+import PlanesEntrenadores from "./pages/PlanesEntrenadores/PlanesEntrenadores";
 
 function App() {
   return (
@@ -92,6 +94,21 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/registro" element={<Registro />} />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route
+            path="/registro/entrenadores"
+            element={<RegistroEntrenadores />}
+          />
+        </Route>
+      </Routes>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/planes/entrenadores" element={<PlanesEntrenadores />} />
         </Route>
       </Routes>
     </Router>

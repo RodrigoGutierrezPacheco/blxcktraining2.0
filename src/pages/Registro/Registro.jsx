@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { Button } from "../Components/Button";
 import { Card, CardContent } from "../Components/Card";
@@ -6,12 +6,26 @@ import { useNavigate } from "react-router-dom";
 import { createUser } from "../../services/users";
 
 export default function Registro() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [touched, setTouched] = useState({
+    fullName: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,42 +35,85 @@ export default function Registro() {
     return re.test(email);
   };
 
+  // Validación en tiempo real
+  useEffect(() => {
+    const newErrors = {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
+
+    if (touched.fullName && !formData.fullName.trim()) {
+      newErrors.fullName = "El nombre completo es obligatorio";
+    }
+
+    if (touched.email) {
+      if (!formData.email) {
+        newErrors.email = "El correo electrónico es obligatorio";
+      } else if (!validateEmail(formData.email)) {
+        newErrors.email = "Ingresa un correo electrónico válido";
+      }
+    }
+
+    if (touched.password) {
+      if (!formData.password) {
+        newErrors.password = "La contraseña es obligatoria";
+      } else if (formData.password.length < 6) {
+        newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      }
+    }
+
+    if (touched.confirmPassword) {
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = "Confirma tu contraseña";
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Las contraseñas no coinciden";
+      }
+    }
+
+    setErrors(newErrors);
+  }, [formData, touched]);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+    // Marcar el campo como "touched" cuando el usuario comienza a escribir
+    if (!touched[id]) {
+      setTouched((prev) => ({ ...prev, [id]: true }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { id } = e.target;
+    setTouched((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const validateForm = () => {
+    // Forzar validación de todos los campos al enviar
+    setTouched({
+      fullName: true,
+      email: true,
+      password: true,
+      confirmPassword: true,
+    });
+
+    // Verificar si hay errores
+    return !Object.values(errors).some((error) => error !== "");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setMessage({ text: "", type: "" });
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      setMessage({ text: "Todos los campos son obligatorios", type: "error" });
-      setIsLoading(false);
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setMessage({
-        text: "Ingresa un correo electrónico válido",
-        type: "error",
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setMessage({ text: "Las contraseñas no coinciden", type: "error" });
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setMessage({
-        text: "La contraseña debe tener al menos 6 caracteres",
-        type: "error",
-      });
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
 
     try {
-      await createUser({ fullName, email, password });
+      await createUser(formData);
       setMessage({
         text: "Registro exitoso! Redirigiendo...",
         type: "success",
@@ -64,10 +121,10 @@ export default function Registro() {
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
       if (error.message.includes("El correo electrónico ya está registrado")) {
-        setMessage({
-          text: "Este correo electrónico ya está en uso. ¿Olvidaste tu contraseña?",
-          type: "error",
-        });
+        setErrors((prev) => ({
+          ...prev,
+          email: "Este correo ya está registrado",
+        }));
       } else {
         setMessage({
           text:
@@ -90,7 +147,19 @@ export default function Registro() {
             <p className="text-gray-600">Crea tu cuenta en BLXCK Training</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {message.text && (
+            <div
+              className={`mb-6 p-3 rounded-md text-center ${
+                message.type === "success"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="fullName"
@@ -101,11 +170,17 @@ export default function Registro() {
               <input
                 type="text"
                 id="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
+                value={formData.fullName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-4 py-3 border ${
+                  errors.fullName ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors`}
                 placeholder="Tu nombre completo"
               />
+              {errors.fullName && touched.fullName && (
+                <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+              )}
             </div>
 
             <div>
@@ -118,11 +193,17 @@ export default function Registro() {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-4 py-3 border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors`}
                 placeholder="tu@email.com"
               />
+              {errors.email && touched.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -136,9 +217,12 @@ export default function Registro() {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-4 py-3 border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10`}
                   placeholder="Mínimo 6 caracteres"
                 />
                 <button
@@ -153,6 +237,9 @@ export default function Registro() {
                   )}
                 </button>
               </div>
+              {errors.password && touched.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+              )}
             </div>
 
             <div>
@@ -166,9 +253,14 @@ export default function Registro() {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-4 py-3 border ${
+                    errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10`}
                   placeholder="Repite tu contraseña"
                 />
                 <button
@@ -183,21 +275,16 @@ export default function Registro() {
                   )}
                 </button>
               </div>
+              {errors.confirmPassword && touched.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
-
-            {message.text && (
-              <p
-                className={`text-center text-sm ${
-                  message.type === "success" ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {message.text}
-              </p>
-            )}
 
             <Button
               type="submit"
-              className="w-full bg-black text-white hover:bg-gray-800 text-lg py-3"
+              className="w-full bg-black text-white hover:bg-gray-800 text-lg py-3 mt-6"
               disabled={isLoading}
             >
               <UserPlus className="mr-2 h-5 w-5" />
