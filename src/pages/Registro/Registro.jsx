@@ -113,7 +113,11 @@ export default function Registro() {
     }
 
     try {
-      await createUser(formData);
+      await createUser({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
       setMessage({
         text: "Registro exitoso! Redirigiendo...",
         type: "success",

@@ -3,8 +3,7 @@ import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { Button } from "../Components/Button";
 import { Card, CardContent } from "../Components/Card";
 import { useNavigate } from "react-router-dom";
-import { createUser } from "../../services/users";
-import { RegistrationSteps } from "../Components/stepsRegister";
+import { createTrainer } from "./../../services/trainers";
 
 export default function Registro() {
   const [formData, setFormData] = useState({
@@ -36,7 +35,6 @@ export default function Registro() {
     return re.test(email);
   };
 
-  // Validación en tiempo real
   useEffect(() => {
     const newErrors = {
       fullName: "",
@@ -79,7 +77,6 @@ export default function Registro() {
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
-    // Marcar el campo como "touched" cuando el usuario comienza a escribir
     if (!touched[id]) {
       setTouched((prev) => ({ ...prev, [id]: true }));
     }
@@ -91,7 +88,6 @@ export default function Registro() {
   };
 
   const validateForm = () => {
-    // Forzar validación de todos los campos al enviar
     setTouched({
       fullName: true,
       email: true,
@@ -99,7 +95,6 @@ export default function Registro() {
       confirmPassword: true,
     });
 
-    // Verificar si hay errores
     return !Object.values(errors).some((error) => error !== "");
   };
 
@@ -114,7 +109,11 @@ export default function Registro() {
     }
 
     try {
-      await createUser(formData);
+      await createTrainer({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
       setMessage({
         text: "Registro exitoso! Redirigiendo...",
         type: "success",
@@ -142,12 +141,15 @@ export default function Registro() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col gap-4 items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Card de registro */}
         <Card className="w-full border-2 border-black">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-black mb-2">Registro</h2>
-              <p className="text-gray-600">Crea tu cuenta en BLXCK Training</p>
+              <h2 className="text-3xl font-bold text-black mb-2">
+                Registro para Entrenadores
+              </h2>
+              <p className="text-gray-600">
+                Crea tu cuenta profesional en BLXCK Training
+              </p>
             </div>
 
             {message.text && (
@@ -168,7 +170,7 @@ export default function Registro() {
                   htmlFor="fullName"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Nombre completo
+                  Nombre completo (como aparecerá en tu perfil)
                 </label>
                 <input
                   type="text"
@@ -179,7 +181,7 @@ export default function Registro() {
                   className={`w-full px-4 py-3 border ${
                     errors.fullName ? "border-red-500" : "border-gray-300"
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors`}
-                  placeholder="Tu nombre completo"
+                  placeholder="Ej: Carlos Rodríguez"
                 />
                 {errors.fullName && touched.fullName && (
                   <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
@@ -191,7 +193,7 @@ export default function Registro() {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Correo electrónico
+                  Correo electrónico profesional
                 </label>
                 <input
                   type="email"
@@ -214,7 +216,7 @@ export default function Registro() {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Contraseña
+                  Contraseña de acceso
                 </label>
                 <div className="relative">
                   <input
@@ -291,13 +293,13 @@ export default function Registro() {
                 disabled={isLoading}
               >
                 <UserPlus className="mr-2 h-5 w-5" />
-                {isLoading ? "Registrando..." : "Registrarse"}
+                {isLoading ? "Registrando..." : "Crear cuenta profesional"}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
               <p className="text-gray-600">
-                ¿Ya tienes cuenta?{" "}
+                ¿Ya tienes cuenta de entrenador?{" "}
                 <a
                   href="/login"
                   className="text-black hover:underline font-medium"
@@ -308,15 +310,10 @@ export default function Registro() {
             </div>
 
             <div className="mt-6 flex flex-col items-center text-sm">
-              <p className="text-gray-600">
-                ¿Ya conoces nuestros planes para entrenadores?{" "}
+              <p className="text-gray-600 text-center">
+                Después del registro podrás subir tus certificaciones y acceder
+                a todas las funciones profesionales
               </p>
-              <a
-                href="/planes/entrenadores"
-                className="text-black hover:underline font-medium"
-              >
-                Planes
-              </a>
             </div>
           </CardContent>
         </Card>
