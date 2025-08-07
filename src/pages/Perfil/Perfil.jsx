@@ -17,21 +17,19 @@ export default function Perfil() {
   const [routineData, setRoutineData] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching user data from localStorage
     const storedUser = localStorage.getItem("userBlck");
     if (storedUser) {
       const user = JSON.parse(storedUser);
       setUserData({
         username: user.username,
-        memberSince: "15 de Enero, 2023", // Simulated data
+        memberSince: "15 de Enero, 2023",
         profileImage:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cfd975fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150", // Placeholder image
+          "https://images.unsplash.com/photo-1535713875002-d1d0cfd975fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150",
       });
 
-      // Simulate routine data including trainer info
       const today = new Date();
       const expirationDate = new Date(today);
-      expirationDate.setDate(today.getDate() + 25); // Routine expires in 25 days
+      expirationDate.setDate(today.getDate() + 25);
       const daysRemaining = Math.ceil(
         (expirationDate - today) / (1000 * 60 * 60 * 24)
       );
@@ -41,16 +39,13 @@ export default function Perfil() {
         type: "Funcional en Casa y Gimnasio",
         duration: "5 Semanas",
         expiresInDays: daysRemaining,
-        trainerName: "Juan Pérez", // Simulated trainer data
-        trainerSpecialty: "Entrenador Funcional & HIIT", // Simulated trainer data
-        progress: "70%", // Simulated progress
+        trainerName: "Juan Pérez",
+        trainerSpecialty: "Entrenador Funcional & HIIT",
+        progress: "70%",
       });
     } else {
-      // Handle case where user is not logged in or data is not in localStorage
       setUserData(null);
       setRoutineData(null);
-      // In a real app, you might redirect to the login page here
-      // window.location.href = '/login';
     }
   }, []);
 

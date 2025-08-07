@@ -1,30 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Menu, X, Play, User } from "lucide-react";
 import { Button } from "./Button";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
   const timeoutRef = useRef(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userBlck");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-      }
-    }
-    return () => {
-      clearTimeout(timeoutRef.current);
-    };
-  }, []);
+  const { user, logout } = useAuth();
 
   const handleMouseEnter = () => {
     clearTimeout(timeoutRef.current);
@@ -41,15 +28,6 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userBlck");
-    setUser(null);
-    navigate("/");
-    window.scrollTo(0, 0);
-    setIsMenuOpen(false);
-    setIsProfileOpen(false);
-  };
-
   const navLinks = [
     { name: "Inicio", href: "/" },
     { name: "Entrenamientos", href: "/entrenamientos" },
@@ -62,11 +40,17 @@ export default function Navbar() {
     return location.pathname === path;
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    window.scrollTo(0, 0);
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="mx-auto">
         <div className="flex items-center h-16 w-full justify-between px-3">
-          {/* Logo */}
           <div className="flex items-center justify-between">
             <a href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
@@ -78,7 +62,6 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Desktop Navigation (lg breakpoint) */}
           <div className="hidden lg:flex items-center justify-between gap-5">
             {navLinks.map((link) => (
               <a
@@ -98,7 +81,6 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center justify-between gap-3">
             {user ? (
               <div
@@ -112,7 +94,7 @@ export default function Navbar() {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
                   <User className="h-5 w-5 mr-2" />
-                  Bienvenido, Rodrigo
+                  Bienvenido, {user.fullName.split(" ")[0]}
                 </button>
                 {isProfileOpen && (
                   <div
@@ -163,7 +145,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center justify-between">
             {!user && (
               <a href="/login" className="mr-4 text-gray-700 hover:text-black">
@@ -183,7 +164,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div
           className={`lg:hidden fixed inset-0 bg-white z-40 transform ${
             isMenuOpen ? "translate-x-0" : "translate-x-full"

@@ -1,5 +1,28 @@
 const APP_URL = import.meta.env.VITE_API_URL;
 
+export const loginUser = async (user) => {
+  try {
+    const response = await fetch(`${APP_URL}auth/login/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al iniciar sesión");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
+
 export const createUser = async (user) => {
   try {
     const response = await fetch(`${APP_URL}auth/register/user`, {
@@ -13,12 +36,12 @@ export const createUser = async (user) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al registrar usuario');
+      throw new Error(data.message || "Error al registrar usuario");
     }
 
     return data;
   } catch (error) {
     console.log("error backend", error);
-    throw new Error(error.message || 'Error de conexión');
+    throw new Error(error.message || "Error de conexión");
   }
 };

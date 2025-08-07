@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
 import Entrenamientos from "./pages/Entrenamientos/Entrenamientos";
@@ -16,99 +16,64 @@ import Registro from "./pages/Registro/Registro";
 import RegistroEntrenadores from "./pages/Registro/RegistroEntrenadores";
 import PlanesEntrenadores from "./pages/PlanesEntrenadores/PlanesEntrenadores";
 
+// Componente para rutas protegidas
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("tokenBlck");
+  
+  if (!token) {
+    // Si no hay token, redirigir a login
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Rutas públicas */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/entrenamientos" element={<Entrenamientos />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/sobre-nosotros" element={<About />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/planes" element={<Planes />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/entrenadores" element={<Entrenadores />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/login" element={<Login />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/perfil" element={<Perfil />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/mi-rutina" element={<Rutina />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/registro/entrenadores" element={<RegistroEntrenadores />} />
           <Route path="/entrenamiento-funcional" element={<Funcional />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/entrenamiento-casa" element={<Casa />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/entrenamiento-gimnasio" element={<Gimnasio />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
           <Route path="/entrenamiento-cardiovascular" element={<Cardio />} />
         </Route>
-      </Routes>
 
-      <Routes>
+        {/* Rutas protegidas */}
         <Route element={<Layout />}>
-          <Route path="/registro" element={<Registro />} />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
-          <Route
-            path="/registro/entrenadores"
-            element={<RegistroEntrenadores />}
+          <Route 
+            path="/perfil" 
+            element={
+              <ProtectedRoute>
+                <Perfil />
+              </ProtectedRoute>
+            } 
           />
-        </Route>
-      </Routes>
-
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/planes/entrenadores" element={<PlanesEntrenadores />} />
+          <Route 
+            path="/mi-rutina" 
+            element={
+              <ProtectedRoute>
+                <Rutina />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/planes/entrenadores" 
+            element={
+              <ProtectedRoute>
+                <PlanesEntrenadores />
+              </ProtectedRoute>
+            } 
+          />
         </Route>
       </Routes>
     </Router>

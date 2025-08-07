@@ -3,31 +3,42 @@ import { Eye, EyeOff, LogInIcon } from "lucide-react";
 import { Button } from "../Components/Button";
 import { Card, CardContent } from "../Components/Card";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/users";
+import Spinner from "../Components/Spinner";
+import { useAuth } from "../../context/useAuth";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+   const { login } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
 
-    if (!username || !password) {
+    if (!email || !password) {
+      setIsLoading(false);
       setMessage("Por favor, ingresa tu usuario y contraseña.");
       return;
     }
-
     try {
-      localStorage.setItem("userBlck", JSON.stringify({ username, password }));
-      setUsername("");
-      setPassword("");
-      navigate("/perfil");
-      window.scrollTo(0, 0);
+      const response = await loginUser({ email, password });
+      if (response.status === "success") {
+        setIsLoading(false);
+        login(response.user, response.token);
+        setMessage("Inicio de sesión exitoso!");
+          navigate("/perfil");
+      } else {
+        setIsLoading(false);
+        setMessage(response.message);
+      }
     } catch (error) {
-      setMessage("Error al guardar los datos. Inténtalo de nuevo.");
-      console.error("Error saving to localStorage:", error);
+      setIsLoading(false);
+      setMessage(error.message || "Error al iniciar sesión");
     }
   };
 
@@ -47,17 +58,17 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label
-                htmlFor="username"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Usuario
               </label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
                 placeholder="Tu nombre de usuario"
                 required
@@ -114,9 +125,16 @@ export default function Login() {
             <Button
               type="submit"
               className="w-full bg-black text-white hover:bg-gray-800 text-lg py-3"
+              disabled={isLoading}
             >
-              <LogInIcon className="mr-2 h-5 w-5" />
-              Iniciar Sesión
+              {!isLoading ? (
+                <div className="flex items-center gap-1 justify-center">
+                  <LogInIcon className="mr-2 h-5 w-5" />
+                  Iniciar Sesión
+                </div>
+              ) : (
+                <Spinner className="h-1 w-1" size="sm" />
+              )}
             </Button>
           </form>
 
@@ -126,7 +144,10 @@ export default function Login() {
             </a>
             <p className="mt-2 text-gray-600">
               ¿No tienes cuenta?{" "}
-              <a href="/registro" className="text-black hover:underline font-medium">
+              <a
+                href="/registro"
+                className="text-black hover:underline font-medium"
+              >
                 Regístrate aquí
               </a>
             </p>
