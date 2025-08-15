@@ -63,3 +63,71 @@ export const createUser = async (user) => {
     throw new Error(error.message || "Error de conexión");
   }
 };
+
+export const updateUserProfile = async (userId, profileData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al actualizar el perfil");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
+
+export const getUserByEmail = async () => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const storedUser = localStorage.getItem("userBlck");
+    if (!storedUser) {
+      throw new Error("No hay información de usuario almacenada");
+    }
+
+    const user = JSON.parse(storedUser);
+    const email = user.email;
+
+    if (!email) {
+      throw new Error("No se encontró el email del usuario");
+    }
+
+    const response = await fetch(`${APP_URL}users/by-email?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al obtener información del usuario");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
