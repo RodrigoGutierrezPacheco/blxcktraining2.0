@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
+import TrainerInfo from "./TrainerInfo";
 import { getUserByEmail } from "../../services/users";
 
 export default function Perfil() {
@@ -63,8 +64,6 @@ export default function Perfil() {
           type: "Funcional en Casa y Gimnasio",
           duration: "5 Semanas",
           expiresInDays: daysRemaining,
-          trainerName: "Juan Pérez",
-          trainerSpecialty: "Entrenador Funcional & HIIT",
           progress: "70%",
         });
       } catch (error) {
@@ -274,24 +273,7 @@ export default function Perfil() {
                   </div>
 
                   {/* Trainer Information */}
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                    <h3 className="text-lg font-semibold text-black mb-3 flex items-center gap-2">
-                      <Award className="h-5 w-5" />
-                      Tu Entrenador:
-                    </h3>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">
-                        {routineData.trainerName}
-                      </span>{" "}
-                      - {routineData.trainerSpecialty}
-                    </p>
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto text-black hover:underline mt-2"
-                    >
-                      Ver perfil del entrenador
-                    </Button>
-                  </div>
+                  {userData.trainerId && <TrainerInfo trainerId={userData.trainerId} />}
 
                   <div className="text-center pt-4">
                     <p className="text-gray-600 text-lg mb-4">

@@ -94,7 +94,7 @@ export default function Navbar() {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
                   <User className="h-5 w-5 mr-2" />
-                  Bienvenido, {user.fullName.split(" ")[0]}
+                  Bienvenido, {user.fullName.split(" ")[0].charAt(0).toUpperCase() + user.fullName.split(" ")[0].slice(1)}
                 </button>
                 {isProfileOpen && (
                   <div
@@ -102,13 +102,15 @@ export default function Navbar() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <a
-                      href="/perfil"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Ver Perfil
-                    </a>
+                    {!isActive("/perfil") && (
+                      <a
+                        href="/perfil"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Ver Perfil
+                      </a>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -189,17 +191,19 @@ export default function Navbar() {
             <div className="pt-4 border-t border-gray-200">
               {user ? (
                 <>
-                  <a
-                    href="/perfil"
-                    className={`block px-4 py-3 text-lg font-medium rounded-lg ${
-                      isActive("/perfil")
-                        ? "bg-gray-100 text-black"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Mi Perfil
-                  </a>
+                  {!isActive("/perfil") && (
+                    <a
+                      href="/perfil"
+                      className={`block px-4 py-3 text-lg font-medium rounded-lg ${
+                        isActive("/perfil")
+                          ? "bg-gray-100 text-black"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Mi Perfil
+                    </a>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg"

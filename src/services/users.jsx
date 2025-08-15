@@ -131,3 +131,30 @@ export const getUserByEmail = async () => {
     throw new Error(error.message || "Error de conexión");
   }
 };
+
+export const getTrainerById = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/${trainerId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al obtener información del entrenador");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
