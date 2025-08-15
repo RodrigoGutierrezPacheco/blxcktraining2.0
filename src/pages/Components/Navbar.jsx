@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Menu, X, Play, User } from "lucide-react";
+import { Menu, X, Play, User, Dumbbell } from "lucide-react";
 import { Button } from "./Button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
@@ -11,7 +11,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
   const timeoutRef = useRef(null);
-  const { user, logout } = useAuth();
+  const { user, logout, isTrainer } = useAuth();
 
   const handleMouseEnter = () => {
     clearTimeout(timeoutRef.current);
@@ -93,8 +93,13 @@ export default function Navbar() {
                   className="flex items-center text-gray-700 hover:text-black font-medium transition-colors duration-200"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  <User className="h-5 w-5 mr-2" />
+                  {isTrainer ? (
+                    <Dumbbell className="h-5 w-5 mr-2" />
+                  ) : (
+                    <User className="h-5 w-5 mr-2" />
+                  )}
                   Bienvenido, {user.fullName.split(" ")[0].charAt(0).toUpperCase() + user.fullName.split(" ")[0].slice(1)}
+                  {isTrainer && " (Entrenador)"}
                 </button>
                 {isProfileOpen && (
                   <div
@@ -102,13 +107,22 @@ export default function Navbar() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    {!isActive("/perfil") && (
+                    {!isActive("/perfil") && !isTrainer && (
                       <a
                         href="/perfil"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Ver Perfil
+                      </a>
+                    )}
+                    {!isActive("/entrenadores/perfil") && isTrainer && (
+                      <a
+                        href="/entrenadores/perfil"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Ver Perfil de Entrenador
                       </a>
                     )}
                     <button
@@ -191,7 +205,7 @@ export default function Navbar() {
             <div className="pt-4 border-t border-gray-200">
               {user ? (
                 <>
-                  {!isActive("/perfil") && (
+                  {!isActive("/perfil") && !isTrainer && (
                     <a
                       href="/perfil"
                       className={`block px-4 py-3 text-lg font-medium rounded-lg ${
@@ -202,6 +216,19 @@ export default function Navbar() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Mi Perfil
+                    </a>
+                  )}
+                  {!isActive("/entrenadores/perfil") && isTrainer && (
+                    <a
+                      href="/entrenadores/perfil"
+                      className={`block px-4 py-3 text-lg font-medium rounded-lg ${
+                        isActive("/entrenadores/perfil")
+                          ? "bg-gray-100 text-black"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Mi Perfil de Entrenador
                     </a>
                   )}
                   <button

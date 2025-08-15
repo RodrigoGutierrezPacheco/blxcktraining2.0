@@ -62,7 +62,6 @@ export default function TrainerInfo({ trainerId }) {
         <Award className="h-5 w-5" />
         Tu Entrenador:
       </h3>
-      {console.log("trainerData", trainerData)}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <User className="h-4 w-4 text-gray-600" />

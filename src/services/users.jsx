@@ -13,7 +13,30 @@ export const loginUser = async (user) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Error al iniciar sesión");
+      throw new Error(data.message || "Error al iniciar sesión");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
+
+export const loginTrainer = async (trainer) => {
+  try {
+    const response = await fetch(`${APP_URL}auth/login/trainer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(trainer),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al iniciar sesión");
     }
 
     return data;

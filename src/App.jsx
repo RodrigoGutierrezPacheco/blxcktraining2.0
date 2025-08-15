@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./Layout/Layout";
 import Home from "./pages/Home/Home";
 import Entrenamientos from "./pages/Entrenamientos/Entrenamientos";
@@ -15,11 +20,12 @@ import Cardio from "./pages/Ejemplos/Cardio/Cardio";
 import Registro from "./pages/Registro/Registro";
 import RegistroEntrenadores from "./pages/Registro/RegistroEntrenadores";
 import PlanesEntrenadores from "./pages/PlanesEntrenadores/PlanesEntrenadores";
+import PerfilEntrenador from "./pages/Perfil/PerfilEntrenador";
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("tokenBlck");
-  
+
   if (!token) {
     // Si no hay token, redirigir a login
     return <Navigate to="/login" replace />;
@@ -41,7 +47,10 @@ function App() {
           <Route path="/entrenadores" element={<Entrenadores />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
-          <Route path="/registro/entrenadores" element={<RegistroEntrenadores />} />
+          <Route
+            path="/registro/entrenadores"
+            element={<RegistroEntrenadores />}
+          />
           <Route path="/entrenamiento-funcional" element={<Funcional />} />
           <Route path="/entrenamiento-casa" element={<Casa />} />
           <Route path="/entrenamiento-gimnasio" element={<Gimnasio />} />
@@ -50,29 +59,37 @@ function App() {
 
         {/* Rutas protegidas */}
         <Route element={<Layout />}>
-          <Route 
-            path="/perfil" 
+          <Route
+            path="/perfil"
             element={
               <ProtectedRoute>
                 <Perfil />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/mi-rutina" 
+          <Route
+            path="/mi-rutina"
             element={
               <ProtectedRoute>
                 <Rutina />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/planes/entrenadores" 
+          <Route
+            path="/planes/entrenadores"
             element={
               <ProtectedRoute>
                 <PlanesEntrenadores />
               </ProtectedRoute>
-            } 
+            }
+          />
+          <Route
+            path="/entrenadores/perfil"
+            element={
+              <ProtectedRoute>
+                <PerfilEntrenador />
+              </ProtectedRoute>
+            }
           />
         </Route>
       </Routes>

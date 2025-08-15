@@ -18,7 +18,6 @@ import { getUserByEmail } from "../../services/users";
 export default function Perfil() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  console.log("userData", userData);
   const [routineData, setRoutineData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
