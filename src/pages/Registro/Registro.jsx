@@ -59,8 +59,8 @@ export default function Registro() {
     if (touched.password) {
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
-      } else if (formData.password.length < 6) {
-        newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      } else if (formData.password.length < 8) {
+        newErrors.password = "La contraseña debe tener al menos 8 caracteres";
       }
     }
 
@@ -124,16 +124,79 @@ export default function Registro() {
       });
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
-      if (error.message.includes("El correo electrónico ya está registrado")) {
+      console.log(error);
+      
+      // Intentar parsear errores de validación del backend
+      try {
+        const errorData = JSON.parse(error.message);
+        
+        // Si hay errores de validación específicos
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          // Mapear errores del backend a campos específicos
+          const newErrors = { ...errors };
+          
+          errorData.errors.forEach(errorMsg => {
+            if (errorMsg.includes("contraseña") || errorMsg.includes("password")) {
+              newErrors.password = errorMsg;
+            } else if (errorMsg.includes("correo") || errorMsg.includes("email")) {
+              newErrors.email = errorMsg;
+            } else if (errorMsg.includes("nombre") || errorMsg.includes("fullName")) {
+              newErrors.fullName = errorMsg;
+            } else {
+              // Si no se puede mapear a un campo específico, mostrar en el mensaje general
+              setMessage({
+                text: errorMsg,
+                type: "error",
+              });
+            }
+          });
+          
+          setErrors(newErrors);
+          
+          // Marcar los campos con errores como touched para mostrar los errores
+          setTouched(prev => ({
+            ...prev,
+            password: true,
+            email: true,
+            fullName: true
+          }));
+          
+          return;
+        }
+        
+        // Si es un error de conflicto (email ya registrado)
+        if (errorData.statusCode === 409 || errorData.error === "Conflict") {
+          setErrors((prev) => ({
+            ...prev,
+            email: errorData.message || "Este correo ya está registrado",
+          }));
+          setTouched(prev => ({ ...prev, email: true }));
+          return;
+        }
+        
+        // Si hay un mensaje general en el error parseado
+        if (errorData.message) {
+          setMessage({
+            text: errorData.message,
+            type: "error",
+          });
+          return;
+        }
+      } catch {
+        // Si no se puede parsear, continuar con el manejo normal de errores
+      }
+      
+      // Manejo de errores específicos conocidos
+      if (error.message.includes("El correo electrónico ya está registrado") || 
+          error.message.includes("correo ya está registrado")) {
         setErrors((prev) => ({
           ...prev,
           email: "Este correo ya está registrado",
         }));
+        setTouched(prev => ({ ...prev, email: true }));
       } else {
         setMessage({
-          text:
-            error.message ||
-            "Error al registrar. Por favor intenta nuevamente.",
+          text: error.message || "Error al registrar. Por favor intenta nuevamente.",
           type: "error",
         });
       }
@@ -227,7 +290,7 @@ export default function Registro() {
                   className={`w-full px-4 py-3 border ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10`}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                 />
                 <button
                   type="button"
