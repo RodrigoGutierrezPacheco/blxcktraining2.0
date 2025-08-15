@@ -28,6 +28,7 @@ export default function Registro() {
   });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [hasBackendErrors, setHasBackendErrors] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -37,6 +38,11 @@ export default function Registro() {
 
   // Validación en tiempo real
   useEffect(() => {
+    // Si hay errores del backend, no sobrescribir con validaciones del frontend
+    if (hasBackendErrors) {
+      return;
+    }
+
     const newErrors = {
       fullName: "",
       email: "",
@@ -73,14 +79,25 @@ export default function Registro() {
     }
 
     setErrors(newErrors);
-  }, [formData, touched]);
+  }, [formData, touched, hasBackendErrors]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    
     // Marcar el campo como "touched" cuando el usuario comienza a escribir
     if (!touched[id]) {
       setTouched((prev) => ({ ...prev, [id]: true }));
+    }
+    
+    // Si hay errores del backend y el usuario modifica un campo, limpiar ese error específico
+    if (hasBackendErrors && errors[id]) {
+      setErrors(prev => ({ ...prev, [id]: "" }));
+      // Si no hay más errores del backend, permitir validación del frontend
+      const remainingBackendErrors = Object.values(errors).filter(error => error !== "" && error !== errors[id]);
+      if (remainingBackendErrors.length === 0) {
+        setHasBackendErrors(false);
+      }
     }
   };
 
@@ -126,13 +143,46 @@ export default function Registro() {
     } catch (error) {
       console.log(error);
       
-      // Intentar parsear errores de validación del backend
-      try {
-        const errorData = JSON.parse(error.message);
+      // Limpiar errores previos y resetear flag de errores del backend
+      setErrors({
+        fullName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+      setHasBackendErrors(false);
+      
+      let errorData = null;
+      
+      // Intentar parsear el error si es un string JSON
+      if (typeof error.message === 'string') {
+        try {
+          errorData = JSON.parse(error.message);
+        } catch {
+          // Si no se puede parsear, errorData será null
+        }
+      }
+      
+      // Si no se pudo parsear, intentar usar el error directamente
+      if (!errorData && error.error) {
+        errorData = error;
+      }
+      
+      // Procesar el error
+      if (errorData) {
+        // Si es un error de conflicto (email ya registrado)
+        if (errorData.statusCode === 409 || errorData.error === "Conflict") {
+          setErrors((prev) => ({
+            ...prev,
+            email: errorData.message || "Este correo ya está registrado",
+          }));
+          setTouched(prev => ({ ...prev, email: true }));
+          setHasBackendErrors(true);
+          return;
+        }
         
         // Si hay errores de validación específicos
         if (errorData.errors && Array.isArray(errorData.errors)) {
-          // Mapear errores del backend a campos específicos
           const newErrors = { ...errors };
           
           errorData.errors.forEach(errorMsg => {
@@ -152,6 +202,7 @@ export default function Registro() {
           });
           
           setErrors(newErrors);
+          setHasBackendErrors(true);
           
           // Marcar los campos con errores como touched para mostrar los errores
           setTouched(prev => ({
@@ -164,17 +215,7 @@ export default function Registro() {
           return;
         }
         
-        // Si es un error de conflicto (email ya registrado)
-        if (errorData.statusCode === 409 || errorData.error === "Conflict") {
-          setErrors((prev) => ({
-            ...prev,
-            email: errorData.message || "Este correo ya está registrado",
-          }));
-          setTouched(prev => ({ ...prev, email: true }));
-          return;
-        }
-        
-        // Si hay un mensaje general en el error parseado
+        // Si hay un mensaje general en el error
         if (errorData.message) {
           setMessage({
             text: errorData.message,
@@ -182,18 +223,19 @@ export default function Registro() {
           });
           return;
         }
-      } catch {
-        // Si no se puede parsear, continuar con el manejo normal de errores
       }
       
-      // Manejo de errores específicos conocidos
-      if (error.message.includes("El correo electrónico ya está registrado") || 
-          error.message.includes("correo ya está registrado")) {
+      // Manejo de errores específicos conocidos como fallback
+      if (error.message && (
+          error.message.includes("El correo electrónico ya está registrado") || 
+          error.message.includes("correo ya está registrado")
+        )) {
         setErrors((prev) => ({
           ...prev,
           email: "Este correo ya está registrado",
         }));
         setTouched(prev => ({ ...prev, email: true }));
+        setHasBackendErrors(true);
       } else {
         setMessage({
           text: error.message || "Error al registrar. Por favor intenta nuevamente.",
