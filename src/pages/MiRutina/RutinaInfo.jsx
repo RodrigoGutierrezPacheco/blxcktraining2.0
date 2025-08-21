@@ -171,7 +171,7 @@ export default function RutinaInfo({
                 <CardContent className="p-3 sm:p-4 flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex items-center justify-center h-6 w-6 rounded-full ${
+                      className={`flex items-center justify-center h-8 w-8 rounded-full ${
                         weekCompleted
                           ? "bg-green-500"
                           : isDark
@@ -179,16 +179,20 @@ export default function RutinaInfo({
                           : "bg-gray-200"
                       }`}
                     >
-                      {weekCompleted && (
-                        <Check className="h-4 w-4 text-white" />
+                      {weekCompleted && <Check className="h-4 w-4 text-white" />}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3
+                        className={`text-lg font-bold ${headerTextColorClass}`}
+                      >
+                        Semana {week.weekNumber}: {week.name || `Semana ${week.weekNumber}`}
+                      </h3>
+                      {week.comments && (
+                        <p className={`text-sm ${secondaryTextClass}`}>
+                          {week.comments}
+                        </p>
                       )}
                     </div>
-                    <h2
-                      className={`text-base sm:text-lg font-bold ${headerTextColorClass} flex items-center gap-2`}
-                    >
-                      <Calendar className={`h-5 w-5 ${headerIconColorClass}`} />
-                      Semana {week.weekNumber}
-                    </h2>
                   </div>
                   {isExpanded ? (
                     <ChevronUp className={`h-5 w-5 ${headerIconColorClass}`} />
@@ -275,9 +279,14 @@ export default function RutinaInfo({
                             <Calendar
                               className={`h-4 w-4 ${headerIconColorClass}`}
                             />
-                            Día {day.dayNumber}: {day.focus}
+                            Día {day.dayNumber}: {day.name || `Día ${day.dayNumber}`}
                           </h3>
                         </div>
+                        {day.comments && (
+                          <p className={`text-sm ${secondaryTextClass} mb-3`}>
+                            {day.comments}
+                          </p>
+                        )}
 
                         <div className="sm:hidden space-y-3">
                           {day.exercises.map((exercise, exIndex) => {
@@ -341,13 +350,13 @@ export default function RutinaInfo({
                                   </div>
                                   <div className={`${secondaryTextClass}`}>
                                     <div className="font-semibold">Reps</div>
-                                    <div>{exercise.reps}</div>
+                                    <div>{exercise.repetitions}</div>
                                   </div>
                                   <div className={`${secondaryTextClass}`}>
                                     <div className="font-semibold">
                                       Descanso
                                     </div>
-                                    <div>{exercise.rest}</div>
+                                    <div>{exercise.restBetweenSets}s</div>
                                   </div>
                                 </div>
                               </div>
@@ -384,6 +393,11 @@ export default function RutinaInfo({
                                 >
                                   Descanso
                                 </th>
+                                <th
+                                  className={`p-2 text-xs font-semibold uppercase ${tableHeadTextClass}`}
+                                >
+                                  Comentarios
+                                </th>
                               </tr>
                             </thead>
                             <tbody>
@@ -419,9 +433,7 @@ export default function RutinaInfo({
                                       >
                                         <Check
                                           className={`h-3 w-3 ${
-                                            isCompleted
-                                              ? "text-white"
-                                              : "opacity-0"
+                                            isCompleted ? "text-white" : "opacity-0"
                                           }`}
                                         />
                                       </button>
@@ -457,7 +469,7 @@ export default function RutinaInfo({
                                           : secondaryTextClass
                                       }`}
                                     >
-                                      {exercise.reps}
+                                      {exercise.repetitions}
                                     </td>
                                     <td
                                       className={`p-2 ${
@@ -466,7 +478,16 @@ export default function RutinaInfo({
                                           : secondaryTextClass
                                       }`}
                                     >
-                                      {exercise.rest}
+                                      {exercise.restBetweenSets}s
+                                    </td>
+                                    <td
+                                      className={`p-2 ${
+                                        isCompleted
+                                          ? "text-green-500"
+                                          : secondaryTextClass
+                                      }`}
+                                    >
+                                      {exercise.comments || "-"}
                                     </td>
                                   </tr>
                                 );
