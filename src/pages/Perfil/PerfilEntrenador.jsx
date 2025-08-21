@@ -15,19 +15,26 @@ import {
   Edit,
   Plus,
   Eye,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
+import { getUserRoutineByEmail } from "../../services/routines";
 import ClientTrainer from "../Components/Modals/ClientTrainer";
+import UserRoutineModal from "../Components/Modals/UserRoutineModal";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
   const [trainerData, setTrainerData] = useState(null);
   const [usersData, setUsersData] = useState([]);
+  console.log("usersData", usersData	)
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
+  const [selectedUserRoutine, setSelectedUserRoutine] = useState(null);
+  const [loadingRoutine, setLoadingRoutine] = useState(false);
 
   // Función para formatear la fecha del backend
   const formatDate = (dateString) => {
@@ -61,7 +68,7 @@ export default function PerfilEntrenador() {
         console.log("Received trainer info:", trainerInfo);
         setTrainerData(trainerInfo);
 
-        // Cargar usuarios del entrenador
+        // Cargar usuarios del entrenador (ya incluye hasRoutine del backend)
         const users = await getUsersByTrainer(user.id);
         console.log("Received users:", users);
         setUsersData(users);
@@ -99,6 +106,44 @@ export default function PerfilEntrenador() {
   // Función para cerrar modal
   const handleCloseModal = () => {
     setShowUserModal(false);
+    setSelectedUser(null);
+  };
+
+  // Función para ver la rutina del usuario
+  const handleViewRoutine = async (user) => {
+    try {
+      setLoadingRoutine(true);
+      setSelectedUser(user);
+      
+      // Verificar si el usuario tiene rutina según el backend
+      if (user.hasRoutine) {
+        // Solo consultar la API si el backend indica que tiene rutina
+        const routine = await getUserRoutineByEmail(user.email);
+        console.log("User routine:", routine);
+        
+        if (routine) {
+          setSelectedUserRoutine(routine);
+          setShowRoutineModal(true);
+        } else {
+          // Si por alguna razón no se encuentra la rutina, mostrar mensaje
+          alert(`${user.fullName} no tiene una rutina asignada aún.`);
+        }
+      } else {
+        // Si el backend indica que no tiene rutina, mostrar mensaje
+        alert(`${user.fullName} no tiene una rutina asignada aún.`);
+      }
+    } catch (error) {
+      console.error("Error fetching user routine:", error);
+      alert(`Error al obtener la rutina de ${user.fullName}: ${error.message}`);
+    } finally {
+      setLoadingRoutine(false);
+    }
+  };
+
+  // Función para cerrar modal de rutina
+  const handleCloseRoutineModal = () => {
+    setShowRoutineModal(false);
+    setSelectedUserRoutine(null);
     setSelectedUser(null);
   };
 
@@ -393,7 +438,7 @@ export default function PerfilEntrenador() {
                 {usersData.length !== 1 ? "s" : ""}
               </div>
             </div>
-
+            {console.log("usersData", usersData)}
             {usersData.length > 0 ? (
               <div className="grid gap-4">
                 {usersData.map((user) => (
@@ -468,10 +513,21 @@ export default function PerfilEntrenador() {
                           <Eye className="mr-1 h-4 w-4" />
                           Ver Detalles
                         </Button>
-                        <Button className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2">
-                          <Plus className="mr-1 h-4 w-4" />
-                          Asignar Rutina
-                        </Button>
+                        {user.hasRoutine ? (
+                          <Button
+                            onClick={() => handleViewRoutine(user)}
+                            disabled={loadingRoutine}
+                            className="bg-purple-600 text-white hover:bg-purple-700 text-sm px-3 py-2"
+                          >
+                            <BookOpen className="mr-1 h-4 w-4" />
+                            {loadingRoutine ? "Cargando..." : "Ver Rutina"}
+                          </Button>
+                        ) : (
+                          <Button className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2">
+                            <Plus className="mr-1 h-4 w-4" />
+                            Asignar Rutina
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -498,6 +554,16 @@ export default function PerfilEntrenador() {
           selectedUser={selectedUser}
           handleCloseModal={handleCloseModal}
           formatUserDate={formatUserDate}
+        />
+      )}
+
+      {/* User Routine Modal */}
+      {showRoutineModal && selectedUserRoutine && selectedUser && (
+        <UserRoutineModal
+          isOpen={showRoutineModal}
+          onClose={handleCloseRoutineModal}
+          userRoutine={selectedUserRoutine}
+          userName={selectedUser.fullName}
         />
       )}
     </div>
