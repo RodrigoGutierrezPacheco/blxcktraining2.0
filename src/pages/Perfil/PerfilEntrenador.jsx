@@ -2,23 +2,20 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "../Components/Card";
 import { Button } from "../Components/Button";
 import {
-  Calendar,
-  Clock,
-  Dumbbell,
-  Users,
   Award,
-  Mail,
-  Phone,
-  MapPin,
-  Star,
-  Edit,
-  Plus,
-  Eye,
-  BookOpen,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
+import { getUserRoutineByEmail, getTrainerRoutines } from "../../services/routines";
 import ClientTrainer from "../Components/Modals/ClientTrainer";
+import UserRoutineModal from "../Components/Modals/UserRoutineModal";
+import AssignRoutineModal from "../Components/Modals/AssignRoutineModal";
+import TrainerRoutinesModal from "../Components/Modals/TrainerRoutinesModal";
+import EditRoutineModal from "../Components/Modals/EditRoutineModal";
+import TrainerInfo from "../Components/TrainerInfo";
+import TrainerStatsBio from "../Components/TrainerStatsBio";
+import ClientsSection from "../Components/ClientsSection";
+import TrainerRoutinesSection from "../Components/TrainerRoutinesSection";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
@@ -29,8 +26,15 @@ export default function PerfilEntrenador() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showAssignRoutineModal, setShowAssignRoutineModal] = useState(false);
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
+  const [selectedUserRoutine, setSelectedUserRoutine] = useState(null);
+  const [loadingRoutine, setLoadingRoutine] = useState(false);
+  const [routinesData, setRoutinesData] = useState([]);
+  const [isLoadingRoutines, setIsLoadingRoutines] = useState(false);
+  const [showTrainerRoutinesModal, setShowTrainerRoutinesModal] = useState(false);
+  const [showEditRoutineModal, setShowEditRoutineModal] = useState(false);
+  const [editingRoutineId, setEditingRoutineId] = useState(null);
 
-  // Función para formatear la fecha del backend
   const formatDate = (dateString) => {
     if (!dateString) return "";
 
@@ -55,16 +59,13 @@ export default function PerfilEntrenador() {
       try {
         setIsLoading(true);
         setError(null);
-        console.log("Fetching trainer data for user:", user);
-
-        // Cargar datos del entrenador
         const trainerInfo = await getTrainerById(user.id);
-        console.log("Received trainer info:", trainerInfo);
         setTrainerData(trainerInfo);
-        // Cargar usuarios del entrenador (ya incluye hasRoutine del backend)
         const users = await getUsersByTrainer(user.id);
-        console.log("Received users:", users);
         setUsersData(users);
+        
+        // Obtener rutinas del entrenador
+        await fetchTrainerRoutines();
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err.message || "Error desconocido al cargar los datos");
@@ -76,7 +77,6 @@ export default function PerfilEntrenador() {
     fetchData();
   }, [user?.id]);
 
-  // Función para formatear la fecha de creación del usuario
   const formatUserDate = (dateString) => {
     if (!dateString) return "No disponible";
 
@@ -90,28 +90,89 @@ export default function PerfilEntrenador() {
     return date.toLocaleDateString("es-ES", options);
   };
 
-  // Función para abrir modal de información del usuario
   const handleViewUser = (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
   };
 
-  // Función para cerrar modal
   const handleCloseModal = () => {
     setShowUserModal(false);
     setSelectedUser(null);
   };
 
-  // Función para abrir modal de asignar rutina
   const handleAssignRoutine = (user) => {
     setSelectedUser(user);
     setShowAssignRoutineModal(true);
   };
 
-  // Función para cerrar modal de asignar rutina
   const handleCloseAssignRoutineModal = () => {
     setShowAssignRoutineModal(false);
     setSelectedUser(null);
+  };
+
+  const handleViewRoutine = async (user) => {
+    try {
+      setLoadingRoutine(true);
+      setSelectedUser(user);
+      
+      const routine = await getUserRoutineByEmail(user.email);
+      
+      if (routine) {
+        setSelectedUserRoutine(routine);
+        setShowRoutineModal(true);
+      } else {
+        alert(`${user.fullName} no tiene una rutina asignada aún.`);
+      }
+    } catch (error) {
+      console.error("Error fetching user routine:", error);
+      alert(`Error al obtener la rutina de ${user.fullName}`);
+    } finally {
+      setLoadingRoutine(false);
+    }
+  };
+
+  const handleCloseRoutineModal = () => {
+    setShowRoutineModal(false);
+    setSelectedUserRoutine(null);
+    setSelectedUser(null);
+  };
+
+  const handleViewRoutines = () => {
+    setShowTrainerRoutinesModal(true);
+  };
+
+  const handleCloseTrainerRoutinesModal = () => {
+    setShowTrainerRoutinesModal(false);
+  };
+
+  const handleEditRoutine = (routineId) => {
+    setEditingRoutineId(routineId);
+    setShowEditRoutineModal(true);
+    setShowTrainerRoutinesModal(false);
+  };
+
+  const handleCloseEditRoutineModal = () => {
+    setShowEditRoutineModal(false);
+    setEditingRoutineId(null);
+  };
+
+  const handleRoutineUpdated = () => {
+    // Recargar las rutinas del entrenador
+    if (user?.id) {
+      fetchTrainerRoutines();
+    }
+  };
+
+  const fetchTrainerRoutines = async () => {
+    try {
+      setIsLoadingRoutines(true);
+      const routines = await getTrainerRoutines(user.id);
+      setRoutinesData(routines);
+    } catch (err) {
+      console.error("Error fetching trainer routines:", err);
+    } finally {
+      setIsLoadingRoutines(false);
+    }
   };
 
   if (isLoading) {
@@ -191,329 +252,34 @@ export default function PerfilEntrenador() {
       <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
         {/* Trainer Information Section */}
         <div className="lg:col-span-1">
-          <Card className="border-2 border-black h-full">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
-                <Dumbbell className="h-6 w-6" />
-                Información del Entrenador
-              </h2>
-              <div className="space-y-4 text-gray-700">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
-                  <span>
-                    Entrenador desde:{" "}
-                    <span className="font-semibold">
-                      {trainerData.createdAt
-                        ? formatDate(trainerData.createdAt)
-                        : "Fecha no disponible"}
-                    </span>
-                  </span>
-                </div>
-
-                {trainerData.email && (
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Email:{" "}
-                      <span className="font-semibold">{trainerData.email}</span>
-                    </span>
-                  </div>
-                )}
-
-                {trainerData.phone && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Teléfono:{" "}
-                      <span className="font-semibold">{trainerData.phone}</span>
-                    </span>
-                  </div>
-                )}
-
-                {trainerData.location && (
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Ubicación:{" "}
-                      <span className="font-semibold">
-                        {trainerData.location}
-                      </span>
-                    </span>
-                  </div>
-                )}
-
-                {trainerData.rating && (
-                  <div className="flex items-center gap-3">
-                    <Star className="h-5 w-5 text-yellow-500" />
-                    <span>
-                      Calificación:{" "}
-                      <span className="font-semibold">
-                        {trainerData.rating} / 5 estrellas
-                      </span>
-                    </span>
-                  </div>
-                )}
-
-                {trainerData.experience && (
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Experiencia:{" "}
-                      <span className="font-semibold">
-                        {trainerData.experience}
-                      </span>
-                    </span>
-                  </div>
-                )}
-
-                <div className="pt-4">
-                  <Button
-                    variant="outline"
-                    className="w-full border-black text-black hover:bg-gray-100 bg-transparent"
-                    onClick={() => {
-                      /* TODO: Implementar edición */
-                    }}
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Editar Perfil
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TrainerInfo trainerData={trainerData} formatDate={formatDate} />
         </div>
 
         {/* Trainer Stats & Bio Section */}
         <div className="lg:col-span-2">
-          <Card className="border-2 border-black h-full">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
-                <Users className="h-6 w-6" />
-                Estadísticas y Biografía
-              </h2>
-
-              {trainerData ? (
-                <div className="space-y-6">
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-black">
-                        {usersData.length}
-                      </div>
-                      <div className="text-sm text-gray-600">Clientes</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-black">
-                        {trainerData.activePrograms || 0}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Programas Activos
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-black">
-                        {trainerData.completedSessions || 0}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Sesiones Completadas
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-black">
-                        {trainerData.rating || "N/A"}
-                      </div>
-                      <div className="text-sm text-gray-600">Rating</div>
-                    </div>
-                  </div>
-
-                  {/* Bio Section */}
-                  {trainerData.bio && (
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <h3 className="text-lg font-semibold text-black mb-3">
-                        Sobre mí
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">
-                        {trainerData.bio}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Certifications */}
-                  {trainerData.certifications &&
-                    trainerData.certifications.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h3 className="text-lg font-semibold text-black mb-3">
-                          Certificaciones
-                        </h3>
-                        <div className="space-y-2">
-                          {trainerData.certifications.map((cert, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-2"
-                            >
-                              <Award className="h-4 w-4 text-blue-600" />
-                              <span className="text-gray-700">{cert}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                  {/* Specialties */}
-                  {trainerData.specialties &&
-                    trainerData.specialties.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h3 className="text-lg font-semibold text-black mb-3">
-                          Especialidades
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {trainerData.specialties.map((specialty, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-600 text-lg mb-4">
-                    No hay información disponible del entrenador.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <TrainerStatsBio trainerData={trainerData} usersData={usersData} />
         </div>
       </div>
 
-      {/* Users Section */}
+      {/* Clients Section */}
       <div className="max-w-6xl mx-auto mt-8">
-        <Card className="border-2 border-black">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-black flex items-center gap-2">
-                <Users className="h-6 w-6" />
-                Mis Usuarios y Entrenamientos
-              </h2>
-              <div className="text-lg font-semibold text-gray-700">
-                Total: {usersData.length} usuario
-                {usersData.length !== 1 ? "s" : ""}
-              </div>
-            </div>
-            {console.log("usersData", usersData)}
-            {usersData.length > 0 ? (
-              <div className="grid gap-4">
-                {usersData.map((user) => (
-                  <div
-                    key={user.id}
-                    className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-black mb-2">
-                          {user.fullName}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
-                          <div>
-                            <span className="font-medium">Email:</span>{" "}
-                            {user.email}
-                          </div>
-                          {user.age && (
-                            <div>
-                              <span className="font-medium">Edad:</span>{" "}
-                              {user.age} años
-                            </div>
-                          )}
-                          {user.weight && (
-                            <div>
-                              <span className="font-medium">Peso:</span>{" "}
-                              {user.weight} kg
-                            </div>
-                          )}
-                          {user.height && (
-                            <div>
-                              <span className="font-medium">Altura:</span>{" "}
-                              {user.height} cm
-                            </div>
-                          )}
-                          <div>
-                            <span className="font-medium">Registrado:</span>{" "}
-                            {formatUserDate(user.createdAt)}
-                          </div>
-                        </div>
+        <ClientsSection
+          usersData={usersData}
+          formatUserDate={formatUserDate}
+          handleViewUser={handleViewUser}
+          handleViewRoutine={handleViewRoutine}
+          handleAssignRoutine={handleAssignRoutine}
+          loadingRoutine={loadingRoutine}
+        />
+      </div>
 
-                        {(user.chronicDiseases || user.healthIssues) && (
-                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                            <h4 className="font-medium text-yellow-800 mb-2">
-                              Información de Salud:
-                            </h4>
-                            {user.chronicDiseases && (
-                              <p className="text-sm text-yellow-700">
-                                <span className="font-medium">
-                                  Enfermedades crónicas:
-                                </span>{" "}
-                                {user.chronicDiseases}
-                              </p>
-                            )}
-                            {user.healthIssues && (
-                              <p className="text-sm text-yellow-700 mt-1">
-                                <span className="font-medium">
-                                  Problemas de salud:
-                                </span>{" "}
-                                {user.healthIssues}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col gap-2 ml-4">
-                        <Button
-                          onClick={() => handleViewUser(user)}
-                          className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
-                        >
-                          <Eye className="mr-1 h-4 w-4" />
-                          Ver Detalles
-                        </Button>
-                        {user.hasRoutine ? (
-                          <Button
-                            className="bg-purple-600 text-white hover:bg-purple-700 text-sm px-3 py-2"
-                          >
-                            <BookOpen className="mr-1 h-4 w-4" />
-                            Ver Rutina
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() => handleAssignRoutine(user)}
-                            className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2"
-                          >
-                            <Plus className="mr-1 h-4 w-4" />
-                            Asignar Rutina
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg mb-2">
-                  No tienes usuarios asignados aún
-                </p>
-                <p className="text-gray-500">
-                  Los usuarios que se registren con tu código aparecerán aquí
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Trainer Routines Section */}
+      <div className="max-w-6xl mx-auto mt-8">
+        <TrainerRoutinesSection
+          routinesData={routinesData}
+          isLoadingRoutines={isLoadingRoutines}
+          handleViewRoutines={handleViewRoutines}
+        />
       </div>
 
       {/* User Details Modal */}
@@ -527,24 +293,41 @@ export default function PerfilEntrenador() {
 
       {/* Assign Routine Modal */}
       {showAssignRoutineModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-md w-full shadow-2xl border border-gray-200">
-            <div className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-black mb-4">
-                Asignar Rutina
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Funcionalidad en desarrollo
-              </p>
-              <Button
-                onClick={handleCloseAssignRoutineModal}
-                className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3"
-              >
-                Cerrar
-              </Button>
-            </div>
-          </div>
-        </div>
+        <AssignRoutineModal
+          isOpen={showAssignRoutineModal}
+          onClose={handleCloseAssignRoutineModal}
+          userName={selectedUser.fullName}
+        />
+      )}
+
+      {/* User Routine Modal */}
+      {showRoutineModal && selectedUserRoutine && selectedUser && (
+        <UserRoutineModal
+          isOpen={showRoutineModal}
+          onClose={handleCloseRoutineModal}
+          userRoutine={selectedUserRoutine}
+          userName={selectedUser.fullName}
+        />
+      )}
+
+      {/* Trainer Routines Modal */}
+      {showTrainerRoutinesModal && (
+        <TrainerRoutinesModal
+          isOpen={showTrainerRoutinesModal}
+          onClose={handleCloseTrainerRoutinesModal}
+          routinesData={routinesData}
+          onEditRoutine={handleEditRoutine}
+        />
+      )}
+
+      {/* Edit Routine Modal */}
+      {showEditRoutineModal && editingRoutineId && (
+        <EditRoutineModal
+          isOpen={showEditRoutineModal}
+          onClose={handleCloseEditRoutineModal}
+          routineId={editingRoutineId}
+          onRoutineUpdated={handleRoutineUpdated}
+        />
       )}
     </div>
   );

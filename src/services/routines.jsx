@@ -128,3 +128,88 @@ export const assignRoutineToUser = async (routineId, userId) => {
     throw new Error(error.message || "Error al asignar la rutina al usuario");
   }
 };
+
+export const getRoutineById = async (routineId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!routineId) {
+      throw new Error("ID de rutina no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/${routineId}`;
+    
+    console.log("Fetching routine by ID:", routineId);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Routine data:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error getting routine by ID:", error);
+    throw new Error(error.message || "Error al obtener la rutina");
+  }
+};
+
+export const updateRoutine = async (routineId, routineData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!routineId) {
+      throw new Error("ID de rutina no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/${routineId}`;
+    
+    console.log("Updating routine:", routineId);
+    console.log("API URL:", apiUrl);
+    console.log("Update data:", JSON.stringify(routineData, null, 2));
+
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(routineData)
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Routine update successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error updating routine:", error);
+    throw new Error(error.message || "Error al actualizar la rutina");
+  }
+};
