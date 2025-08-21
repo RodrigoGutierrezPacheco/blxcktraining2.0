@@ -48,12 +48,15 @@ export default function EditProfileModal({
         const today = new Date();
         let age = today.getFullYear() - birthDateObj.getFullYear();
         const monthDiff = today.getMonth() - birthDateObj.getMonth();
-        
+
         // Ajustar la edad si aún no ha cumplido años este año
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDateObj.getDate())
+        ) {
           age--;
         }
-        
+
         calculatedAge = age.toString();
       }
 
@@ -72,20 +75,23 @@ export default function EditProfileModal({
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
-    
+
     // Si se cambia la fecha de nacimiento, calcular la edad automáticamente
     if (id === "dateOfBirth" && value) {
       const birthDate = new Date(value);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       // Ajustar la edad si aún no ha cumplido años este año
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         age--;
       }
-      
-      setFormData(prev => ({ ...prev, age: age.toString() }));
+
+      setFormData((prev) => ({ ...prev, age: age.toString() }));
     }
   };
 
@@ -253,7 +259,10 @@ export default function EditProfileModal({
               </div>
 
               <div>
-                <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="age"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Edad
                 </label>
                 <input
@@ -268,7 +277,8 @@ export default function EditProfileModal({
                   max="150"
                 />
                 <p className="mt-1 text-sm text-gray-500">
-                  La edad se calcula automáticamente según tu fecha de nacimiento
+                  La edad se calcula automáticamente según tu fecha de
+                  nacimiento
                 </p>
               </div>
 
@@ -317,7 +327,7 @@ export default function EditProfileModal({
                 htmlFor="healthIssues"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Problemas de salud
+                Problemas de salud/Enfermedades crónicas
               </label>
               <textarea
                 id="healthIssues"

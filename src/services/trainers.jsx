@@ -106,3 +106,59 @@ export const getTrainerById = async (trainerId) => {
     throw new Error(error.message || "Error al obtener información del entrenador");
   }
 };
+
+export const getUsersByTrainer = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const apiUrl = `${APP_URL}users/by-trainer/${trainerId}`;
+    
+    console.log("Fetching users for trainer ID:", trainerId);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Users data:", data);
+    
+    // Filtrar solo los campos que queremos mostrar
+    const filteredUsers = data.map(user => ({
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      age: user.age,
+      weight: user.weight,
+      height: user.height,
+      chronicDiseases: user.chronicDiseases,
+      dateOfBirth: user.dateOfBirth,
+      healthIssues: user.healthIssues,
+      createdAt: user.createdAt
+    }));
+
+    return filteredUsers;
+  } catch (error) {
+    console.log("Error getting users by trainer:", error);
+    throw new Error(error.message || "Error al obtener usuarios del entrenador");
+  }
+};

@@ -13,32 +13,38 @@ import {
   MapPin,
   Star,
   Edit,
+  Plus,
+  Eye,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
-import { getTrainerById } from "../../services/trainers";
+import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
+import ClientTrainer from "../Components/Modals/ClientTrainer";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
   const [trainerData, setTrainerData] = useState(null);
+  const [usersData, setUsersData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserModal, setShowUserModal] = useState(false);
 
   // Función para formatear la fecha del backend
   const formatDate = (dateString) => {
     if (!dateString) return "";
-    
+
     const date = new Date(dateString);
-    const options = { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    const options = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     };
-    
-    return date.toLocaleDateString('es-ES', options);
+
+    return date.toLocaleDateString("es-ES", options);
   };
 
   useEffect(() => {
-    const fetchTrainerData = async () => {
+    const fetchData = async () => {
       if (!user?.id) {
         setIsLoading(false);
         setError("No se encontró información del entrenador");
@@ -49,19 +55,52 @@ export default function PerfilEntrenador() {
         setIsLoading(true);
         setError(null);
         console.log("Fetching trainer data for user:", user);
+
+        // Cargar datos del entrenador
         const trainerInfo = await getTrainerById(user.id);
         console.log("Received trainer info:", trainerInfo);
         setTrainerData(trainerInfo);
+
+        // Cargar usuarios del entrenador
+        const users = await getUsersByTrainer(user.id);
+        console.log("Received users:", users);
+        setUsersData(users);
       } catch (err) {
-        console.error("Error fetching trainer data:", err);
+        console.error("Error fetching data:", err);
         setError(err.message || "Error desconocido al cargar los datos");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchTrainerData();
+    fetchData();
   }, [user?.id]);
+
+  // Función para formatear la fecha de creación del usuario
+  const formatUserDate = (dateString) => {
+    if (!dateString) return "No disponible";
+
+    const date = new Date(dateString);
+    const options = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+
+    return date.toLocaleDateString("es-ES", options);
+  };
+
+  // Función para abrir modal de información del usuario
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setShowUserModal(true);
+  };
+
+  // Función para cerrar modal
+  const handleCloseModal = () => {
+    setShowUserModal(false);
+    setSelectedUser(null);
+  };
 
   if (isLoading) {
     return (
@@ -80,8 +119,8 @@ export default function PerfilEntrenador() {
           <p className="text-xl text-red-600 mb-4">
             Error al cargar el perfil: {error}
           </p>
-          <Button 
-            onClick={() => window.location.reload()} 
+          <Button
+            onClick={() => window.location.reload()}
             className="bg-black text-white hover:bg-gray-800"
           >
             Reintentar
@@ -108,7 +147,10 @@ export default function PerfilEntrenador() {
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="relative">
             <img
-              src={trainerData.profileImage || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150"}
+              src={
+                trainerData.profileImage ||
+                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150"
+              }
               alt="Imagen de perfil del entrenador"
               className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md"
             />
@@ -149,19 +191,19 @@ export default function PerfilEntrenador() {
                   <span>
                     Entrenador desde:{" "}
                     <span className="font-semibold">
-                      {trainerData.createdAt ? formatDate(trainerData.createdAt) : "Fecha no disponible"}
+                      {trainerData.createdAt
+                        ? formatDate(trainerData.createdAt)
+                        : "Fecha no disponible"}
                     </span>
                   </span>
                 </div>
-                
+
                 {trainerData.email && (
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-gray-600" />
                     <span>
                       Email:{" "}
-                      <span className="font-semibold">
-                        {trainerData.email}
-                      </span>
+                      <span className="font-semibold">{trainerData.email}</span>
                     </span>
                   </div>
                 )}
@@ -171,9 +213,7 @@ export default function PerfilEntrenador() {
                     <Phone className="h-5 w-5 text-gray-600" />
                     <span>
                       Teléfono:{" "}
-                      <span className="font-semibold">
-                        {trainerData.phone}
-                      </span>
+                      <span className="font-semibold">{trainerData.phone}</span>
                     </span>
                   </div>
                 )}
@@ -218,7 +258,9 @@ export default function PerfilEntrenador() {
                   <Button
                     variant="outline"
                     className="w-full border-black text-black hover:bg-gray-100 bg-transparent"
-                    onClick={() => {/* TODO: Implementar edición */}}
+                    onClick={() => {
+                      /* TODO: Implementar edición */
+                    }}
                   >
                     <Edit className="mr-2 h-4 w-4" />
                     Editar Perfil
@@ -237,14 +279,14 @@ export default function PerfilEntrenador() {
                 <Users className="h-6 w-6" />
                 Estadísticas y Biografía
               </h2>
-              
+
               {trainerData ? (
                 <div className="space-y-6">
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-black">
-                        {trainerData.totalClients || 0}
+                        {usersData.length}
                       </div>
                       <div className="text-sm text-gray-600">Clientes</div>
                     </div>
@@ -252,13 +294,17 @@ export default function PerfilEntrenador() {
                       <div className="text-2xl font-bold text-black">
                         {trainerData.activePrograms || 0}
                       </div>
-                      <div className="text-sm text-gray-600">Programas Activos</div>
+                      <div className="text-sm text-gray-600">
+                        Programas Activos
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-black">
                         {trainerData.completedSessions || 0}
                       </div>
-                      <div className="text-sm text-gray-600">Sesiones Completadas</div>
+                      <div className="text-sm text-gray-600">
+                        Sesiones Completadas
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-black">
@@ -281,40 +327,45 @@ export default function PerfilEntrenador() {
                   )}
 
                   {/* Certifications */}
-                  {trainerData.certifications && trainerData.certifications.length > 0 && (
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <h3 className="text-lg font-semibold text-black mb-3">
-                        Certificaciones
-                      </h3>
-                      <div className="space-y-2">
-                        {trainerData.certifications.map((cert, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <Award className="h-4 w-4 text-blue-600" />
-                            <span className="text-gray-700">{cert}</span>
-                          </div>
-                        ))}
+                  {trainerData.certifications &&
+                    trainerData.certifications.length > 0 && (
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 className="text-lg font-semibold text-black mb-3">
+                          Certificaciones
+                        </h3>
+                        <div className="space-y-2">
+                          {trainerData.certifications.map((cert, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <Award className="h-4 w-4 text-blue-600" />
+                              <span className="text-gray-700">{cert}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Specialties */}
-                  {trainerData.specialties && trainerData.specialties.length > 0 && (
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <h3 className="text-lg font-semibold text-black mb-3">
-                        Especialidades
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {trainerData.specialties.map((specialty, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                          >
-                            {specialty}
-                          </span>
-                        ))}
+                  {trainerData.specialties &&
+                    trainerData.specialties.length > 0 && (
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 className="text-lg font-semibold text-black mb-3">
+                          Especialidades
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {trainerData.specialties.map((specialty, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                            >
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -327,6 +378,128 @@ export default function PerfilEntrenador() {
           </Card>
         </div>
       </div>
+
+      {/* Users Section */}
+      <div className="max-w-6xl mx-auto mt-8">
+        <Card className="border-2 border-black">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-black flex items-center gap-2">
+                <Users className="h-6 w-6" />
+                Mis Usuarios y Entrenamientos
+              </h2>
+              <div className="text-lg font-semibold text-gray-700">
+                Total: {usersData.length} usuario
+                {usersData.length !== 1 ? "s" : ""}
+              </div>
+            </div>
+
+            {usersData.length > 0 ? (
+              <div className="grid gap-4">
+                {usersData.map((user) => (
+                  <div
+                    key={user.id}
+                    className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-black mb-2">
+                          {user.fullName}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
+                          <div>
+                            <span className="font-medium">Email:</span>{" "}
+                            {user.email}
+                          </div>
+                          {user.age && (
+                            <div>
+                              <span className="font-medium">Edad:</span>{" "}
+                              {user.age} años
+                            </div>
+                          )}
+                          {user.weight && (
+                            <div>
+                              <span className="font-medium">Peso:</span>{" "}
+                              {user.weight} kg
+                            </div>
+                          )}
+                          {user.height && (
+                            <div>
+                              <span className="font-medium">Altura:</span>{" "}
+                              {user.height} cm
+                            </div>
+                          )}
+                          <div>
+                            <span className="font-medium">Registrado:</span>{" "}
+                            {formatUserDate(user.createdAt)}
+                          </div>
+                        </div>
+
+                        {(user.chronicDiseases || user.healthIssues) && (
+                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                            <h4 className="font-medium text-yellow-800 mb-2">
+                              Información de Salud:
+                            </h4>
+                            {user.chronicDiseases && (
+                              <p className="text-sm text-yellow-700">
+                                <span className="font-medium">
+                                  Enfermedades crónicas:
+                                </span>{" "}
+                                {user.chronicDiseases}
+                              </p>
+                            )}
+                            {user.healthIssues && (
+                              <p className="text-sm text-yellow-700 mt-1">
+                                <span className="font-medium">
+                                  Problemas de salud:
+                                </span>{" "}
+                                {user.healthIssues}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col gap-2 ml-4">
+                        <Button
+                          onClick={() => handleViewUser(user)}
+                          className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
+                        >
+                          <Eye className="mr-1 h-4 w-4" />
+                          Ver Detalles
+                        </Button>
+                        <Button className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2">
+                          <Plus className="mr-1 h-4 w-4" />
+                          Asignar Rutina
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg mb-2">
+                  No tienes usuarios asignados aún
+                </p>
+                <p className="text-gray-500">
+                  Los usuarios que se registren con tu código aparecerán aquí
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* User Details Modal */}
+      {showUserModal && selectedUser && (
+        <ClientTrainer
+          selectedUser={selectedUser}
+          handleCloseModal={handleCloseModal}
+          formatUserDate={formatUserDate}
+        />
+      )}
     </div>
   );
 }
