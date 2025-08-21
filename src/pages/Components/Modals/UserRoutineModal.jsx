@@ -68,7 +68,9 @@ export default function UserRoutineModal({
               <div className="text-center">
                 <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
                 <h4 className="font-semibold text-gray-900">Duración</h4>
-                <p className="text-sm text-gray-600">{routine.totalWeeks || routine.weeks?.length || 0} semanas</p>
+                <p className="text-sm text-gray-600">
+                  {routine.totalWeeks || routine.weeks?.length || 0} semanas
+                </p>
               </div>
               <div className="text-center">
                 <Clock className="h-8 w-8 text-purple-600 mx-auto mb-2" />
@@ -81,7 +83,8 @@ export default function UserRoutineModal({
             {routine.comments && (
               <div className="mt-4 p-3 bg-white/50 rounded-lg border border-blue-200">
                 <p className="text-sm text-gray-700 text-center">
-                  <span className="font-medium">Comentarios:</span> {routine.comments}
+                  <span className="font-medium">Comentarios:</span>{" "}
+                  {routine.comments}
                 </p>
               </div>
             )}
@@ -89,9 +92,9 @@ export default function UserRoutineModal({
 
           {/* Weeks */}
           <div className="space-y-4">
-            {routine.weeks?.map((week, weekIndex) => {
+            {routine.weeks?.map((week) => {
               const isExpanded = expandedWeeks.has(week.weekNumber);
-              
+
               return (
                 <Card key={week.weekNumber} className="border border-gray-200">
                   <CardContent className="p-0">
@@ -111,7 +114,9 @@ export default function UserRoutineModal({
                               {week.name || `Semana ${week.weekNumber}`}
                             </h4>
                             {week.comments && (
-                              <p className="text-sm text-gray-600">{week.comments}</p>
+                              <p className="text-sm text-gray-600">
+                                {week.comments}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -127,7 +132,10 @@ export default function UserRoutineModal({
                       <div className="px-4 pb-4 border-t border-gray-100">
                         <div className="space-y-4 pt-4">
                           {week.days?.map((day) => (
-                            <div key={day.dayNumber} className="bg-gray-50 rounded-lg p-4">
+                            <div
+                              key={day.dayNumber}
+                              className="bg-gray-50 rounded-lg p-4"
+                            >
                               <div className="flex items-center gap-3 mb-3">
                                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                                   <span className="text-green-600 font-bold text-xs">
@@ -138,7 +146,7 @@ export default function UserRoutineModal({
                                   {day.name || `Día ${day.dayNumber}`}
                                 </h5>
                               </div>
-                              
+
                               {day.comments && (
                                 <p className="text-sm text-gray-600 mb-3 pl-9">
                                   {day.comments}
@@ -150,16 +158,29 @@ export default function UserRoutineModal({
                                 <table className="w-full text-sm">
                                   <thead>
                                     <tr className="bg-gray-100">
-                                      <th className="p-2 text-left font-medium text-gray-700">Ejercicio</th>
-                                      <th className="p-2 text-center font-medium text-gray-700">Series</th>
-                                      <th className="p-2 text-center font-medium text-gray-700">Reps</th>
-                                      <th className="p-2 text-center font-medium text-gray-700">Descanso</th>
-                                      <th className="p-2 text-center font-medium text-gray-700">Comentarios</th>
+                                      <th className="p-2 text-left font-medium text-gray-700">
+                                        Ejercicio
+                                      </th>
+                                      <th className="p-2 text-center font-medium text-gray-700">
+                                        Series
+                                      </th>
+                                      <th className="p-2 text-center font-medium text-gray-700">
+                                        Reps
+                                      </th>
+                                      <th className="p-2 text-center font-medium text-gray-700">
+                                        Descanso
+                                      </th>
+                                      <th className="p-2 text-center font-medium text-gray-700">
+                                        Comentarios
+                                      </th>
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {day.exercises?.map((exercise, exIndex) => (
-                                      <tr key={exIndex} className="border-b border-gray-100 hover:bg-gray-50">
+                                      <tr
+                                        key={exIndex}
+                                        className="border-b border-gray-100 hover:bg-gray-50"
+                                      >
                                         <td className="p-2 font-medium text-gray-900">
                                           {exercise.name}
                                         </td>
