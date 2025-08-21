@@ -11,18 +11,22 @@ import {
   Target,
   CheckCircle2,
   XCircle,
+  Plus,
 } from "lucide-react";
 import { getRoutineById } from "../../../services/routines";
+import CreateRoutineModal from "./CreateRoutineModal";
 
 export default function TrainerRoutinesModal({
   isOpen,
   onClose,
   routinesData,
   onEditRoutine,
+  onRoutineCreated,
 }) {
   const [viewMode, setViewMode] = useState("list"); // 'list' o 'details'
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [isLoadingRoutine, setIsLoadingRoutine] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleViewDetails = async (routineId) => {
     try {
@@ -41,6 +45,21 @@ export default function TrainerRoutinesModal({
   const handleBackToList = () => {
     setViewMode("list");
     setSelectedRoutine(null);
+  };
+
+  const handleCreateRoutine = () => {
+    setShowCreateModal(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+
+  const handleRoutineCreated = () => {
+    // Notificar que se creó una nueva rutina
+    if (onRoutineCreated) {
+      onRoutineCreated();
+    }
   };
 
   if (!isOpen) return null;
@@ -67,12 +86,23 @@ export default function TrainerRoutinesModal({
                   : "Detalles de la Rutina"}
               </h3>
             </div>
-            <Button
-              onClick={onClose}
-              className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-3">
+              {viewMode === "list" && (
+                <Button
+                  onClick={handleCreateRoutine}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 px-4 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Crear Rutina
+                </Button>
+              )}
+              <Button
+                onClick={onClose}
+                className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Contenido condicional según el modo de vista */}
@@ -534,6 +564,13 @@ export default function TrainerRoutinesModal({
               )}
             </>
           )}
+
+          {/* Modal de Crear Rutina */}
+          <CreateRoutineModal
+            isOpen={showCreateModal}
+            onClose={handleCloseCreateModal}
+            onRoutineCreated={handleRoutineCreated}
+          />
         </div>
       </div>
     </div>

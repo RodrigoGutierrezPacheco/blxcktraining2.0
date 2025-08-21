@@ -86,7 +86,7 @@ export const getTrainerRoutines = async (trainerId) => {
   }
 };
 
-export const assignRoutineToUser = async (routineId, userId) => {
+export const assignRoutineToUser = async (routineId, userId, startDate, endDate, notes) => {
   try {
     const token = localStorage.getItem("tokenBlck");
     if (!token) {
@@ -97,7 +97,7 @@ export const assignRoutineToUser = async (routineId, userId) => {
       throw new Error("IDs de rutina y usuario son requeridos");
     }
 
-    const apiUrl = `${APP_URL}routines/${routineId}/assign`;
+    const apiUrl = `${APP_URL}routines/assign`;
     
     console.log("Assigning routine:", routineId, "to user:", userId);
     console.log("API URL:", apiUrl);
@@ -109,7 +109,13 @@ export const assignRoutineToUser = async (routineId, userId) => {
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
-      body: JSON.stringify({ userId })
+      body: JSON.stringify({
+        routine_id: routineId,
+        user_id: userId,
+        startDate: startDate || new Date().toISOString(),
+        endDate: endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días por defecto
+        notes: notes || "Rutina asignada por el entrenador"
+      })
     });
 
     console.log("Response status:", response.status);

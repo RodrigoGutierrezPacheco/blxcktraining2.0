@@ -297,6 +297,25 @@ export default function PerfilEntrenador() {
           isOpen={showAssignRoutineModal}
           onClose={handleCloseAssignRoutineModal}
           userName={selectedUser.fullName}
+          userId={selectedUser.id}
+          trainerId={user?.id}
+          onRoutineAssigned={() => {
+            // Recargar la lista de usuarios para mostrar la rutina asignada
+            if (user?.id) {
+              // Recargar los datos del entrenador y usuarios
+              const reloadData = async () => {
+                try {
+                  const trainerInfo = await getTrainerById(user.id);
+                  setTrainerData(trainerInfo);
+                  const users = await getUsersByTrainer(user.id);
+                  setUsersData(users);
+                } catch (err) {
+                  console.error("Error reloading data:", err);
+                }
+              };
+              reloadData();
+            }
+          }}
         />
       )}
 
@@ -317,6 +336,12 @@ export default function PerfilEntrenador() {
           onClose={handleCloseTrainerRoutinesModal}
           routinesData={routinesData}
           onEditRoutine={handleEditRoutine}
+          onRoutineCreated={() => {
+            // Recargar las rutinas del entrenador
+            if (user?.id) {
+              fetchTrainerRoutines();
+            }
+          }}
         />
       )}
 
