@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Award,
   Scale,
+  CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
@@ -18,7 +19,6 @@ import { getUserByEmail } from "../../services/users";
 export default function Perfil() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [routineData, setRoutineData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,21 +50,9 @@ export default function Perfil() {
           profileImage:
             "https://images.unsplash.com/photo-1535713875002-d1d0cfd975fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150",
         });
+  
 
-        const today = new Date();
-        const expirationDate = new Date(today);
-        expirationDate.setDate(today.getDate() + 25);
-        const daysRemaining = Math.ceil(
-          (expirationDate - today) / (1000 * 60 * 60 * 24)
-        );
 
-        setRoutineData({
-          name: "Plan Transformación Total",
-          type: "Funcional en Casa y Gimnasio",
-          duration: "5 Semanas",
-          expiresInDays: daysRemaining,
-          progress: "70%",
-        });
       } catch (error) {
         console.error("Error fetching user data:", error);
         // Fallback a datos del localStorage si falla la API
@@ -216,18 +204,6 @@ export default function Perfil() {
                   </div>
                 )}
                 
-                {routineData && (
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Tu rutina vence en:{" "}
-                      <span className="font-semibold">
-                        {routineData.expiresInDays} días
-                      </span>
-                    </span>
-                  </div>
-                )}
-                
                 <div className="pt-4">
                   <Button
                     variant="outline"
@@ -248,55 +224,90 @@ export default function Perfil() {
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
                 <Dumbbell className="h-6 w-6" />
-                Mi Rutina Actual
+                Mi Estado de Entrenamiento
               </h2>
-              {routineData ? (
-                <div className="space-y-6">
-                  <div className="grid sm:grid-cols-2 gap-4 text-gray-700 mb-6">
-                    <div>
-                      <p className="text-lg font-semibold mb-1">
-                        {routineData.name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {routineData.type}
-                      </p>
+              
+              {/* Si no tiene entrenador asignado */}
+              {!userData.trainerId ? (
+                <div className="text-center py-8">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-8 border border-blue-200 mb-6">
+                    <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Dumbbell className="h-8 w-8" />
                     </div>
-                    <div className="text-right sm:text-left">
-                      <p className="text-lg font-semibold mb-1">
-                        Duración: {routineData.duration}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Progreso: {routineData.progress}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Trainer Information */}
-                  {userData.trainerId && <TrainerInfo trainerId={userData.trainerId} />}
-
-                  <div className="text-center pt-4">
-                    <p className="text-gray-600 text-lg mb-4">
-                      Accede a los detalles completos de tu rutina
-                      personalizada.
+                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                      ¡Comienza tu viaje fitness!
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-6">
+                      Para acceder a rutinas personalizadas y entrenamiento profesional, 
+                      necesitas elegir un plan de entrenamiento.
                     </p>
-                    <Button
-                      onClick={handleViewRoutine}
-                      className="bg-black text-white hover:bg-gray-800 text-lg py-3 px-8"
+                    <Button 
+                      onClick={() => navigate("/planes")}
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 text-lg py-3 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <ArrowRight className="mr-2 h-5 w-5" />
-                      Mi Rutina
+                      Ver Planes Disponibles
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-600 text-lg mb-4">
-                    Aún no tienes una rutina activa.
-                  </p>
-                  <Button className="bg-black text-white hover:bg-gray-800">
-                    Explorar Planes de Entrenamiento
-                  </Button>
-                </div>
+                /* Si tiene entrenador pero no tiene rutina */
+                !userData.hasRoutine ? (
+                  <div className="text-center py-8">
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-xl p-8 border border-yellow-200 mb-6">
+                      <div className="bg-yellow-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <Clock className="h-8 w-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                        Entrenador Asignado
+                      </h3>
+                      <p className="text-gray-600 text-lg mb-6">
+                        Tu entrenador está preparando tu rutina personalizada. 
+                        Pronto tendrás acceso a tu plan de entrenamiento.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Estado:</span> Esperando asignación de rutina
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Si tiene entrenador y tiene rutina */
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border border-green-200">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-green-600 text-white rounded-full p-2">
+                          <CheckCircle className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">
+                            Rutina Activa
+                          </h3>
+                          <p className="text-green-600 font-medium">
+                            ¡Tu rutina está lista!
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Trainer Information */}
+                      {userData.trainerId && <TrainerInfo trainerId={userData.trainerId} />}
+                    </div>
+
+                    <div className="text-center pt-4">
+                      <p className="text-gray-600 text-lg mb-4">
+                        Accede a los detalles completos de tu rutina personalizada.
+                      </p>
+                      <Button
+                        onClick={handleViewRoutine}
+                        className="bg-black text-white hover:bg-gray-800 text-lg py-3 px-8"
+                      >
+                        <ArrowRight className="mr-2 h-5 w-5" />
+                        Ver Mi Rutina
+                      </Button>
+                    </div>
+                  </div>
+                )
               )}
             </CardContent>
           </Card>

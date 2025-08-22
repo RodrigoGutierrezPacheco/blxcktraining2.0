@@ -190,9 +190,6 @@ export default function TrainerRoutinesModal({
                         >
                           Editar
                         </Button>
-                        <Button className="bg-purple-600 text-white hover:bg-purple-700 text-sm px-3 py-2">
-                          Asignar a Cliente
-                        </Button>
                       </div>
                     </div>
                   ))}
