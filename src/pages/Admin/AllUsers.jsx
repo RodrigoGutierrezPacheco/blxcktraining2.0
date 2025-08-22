@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../Components/Button";
-import { getAllNormalUsers, deleteUser, removeTrainerFromUser, assignTrainerToUser, createUser, getUserById, updateUser, toggleUserStatus } from "../../services/admin";
+import { getAllNormalUsers, getUserById, toggleUserStatus } from "../../services/admin";
 import { 
   Users, 
   ArrowLeft, 
@@ -12,8 +12,6 @@ import UsersTable from "./components/UsersTable";
 import ViewUserModal from "./components/ViewUserModal";
 import CreateUserModal from "./components/CreateUserModal";
 import EditUserModal from "./components/EditUserModal";
-import TrainerAssignmentModal from "./components/TrainerAssignmentModal";
-import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
 
 export default function AllUsers() {
   const navigate = useNavigate();
@@ -22,10 +20,6 @@ export default function AllUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
-  const [showTrainerModal, setShowTrainerModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showViewUserModal, setShowViewUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
@@ -82,38 +76,6 @@ export default function AllUsers() {
       setShowEditUserModal(true);
     } catch (err) {
       setError(err.message || "Error al cargar los datos del usuario");
-    }
-  };
-
-  const handleDeleteUser = (userId) => {
-    setUserToDelete(userId);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDeleteUser = async () => {
-    if (!userToDelete) return;
-    
-    try {
-      await deleteUser(userToDelete);
-      setShowDeleteModal(false);
-      setUserToDelete(null);
-      fetchUsers();
-    } catch (err) {
-      setError(err.message || "Error al eliminar el usuario");
-    }
-  };
-
-  const handleAssignTrainer = (user) => {
-    setSelectedUser(user);
-    setShowTrainerModal(true);
-  };
-
-  const handleRemoveTrainer = async (userId) => {
-    try {
-      await removeTrainerFromUser(userId);
-      fetchUsers();
-    } catch (err) {
-      setError(err.message || "Error al remover el entrenador");
     }
   };
 
@@ -219,9 +181,6 @@ export default function AllUsers() {
           searchTerm={searchTerm}
           onViewUser={handleViewUser}
           onEditUser={handleEditUser}
-          onDeleteUser={handleDeleteUser}
-          onAssignTrainer={handleAssignTrainer}
-          onRemoveTrainer={handleRemoveTrainer}
           onToggleStatus={handleToggleUserStatus}
         />
       </main>
@@ -256,21 +215,6 @@ export default function AllUsers() {
           setSelectedUserForEdit(null);
           fetchUsers();
         }}
-      />
-
-      <TrainerAssignmentModal
-        isOpen={showTrainerModal}
-        user={selectedUser}
-        onClose={() => setShowTrainerModal(false)}
-        onAssign={() => {/* TODO: Implementar asignación */}}
-      />
-
-      <DeleteConfirmationModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={confirmDeleteUser}
-        title="Confirmar Eliminación"
-        message="¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer."
       />
     </div>
   );

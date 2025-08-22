@@ -1,4 +1,15 @@
-import { User, Calendar, Mail, Phone, Eye, Edit, Trash2 } from "lucide-react";
+import {
+  User,
+  Calendar,
+  Mail,
+  Phone,
+  Eye,
+  Edit,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  FileText,
+} from "lucide-react";
 import { Button } from "../../Components/Button";
 
 export default function UsersTable({
@@ -6,9 +17,6 @@ export default function UsersTable({
   searchTerm,
   onViewUser,
   onEditUser,
-  onDeleteUser,
-  onAssignTrainer,
-  onRemoveTrainer,
   onToggleStatus,
 }) {
   const formatDate = (dateString) => {
@@ -37,6 +45,12 @@ export default function UsersTable({
                 Estado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Entrenador
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Rutina
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Fecha de Registro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -48,7 +62,7 @@ export default function UsersTable({
             {users.length === 0 ? (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="7"
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   {searchTerm
@@ -106,6 +120,44 @@ export default function UsersTable({
                           {user.isActive ? "Activo" : "Inactivo"}
                         </span>
                       </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      {user.trainerId ? (
+                        <>
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <span className="text-sm text-green-700">
+                            Asignado
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-5 w-5 text-red-500" />
+                          <span className="text-sm text-red-700">
+                            Sin entrenador
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      {user.hasRoutine ? (
+                        <>
+                          <FileText className="h-5 w-5 text-green-500" />
+                          <span className="text-sm text-green-700">
+                            Con rutina
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-5 w-5 text-red-500" />
+                          <span className="text-sm text-red-700">
+                            Sin rutina
+                          </span>
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

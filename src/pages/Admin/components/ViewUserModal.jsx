@@ -17,7 +17,7 @@ export default function ViewUserModal({ isOpen, user, onClose, onToggleStatus })
     try {
       setIsLoading(true);
       setError("");
-      const data = await getUserById(user);
+      const data = await getUserById(user?.id);
       setUserData(data);
     } catch (err) {
       setError(err.message || "Error al cargar los datos del usuario");
