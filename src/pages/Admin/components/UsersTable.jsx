@@ -18,6 +18,8 @@ export default function UsersTable({
   onViewUser,
   onEditUser,
   onToggleStatus,
+  onShowTrainerStatus,
+  onShowRoutineStatus,
 }) {
   const formatDate = (dateString) => {
     if (!dateString) return "Sin fecha";
@@ -84,9 +86,6 @@ export default function UsersTable({
                         <div className="text-sm font-medium text-gray-900">
                           {user.fullName || "Sin nombre"}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          ID: {user.id}
-                        </div>
                       </div>
                     </div>
                   </td>
@@ -123,7 +122,10 @@ export default function UsersTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
+                    <div
+                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                      onClick={() => onShowTrainerStatus(user)}
+                    >
                       {user.trainerId ? (
                         <>
                           <CheckCircle className="h-5 w-5 text-green-500" />
@@ -142,7 +144,10 @@ export default function UsersTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
+                    <div
+                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                      onClick={() => onShowRoutineStatus(user)}
+                    >
                       {user.hasRoutine ? (
                         <>
                           <FileText className="h-5 w-5 text-green-500" />

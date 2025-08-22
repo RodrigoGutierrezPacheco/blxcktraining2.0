@@ -6,6 +6,7 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
   const [editUserData, setEditUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -16,31 +17,84 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
         height: user.height || "",
         dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split('T')[0] : "",
         healthIssues: user.healthIssues || "",
-        chronicDiseases: user.chronicDiseases || "",
         password: ""
       });
+      setError("");
+      setValidationErrors([]);
     }
   }, [isOpen, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Convertir campos numéricos a números
+    let processedValue = value;
+    if (['age', 'weight', 'height'].includes(name)) {
+      if (value === "") {
+        processedValue = "";
+      } else {
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue)) {
+          processedValue = numValue;
+        }
+      }
+    }
+
     setEditUserData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
+  };
+
+  const validateForm = () => {
+    const errors = [];
+
+    if (!editUserData.fullName.trim()) {
+      errors.push("El nombre completo es obligatorio");
+    }
+
+    if (editUserData.age !== "" && editUserData.age !== null) {
+      const age = Number(editUserData.age);
+      if (isNaN(age) || age < 0 || age > 200) {
+        errors.push("La edad debe ser un número entre 0 y 200 años");
+      }
+    }
+
+    if (editUserData.weight !== "" && editUserData.weight !== null) {
+      const weight = Number(editUserData.weight);
+      if (isNaN(weight) || weight < 0 || weight > 1000) {
+        errors.push("El peso debe ser un número entre 0 y 1000 kg");
+      }
+    }
+
+    if (editUserData.height !== "" && editUserData.height !== null) {
+      const height = Number(editUserData.height);
+      if (isNaN(height) || height < 0 || height > 500) {
+        errors.push("La altura debe ser un número entre 0 y 500 cm");
+      }
+    }
+
+    if (editUserData.password !== "" && editUserData.password.length < 6) {
+      errors.push("La contraseña debe tener al menos 6 caracteres");
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!editUserData.fullName.trim()) {
-      setError("El nombre completo es obligatorio");
+    // Validación del frontend
+    const frontendErrors = validateForm();
+    if (frontendErrors.length > 0) {
+      setValidationErrors(frontendErrors);
       return;
     }
 
     try {
       setIsEditing(true);
       setError("");
+      setValidationErrors([]);
       
       // Preparar datos para enviar (solo campos con valor)
       const dataToSend = {};
@@ -53,7 +107,21 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
       await updateUser(user.id, dataToSend);
       onEditSuccess();
     } catch (err) {
-      setError(err.message || "Error al actualizar el usuario");
+      // Manejar errores de validación del backend
+      if (err.message && err.message.includes("Error de validación")) {
+        try {
+          const errorData = JSON.parse(err.message);
+          if (errorData.errors && Array.isArray(errorData.errors)) {
+            setValidationErrors(errorData.errors);
+          } else {
+            setError(err.message);
+          }
+        } catch {
+          setError(err.message);
+        }
+      } else {
+        setError(err.message || "Error al actualizar el usuario");
+      }
     } finally {
       setIsEditing(false);
     }
@@ -62,6 +130,7 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
   const handleClose = () => {
     setEditUserData({});
     setError("");
+    setValidationErrors([]);
     onClose();
   };
 
@@ -82,6 +151,19 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
           </Button>
         </div>
 
+        {/* Errores de validación */}
+        {validationErrors.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <h4 className="text-sm font-medium text-red-800 mb-2">Errores de validación:</h4>
+            <ul className="list-disc list-inside space-y-1">
+              {validationErrors.map((error, index) => (
+                <li key={index} className="text-red-600 text-sm">{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Error general */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-600 text-sm">{error}</p>
@@ -119,8 +201,10 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Edad"
                   min="0"
-                  max="120"
+                  max="200"
+                  step="1"
                 />
+                <p className="text-xs text-gray-500 mt-1">Entre 0 y 200 años</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -168,8 +252,10 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Peso en kg"
                   min="0"
+                  max="1000"
                   step="0.1"
                 />
+                <p className="text-xs text-gray-500 mt-1">Entre 0 y 1000 kg</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -183,8 +269,10 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Altura en cm"
                   min="0"
-                  max="300"
+                  max="500"
+                  step="1"
                 />
+                <p className="text-xs text-gray-500 mt-1">Entre 0 y 500 cm</p>
               </div>
             </div>
           </div>
@@ -204,19 +292,6 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
                   rows={3}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Describir problemas de salud..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enfermedades Crónicas
-                </label>
-                <textarea
-                  name="chronicDiseases"
-                  value={editUserData.chronicDiseases}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Describir enfermedades crónicas..."
                 />
               </div>
             </div>

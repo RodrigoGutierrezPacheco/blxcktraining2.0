@@ -383,6 +383,34 @@ export const toggleUserStatus = async (userId) => {
   }
 };
 
+export const getTrainerById = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/${trainerId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener datos del entrenador");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error obteniendo entrenador por ID:", error);
+    throw new Error(error.message || "Error al obtener datos del entrenador");
+  }
+};
+
 // ==================== RUTINAS ====================
 
 // Obtener todas las rutinas
