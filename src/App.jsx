@@ -21,6 +21,14 @@ import Registro from "./pages/Registro/Registro";
 import RegistroEntrenadores from "./pages/Registro/RegistroEntrenadores";
 import PlanesEntrenadores from "./pages/PlanesEntrenadores/PlanesEntrenadores";
 import PerfilEntrenador from "./pages/Perfil/PerfilEntrenador";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AllUsers from "./pages/Admin/AllUsers";
+import AllTrainers from "./pages/Admin/AllTrainers";
+import AllAdmins from "./pages/Admin/AllAdmins";
+import AllRoutines from "./pages/Admin/AllRoutines";
+import AllPlans from "./pages/Admin/AllPlans";
+import AdminRoute from "./components/AdminRoute";
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }) => {
@@ -32,7 +40,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return children;
-};
+ };
 
 function App() {
   return (
@@ -92,6 +100,57 @@ function App() {
             }
           />
         </Route>
+
+        {/* Rutas de Administrador */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <AllUsers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/trainers"
+          element={
+            <AdminRoute>
+              <AllTrainers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/admins"
+          element={
+            <AdminRoute>
+              <AllAdmins />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/routines"
+          element={
+            <AdminRoute>
+              <AllRoutines />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/plans"
+          element={
+            <AdminRoute>
+              <AllPlans />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </Router>
   );

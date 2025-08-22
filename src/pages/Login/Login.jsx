@@ -212,6 +212,19 @@ export default function Login() {
                 Regístrate aquí
               </a>
             </p>
+            
+            {/* Enlace al login de administrador */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-gray-500 text-xs mb-2">
+                ¿Eres administrador?
+              </p>
+              <a
+                href="/admin/login"
+                className="text-red-600 hover:text-red-700 text-sm font-medium hover:underline"
+              >
+                Acceder al Panel Administrativo
+              </a>
+            </div>
           </div>
         </CardContent>
       </Card>

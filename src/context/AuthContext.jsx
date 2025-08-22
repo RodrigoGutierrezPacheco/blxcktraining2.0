@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [userType, setUserType] = useState(null); // "user" o "trainer"
+  const [userType, setUserType] = useState(null); // "user", "trainer" o "admin"
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user && !!token,
     isTrainer: userType === "trainer",
     isUser: userType === "user",
+    isAdmin: userType === "admin",
     login,
     logout
   };
