@@ -768,3 +768,63 @@ export const deactivatePlan = async (planId) => {
     throw new Error(error.message || "Error al desactivar el plan");
   }
 };
+
+// ==================== ENTRENADORES ====================
+
+// Cambiar status del entrenador (activar/desactivar)
+export const toggleTrainerStatus = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/${trainerId}/toggle-status`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error cambiando status del entrenador:", error);
+    throw new Error(error.message || "Error al cambiar el status del entrenador");
+  }
+};
+
+// Cambiar verificación del entrenador (verificar/desverificar)
+export const toggleTrainerVerification = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/${trainerId}/toggle-verification`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error cambiando verificación del entrenador:", error);
+    throw new Error(error.message || "Error al cambiar la verificación del entrenador");
+  }
+};

@@ -97,13 +97,42 @@ export const getTrainerById = async (trainerId) => {
     return data;
   } catch (error) {
     console.log("error backend", error);
-    
-    // Si es un error de red o del servidor, dar un mensaje más específico
-    if (error.name === "TypeError" && error.message.includes("fetch")) {
-      throw new Error("Error de conexión con el servidor");
+    throw new Error(error.message || "Error al obtener datos del entrenador");
+  }
+};
+
+// Actualizar entrenador
+export const updateTrainer = async (trainerId, trainerData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
     }
-    
-    throw new Error(error.message || "Error al obtener información del entrenador");
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/${trainerId}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(trainerData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error actualizando entrenador:", error);
+    throw new Error(error.message || "Error al actualizar el entrenador");
   }
 };
 
