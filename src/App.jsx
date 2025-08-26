@@ -28,6 +28,7 @@ import AllTrainers from "./pages/Admin/AllTrainers";
 import AllAdmins from "./pages/Admin/AllAdmins";
 import AllRoutines from "./pages/Admin/AllRoutines";
 import AllPlans from "./pages/Admin/AllPlans";
+import AllExercises from "./pages/Admin/AllExercises";
 import AdminRoute from "./components/AdminRoute";
 
 // Componente para rutas protegidas
@@ -148,6 +149,14 @@ function App() {
           element={
             <AdminRoute>
               <AllPlans />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/exercises"
+          element={
+            <AdminRoute>
+              <AllExercises />
             </AdminRoute>
           }
         />

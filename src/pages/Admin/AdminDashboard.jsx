@@ -155,6 +155,13 @@ export default function AdminDashboard() {
               >
                 Gestionar Planes
               </Button>
+              <Button 
+                onClick={() => navigate("/admin/exercises")}
+                className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                <Dumbbell className="h-5 w-5 mr-2" />
+                Gestionar Ejercicios
+              </Button>
             </div>
           </div>
 
