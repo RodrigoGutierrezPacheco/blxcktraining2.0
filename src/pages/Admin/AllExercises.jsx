@@ -55,14 +55,14 @@ export default function AllExercises() {
 
       const data = await muscleGroupsService.getAllMuscleGroups(token);
 
-      // Transformar la respuesta de la API al formato esperado por el componente
-      const transformedData = data.map((item) => ({
-        id: item.id,
-        name: item.title,
-        description: item.description,
-        exercisesCount: item.exercises_count || 0,
-        isActive: item.isActive === true, // Solo true si explícitamente es true
-      }));
+             // Transformar la respuesta de la API al formato esperado por el componente
+       const transformedData = data.map((item) => ({
+         id: item.id,
+         name: item.title,
+         description: item.description,
+         exercisesCount: item.exercises_count || 0,
+         isActive: item.isActive === true, // Solo true si explícitamente es true
+       }));
 
       setMuscleGroups(transformedData);
     } catch (error) {
@@ -128,46 +128,42 @@ export default function AllExercises() {
 
       const data = await exercisesService.getAllExercises(token);
 
-      // Transformar la respuesta de la API al formato esperado por el componente
-      const transformedData = data.map((item) => ({
-        id: item.id,
-        name: item.title,
-        muscleGroup: item.muscle_group,
-        difficulty: item.difficulty,
-        equipment: item.equipment,
-        description: item.description,
-      }));
+             // Transformar la respuesta de la API al formato esperado por el componente
+       const transformedData = data.map((item) => ({
+         id: item.id,
+         name: item.name,
+         muscleGroupId: item.muscleGroupId,
+         muscleGroup: item.muscleGroup || 'N/A',
+         description: item.description,
+       }));
 
       setExercises(transformedData);
     } catch (error) {
       console.error("Error cargando ejercicios:", error);
       // En caso de error, mostrar datos de ejemplo como fallback
-      const fallbackData = [
-        {
-          id: 1,
-          name: "Press de Banca",
-          muscleGroup: "Pecho",
-          difficulty: "Intermedio",
-          equipment: "Barra y banco",
-          description: "Ejercicio básico para el desarrollo del pecho",
-        },
-        {
-          id: 2,
-          name: "Sentadillas",
-          muscleGroup: "Piernas",
-          difficulty: "Principiante",
-          equipment: "Peso corporal",
-          description: "Ejercicio fundamental para las piernas",
-        },
-        {
-          id: 3,
-          name: "Dominadas",
-          muscleGroup: "Espalda",
-          difficulty: "Avanzado",
-          equipment: "Barra de dominadas",
-          description: "Ejercicio para fortalecer la espalda",
-        },
-      ];
+             const fallbackData = [
+         {
+           id: 1,
+           name: "Press de Banca",
+           muscleGroupId: "1",
+           muscleGroup: "Pecho",
+           description: "Ejercicio básico para el desarrollo del pecho",
+         },
+         {
+           id: 2,
+           name: "Sentadillas",
+           muscleGroupId: "3",
+           muscleGroup: "Piernas",
+           description: "Ejercicio fundamental para las piernas",
+         },
+         {
+           id: 3,
+           name: "Dominadas",
+           muscleGroupId: "2",
+           muscleGroup: "Espalda",
+           description: "Ejercicio para fortalecer la espalda",
+         },
+       ];
       setExercises(fallbackData);
     } finally {
       setLoading(false);
@@ -197,6 +193,22 @@ export default function AllExercises() {
     setShowCreateExercise(true);
   };
 
+  const handleDeleteMuscleGroup = async (id) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este grupo muscular?")) {
+      try {
+        const token = localStorage.getItem("tokenBlck");
+        if (!token) {
+          throw new Error("No hay token de autenticación");
+        }
+        
+        await muscleGroupsService.deleteMuscleGroup(token, id);
+        setMuscleGroups(muscleGroups.filter(mg => mg.id !== id));
+      } catch (error) {
+        console.error("Error eliminando grupo muscular:", error);
+        alert("Error al eliminar el grupo muscular. Por favor, inténtalo de nuevo.");
+      }
+    }
+  };
 
   const handleDeleteExercise = async (id) => {
     if (
@@ -406,14 +418,20 @@ export default function AllExercises() {
                           </button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleEditMuscleGroup(muscleGroup)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                          </div>
+                                                     <div className="flex space-x-2">
+                             <button
+                               onClick={() => handleEditMuscleGroup(muscleGroup)}
+                               className="text-indigo-600 hover:text-indigo-900"
+                             >
+                               <Edit className="h-4 w-4" />
+                             </button>
+                             <button
+                               onClick={() => handleDeleteMuscleGroup(muscleGroup.id)}
+                               className="text-red-600 hover:text-red-900"
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </button>
+                           </div>
                         </td>
                       </tr>
                     ))}
@@ -450,12 +468,7 @@ export default function AllExercises() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Grupo Muscular
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Dificultad
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Equipamiento
-                      </th>
+                      
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Acciones
                       </th>
@@ -477,24 +490,7 @@ export default function AllExercises() {
                             {exercise.muscleGroup}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              exercise.difficulty === "Principiante"
-                                ? "bg-green-100 text-green-800"
-                                : exercise.difficulty === "Intermedio"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {exercise.difficulty}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">
-                            {exercise.equipment}
-                          </div>
-                        </td>
+                        
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
@@ -564,13 +560,13 @@ export default function AllExercises() {
                 const newMuscleGroup =
                   await muscleGroupsService.createMuscleGroup(token, data);
 
-                const transformedMuscleGroup = {
-                  id: newMuscleGroup.id,
-                  name: newMuscleGroup.title,
-                  description: newMuscleGroup.description,
-                  exercisesCount: 0,
-                  isActive: newMuscleGroup.isActive === true,
-                };
+                                 const transformedMuscleGroup = {
+                   id: newMuscleGroup.id,
+                   name: newMuscleGroup.title,
+                   description: newMuscleGroup.description,
+                   exercisesCount: 0,
+                   isActive: newMuscleGroup.isActive === true,
+                 };
 
                 setMuscleGroups([...muscleGroups, transformedMuscleGroup]);
               }
@@ -620,10 +616,8 @@ export default function AllExercises() {
                     ex.id === editingExercise.id
                       ? {
                           ...ex,
-                          name: updatedExercise.title,
-                          muscleGroup: updatedExercise.muscle_group,
-                          difficulty: updatedExercise.difficulty,
-                          equipment: updatedExercise.equipment,
+                          name: updatedExercise.name,
+                          muscleGroupId: updatedExercise.muscleGroupId,
                           description: updatedExercise.description,
                         }
                       : ex
@@ -636,12 +630,14 @@ export default function AllExercises() {
                   data
                 );
 
+                // Buscar el nombre del grupo muscular para mostrar en la tabla
+                const muscleGroup = muscleGroups.find(mg => mg.id === data.muscleGroupId);
+                
                 const transformedExercise = {
                   id: newExercise.id,
-                  name: newExercise.title,
-                  muscleGroup: newExercise.muscle_group,
-                  difficulty: newExercise.difficulty,
-                  equipment: newExercise.equipment,
+                  name: newExercise.name,
+                  muscleGroup: muscleGroup ? muscleGroup.name : 'N/A',
+                  muscleGroupId: newExercise.muscleGroupId,
                   description: newExercise.description,
                 };
 
@@ -792,9 +788,7 @@ function CreateExerciseModal({
 }) {
   const [formData, setFormData] = useState({
     name: "",
-    muscleGroup: "",
-    difficulty: "Principiante",
-    equipment: "",
+    muscleGroupId: "",
     description: "",
   });
 
@@ -802,17 +796,13 @@ function CreateExerciseModal({
     if (exercise) {
       setFormData({
         name: exercise.name,
-        muscleGroup: exercise.muscleGroup,
-        difficulty: exercise.difficulty,
-        equipment: exercise.equipment,
+        muscleGroupId: exercise.muscleGroupId || "",
         description: exercise.description,
       });
     } else {
       setFormData({
         name: "",
-        muscleGroup: "",
-        difficulty: "Principiante",
-        equipment: "",
+        muscleGroupId: "",
         description: "",
       });
     }
@@ -851,52 +841,25 @@ function CreateExerciseModal({
               Grupo Muscular
             </label>
             <select
-              value={formData.muscleGroup}
+              value={formData.muscleGroupId}
               onChange={(e) =>
-                setFormData({ ...formData, muscleGroup: e.target.value })
+                setFormData({ ...formData, muscleGroupId: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             >
               <option value="">Seleccionar grupo muscular</option>
-              {muscleGroups.map((mg) => (
-                <option key={mg.id} value={mg.name}>
-                  {mg.name}
-                </option>
-              ))}
+              {muscleGroups
+                .filter(mg => mg.isActive)
+                .map((mg) => (
+                  <option key={mg.id} value={mg.id}>
+                    {mg.name}
+                  </option>
+                ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dificultad
-            </label>
-            <select
-              value={formData.difficulty}
-              onChange={(e) =>
-                setFormData({ ...formData, difficulty: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              required
-            >
-              <option value="Principiante">Principiante</option>
-              <option value="Intermedio">Intermedio</option>
-              <option value="Avanzado">Avanzado</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Equipamiento
-            </label>
-            <input
-              type="text"
-              value={formData.equipment}
-              onChange={(e) =>
-                setFormData({ ...formData, equipment: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              required
-            />
-          </div>
+
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Descripción

@@ -34,11 +34,9 @@ export const exercisesService = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: exerciseData.name,
-          muscle_group: exerciseData.muscleGroup,
-          difficulty: exerciseData.difficulty,
-          equipment: exerciseData.equipment,
+          name: exerciseData.name,
           description: exerciseData.description,
+          muscleGroupId: exerciseData.muscleGroupId,
         }),
       });
 
