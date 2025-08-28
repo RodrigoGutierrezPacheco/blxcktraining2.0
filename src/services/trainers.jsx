@@ -192,3 +192,106 @@ export const getUsersByTrainer = async (trainerId) => {
     throw new Error(error.message || "Error al obtener usuarios del entrenador");
   }
 };
+
+// Funciones para manejar documentos de entrenadores
+export const uploadTrainerDocument = async (trainerId, documentData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const formData = new FormData();
+    formData.append('document', documentData.file);
+    formData.append('title', documentData.title);
+    formData.append('description', documentData.description);
+    formData.append('type', documentData.type);
+
+    const response = await fetch(`${APP_URL}trainers/${trainerId}/documents`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error subiendo documento:", error);
+    throw new Error(error.message || "Error al subir el documento");
+  }
+};
+
+export const getTrainerDocuments = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainers/${trainerId}/documents`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error obteniendo documentos:", error);
+    throw new Error(error.message || "Error al obtener los documentos");
+  }
+};
+
+export const deleteTrainerDocument = async (trainerId, documentId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId || !documentId) {
+      throw new Error("ID del entrenador o documento no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainers/${trainerId}/documents/${documentId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error eliminando documento:", error);
+    throw new Error(error.message || "Error al eliminar el documento");
+  }
+};

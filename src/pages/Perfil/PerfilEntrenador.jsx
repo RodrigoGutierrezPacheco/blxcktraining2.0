@@ -16,6 +16,7 @@ import TrainerInfo from "../Components/TrainerInfo";
 import TrainerStatsBio from "../Components/TrainerStatsBio";
 import ClientsSection from "../Components/ClientsSection";
 import TrainerRoutinesSection from "../Components/TrainerRoutinesSection";
+import TrainerDocumentsSection from "../../components/TrainerDocumentsSection";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
@@ -280,6 +281,11 @@ export default function PerfilEntrenador() {
           isLoadingRoutines={isLoadingRoutines}
           handleViewRoutines={handleViewRoutines}
         />
+      </div>
+
+      {/* Trainer Documents Section */}
+      <div className="max-w-6xl mx-auto mt-8">
+        <TrainerDocumentsSection trainerId={user?.id} />
       </div>
 
       {/* User Details Modal */}
