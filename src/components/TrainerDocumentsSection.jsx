@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "../pages/Components/Card";
-import {Button} from "../pages/Components/Button";
-import { 
-  Upload, 
-  FileText, 
-  Trash2, 
-  Download, 
-  Plus,
-  X,
-  AlertCircle,
-  Eye
-} from "lucide-react";
+import { Button } from "../pages/Components/Button";
+import { Upload, Plus } from "lucide-react";
 import { 
   uploadTrainerDocument, 
   getTrainerDocuments, 
@@ -25,6 +16,13 @@ import {
   DOCUMENT_ALLOWED_TYPES,
   MAX_FILE_SIZE_MB
 } from "../services/documents";
+
+// Importar componentes modulares
+import VerificationFormModal from "./VerificationFormModal";
+import UploadFormModal from "./UploadFormModal";
+import DocumentsList from "./DocumentsList";
+import VerificationDocumentsList from "./VerificationDocumentsList";
+import DocumentViewModal from "./DocumentViewModal";
 
 export default function TrainerDocumentsSection({ trainerId }) {
   console.log("trainerId", trainerId);
@@ -105,13 +103,11 @@ export default function TrainerDocumentsSection({ trainerId }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validar tipo de archivo usando el servicio
       if (!validateFileType(file, DOCUMENT_ALLOWED_TYPES)) {
         setError("Solo se permiten archivos PDF, imágenes y documentos de Word");
         return;
       }
       
-      // Validar tamaño usando el servicio
       if (!validateFileSize(file, MAX_FILE_SIZE_MB)) {
         setError(`El archivo no puede ser mayor a ${MAX_FILE_SIZE_MB}MB`);
         return;
@@ -136,7 +132,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
       
       await uploadTrainerDocument(trainerId, uploadForm);
       
-      // Limpiar formulario y cerrar modal
       setUploadForm({
         title: "",
         description: "",
@@ -145,7 +140,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
       });
       setShowUploadForm(false);
       
-      // Recargar documentos
       await fetchDocuments();
       
     } catch (err) {
@@ -178,7 +172,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
     try {
       await deleteVerificationDocument(documentId, trainerId);
       await fetchVerificationDocuments();
-      // Mostrar mensaje de éxito
       alert("Documento de verificación eliminado exitosamente");
     } catch (err) {
       console.error("Error deleting verification document:", err);
@@ -189,13 +182,11 @@ export default function TrainerDocumentsSection({ trainerId }) {
   const handleVerificationFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validar tipo de archivo para verificación usando el servicio
       if (!validateFileType(file, VERIFICATION_ALLOWED_TYPES)) {
         setError("Para verificación solo se permiten archivos PDF e imágenes (JPG, PNG)");
         return;
       }
       
-      // Validar tamaño usando el servicio
       if (!validateFileSize(file, MAX_FILE_SIZE_MB)) {
         setError(`El archivo no puede ser mayor a ${MAX_FILE_SIZE_MB}MB`);
         return;
@@ -225,7 +216,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
         verificationForm.notes
       );
       
-      // Limpiar formulario y cerrar modal
       setVerificationForm({
         documentType: "identification",
         notes: "",
@@ -233,11 +223,8 @@ export default function TrainerDocumentsSection({ trainerId }) {
       });
       setShowVerificationForm(false);
       
-             // Mostrar mensaje de éxito
-       alert("Documento de verificación subido exitosamente");
-       
-       // Recargar documentos de verificación
-       await fetchVerificationDocuments();
+      alert("Documento de verificación subido exitosamente");
+      await fetchVerificationDocuments();
       
     } catch (err) {
       console.error("Error uploading verification document:", err);
@@ -262,7 +249,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
       
       setSelectedDocument(document);
       
-      // Obtener el contenido del documento usando el endpoint
       const documentData = await getTrainerDocument(documentId, trainerId);
       setDocumentContent(documentData);
       
@@ -320,511 +306,70 @@ export default function TrainerDocumentsSection({ trainerId }) {
           </div>
         </div>
 
-                 {/* Verification Form Modal */}
-         {showVerificationForm && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-             <div className="bg-white rounded-lg max-w-md w-full p-6">
-               <div className="flex items-center justify-between mb-4">
-                 <h4 className="text-lg font-semibold">Subir Documento de Verificación</h4>
-                 <button
-                   onClick={() => setShowVerificationForm(false)}
-                   className="text-gray-400 hover:text-gray-600"
-                 >
-                   <X className="h-5 w-5" />
-                 </button>
-               </div>
-               
-               <form onSubmit={handleVerificationSubmit} className="space-y-4">
-                                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tipo de Documento *
-                    </label>
-                    <select
-                      value={verificationForm.documentType}
-                      onChange={(e) => setVerificationForm(prev => ({ ...prev, documentType: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                    >
-                      {verificationTypes.map(type => (
-                        <option key={type.value} value={type.value}>
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Notas Adicionales
-                   </label>
-                   <textarea
-                     value={verificationForm.notes}
-                     onChange={(e) => setVerificationForm(prev => ({ ...prev, notes: e.target.value }))}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                     placeholder="Notas adicionales sobre el documento"
-                     rows="3"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Archivo *
-                   </label>
-                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                     <input
-                       type="file"
-                       onChange={handleVerificationFileChange}
-                       accept=".pdf,.jpg,.jpeg,.png"
-                       className="hidden"
-                       id="verification-file-upload"
-                       required
-                     />
-                     <label htmlFor="verification-file-upload" className="cursor-pointer">
-                       <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                       <p className="text-sm text-gray-600">
-                         Haz clic para seleccionar un archivo
-                       </p>
-                       <p className="text-xs text-gray-500 mt-1">
-                         Solo PDF e imágenes (JPG, PNG) - máx. 10MB
-                       </p>
-                     </label>
-                   </div>
-                   {verificationForm.file && (
-                     <p className="text-sm text-gray-600 mt-2">
-                       Archivo seleccionado: {verificationForm.file.name}
-                     </p>
-                   )}
-                 </div>
-                 
-                 <div className="flex gap-3 pt-4">
-                   <Button
-                     type="button"
-                     onClick={() => setShowVerificationForm(false)}
-                     className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
-                   >
-                     Cancelar
-                   </Button>
-                   <Button
-                     type="submit"
-                     disabled={isUploading}
-                     className="flex-1 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                   >
-                     {isUploading ? "Subiendo..." : "Subir Verificación"}
-                   </Button>
-                 </div>
-               </form>
-             </div>
-           </div>
-         )}
+        {/* Lista de Documentos Regulares */}
+        <DocumentsList
+          isLoading={isLoading}
+          documents={documents}
+          documentTypes={documentTypes}
+          handleViewDocument={handleViewDocument}
+          handleDeleteDocument={handleDeleteDocument}
+          formatFileSize={formatFileSize}
+          getFileIcon={getFileIcon}
+        />
 
-         {/* Upload Form Modal */}
-         {showUploadForm && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-             <div className="bg-white rounded-lg max-w-md w-full p-6">
-               <div className="flex items-center justify-between mb-4">
-                 <h4 className="text-lg font-semibold">Subir Nuevo Documento</h4>
-                 <button
-                   onClick={() => setShowUploadForm(false)}
-                   className="text-gray-400 hover:text-gray-600"
-                 >
-                   <X className="h-5 w-5" />
-                 </button>
-               </div>
-               
-               <form onSubmit={handleSubmit} className="space-y-4">
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Título del Documento *
-                   </label>
-                   <input
-                     type="text"
-                     value={uploadForm.title}
-                     onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                     placeholder="Ej: Certificación de Entrenador Personal"
-                     required
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Descripción
-                   </label>
-                   <textarea
-                     value={uploadForm.description}
-                     onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                     placeholder="Descripción opcional del documento"
-                     rows="3"
-                   />
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Tipo de Documento
-                   </label>
-                   <select
-                     value={uploadForm.type}
-                     onChange={(e) => setUploadForm(prev => ({ ...prev, type: e.target.value }))}
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                   >
-                     {documentTypes.map(type => (
-                       <option key={type.value} value={type.value}>
-                         {type.label}
-                       </option>
-                     ))}
-                   </select>
-                 </div>
-                 
-                 <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Archivo *
-                   </label>
-                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                     <input
-                       type="file"
-                       onChange={handleFileChange}
-                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                       className="hidden"
-                       id="file-upload"
-                       required
-                     />
-                     <label htmlFor="file-upload" className="cursor-pointer">
-                       <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                       <p className="text-sm text-gray-600">
-                         Haz clic para seleccionar un archivo
-                       </p>
-                       <p className="text-xs text-gray-500 mt-1">
-                         PDF, JPG, PNG, DOC, DOCX (máx. 10MB)
-                       </p>
-                     </label>
-                   </div>
-                   {uploadForm.file && (
-                     <p className="text-sm text-gray-600 mt-2">
-                       Archivo seleccionado: {uploadForm.file.name}
-                     </p>
-                   )}
-                 </div>
-                 
-                 <div className="flex gap-3 pt-4">
-                   <Button
-                     type="button"
-                     onClick={() => setShowUploadForm(false)}
-                     className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
-                   >
-                     Cancelar
-                   </Button>
-                   <Button
-                     type="submit"
-                     disabled={isUploading}
-                     className="flex-1 bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                   >
-                     {isUploading ? "Subiendo..." : "Subir Documento"}
-                   </Button>
-                 </div>
-               </form>
-             </div>
-           </div>
-         )}
+        {/* Sección de Documentos de Verificación */}
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+            Documentos de Verificación
+          </h4>
+          
+          <VerificationDocumentsList
+            isLoadingVerification={isLoadingVerification}
+            verificationDocuments={verificationDocuments}
+            verificationTypes={verificationTypes}
+            handleViewDocument={handleViewDocument}
+            handleDeleteVerificationDocument={handleDeleteVerificationDocument}
+            formatFileSize={formatFileSize}
+            getFileIcon={getFileIcon}
+          />
+        </div>
 
-                 {/* Documents List */}
-         {isLoading ? (
-           <div className="text-center py-8">
-             <p className="text-gray-500">Cargando documentos...</p>
-           </div>
-         ) : documents.length === 0 ? (
-           <div className="text-center py-8">
-             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-             <p className="text-gray-500 mb-2">No hay documentos subidos aún</p>
-             <p className="text-sm text-gray-400">
-               Comienza subiendo tu primera certificación o documento
-             </p>
-           </div>
-         ) : (
-           <div className="space-y-3">
-             {documents.map((doc) => (
-               <div
-                 key={doc.id}
-                 className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-               >
-                 <div className="flex items-center gap-3">
-                   <span className="text-2xl">
-                     {getFileIcon(doc.fileType || doc.type)}
-                   </span>
-                   <div>
-                     <h5 className="font-medium text-gray-900">{doc.title}</h5>
-                     <p className="text-sm text-gray-600">{doc.description}</p>
-                     <div className="flex items-center gap-4 mt-1">
-                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                         {documentTypes.find(t => t.value === doc.type)?.label || doc.type}
-                       </span>
-                       {doc.fileSize && (
-                         <span className="text-xs text-gray-500">
-                           {formatFileSize(doc.fileSize)}
-                         </span>
-                       )}
-                       {doc.uploadedAt && (
-                         <span className="text-xs text-gray-500">
-                           {new Date(doc.uploadedAt).toLocaleDateString('es-ES')}
-                         </span>
-                       )}
-                     </div>
-                   </div>
-                 </div>
-                 
-                 <div className="flex items-center gap-2">
-                   <Button
-                     onClick={() => handleViewDocument(doc.id, false)}
-                     className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                     title="Ver"
-                   >
-                     <Eye className="h-4 w-4" />
-                   </Button>
-                   {doc.downloadUrl && (
-                     <Button
-                       onClick={() => window.open(doc.downloadUrl, '_blank')}
-                       className="p-2 text-gray-600 hover:text-black hover:bg-gray-100"
-                       title="Descargar"
-                     >
-                       <Download className="h-4 w-4" />
-                     </Button>
-                   )}
-                   <Button
-                     onClick={() => handleDeleteDocument(doc.id)}
-                     className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                     title="Eliminar"
-                   >
-                     <Trash2 className="h-4 w-4" />
-                   </Button>
-                 </div>
-               </div>
-             ))}
-           </div>
-         )}
+        {/* Modales */}
+        <VerificationFormModal
+          showVerificationForm={showVerificationForm}
+          setShowVerificationForm={setShowVerificationForm}
+          verificationForm={verificationForm}
+          setVerificationForm={setVerificationForm}
+          handleVerificationSubmit={handleVerificationSubmit}
+          handleVerificationFileChange={handleVerificationFileChange}
+          isUploading={isUploading}
+          verificationTypes={verificationTypes}
+        />
 
-         {/* Verification Documents Section */}
-         <div className="mt-8">
-           <h4 className="text-lg font-semibold text-gray-900 mb-4">
-             Documentos de Verificación
-           </h4>
-           
-           {isLoadingVerification ? (
-             <div className="text-center py-6">
-               <p className="text-gray-500">Cargando documentos de verificación...</p>
-             </div>
-           ) : verificationDocuments.length === 0 ? (
-             <div className="text-center py-6 bg-gray-50 rounded-lg">
-               <FileText className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-               <p className="text-gray-500 mb-2">No hay documentos de verificación</p>
-               <p className="text-sm text-gray-400">
-                 Sube documentos de identificación, CURP, RFC y otros para verificación
-               </p>
-             </div>
-           ) : (
-             <div className="space-y-3">
-               {verificationDocuments.map((doc) => (
-                 <div
-                   key={doc.id}
-                   className="flex items-center justify-between p-4 border border-blue-200 rounded-lg hover:bg-blue-50 bg-blue-50"
-                 >
-                   <div className="flex items-center gap-3">
-                     <span className="text-2xl">
-                       {getFileIcon(doc.fileType || 'application/pdf')}
-                     </span>
-                     <div>
-                       <h5 className="font-medium text-gray-900">
-                         {verificationTypes.find(t => t.value === doc.documentType)?.label || doc.documentType}
-                       </h5>
-                       {doc.notes && (
-                         <p className="text-sm text-gray-600">{doc.notes}</p>
-                       )}
-                       <div className="flex items-center gap-4 mt-1">
-                         <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                           Verificación
-                         </span>
-                         {doc.fileSize && (
-                           <span className="text-xs text-gray-500">
-                             {formatFileSize(doc.fileSize)}
-                           </span>
-                         )}
-                         {doc.uploadedAt && (
-                           <span className="text-xs text-gray-500">
-                             {new Date(doc.uploadedAt).toLocaleDateString('es-ES')}
-                           </span>
-                         )}
-                       </div>
-                     </div>
-                   </div>
-                   
-                                       <div className="flex items-center gap-2">
-                      <Button
-                        onClick={() => handleViewDocument(doc.id, true)}
-                        className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                        title="Ver"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {doc.downloadUrl && (
-                        <Button
-                          onClick={() => window.open(doc.downloadUrl, '_blank')}
-                          className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                          title="Descargar"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        )}
-                      <Button
-                        onClick={() => handleDeleteVerificationDocument(doc.id)}
-                        className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                 </div>
-               ))}
-             </div>
-           )}
-         </div>
+        <UploadFormModal
+          showUploadForm={showUploadForm}
+          setShowUploadForm={setShowUploadForm}
+          uploadForm={uploadForm}
+          setUploadForm={setUploadForm}
+          handleSubmit={handleSubmit}
+          handleFileChange={handleFileChange}
+          isUploading={isUploading}
+          documentTypes={documentTypes}
+        />
 
-         {/* Document View Modal */}
-         {showViewModal && selectedDocument && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-               <div className="flex items-center justify-between p-4 border-b">
-                 <h4 className="text-lg font-semibold">
-                   {selectedDocument.title || verificationTypes.find(t => t.value === selectedDocument.documentType)?.label || 'Ver Documento'}
-                 </h4>
-                 <button
-                   onClick={() => {
-                     setShowViewModal(false);
-                     setSelectedDocument(null);
-                     setDocumentContent(null);
-                   }}
-                   className="text-gray-400 hover:text-gray-600"
-                 >
-                   <X className="h-5 w-5" />
-                 </button>
-               </div>
-               
-               <div className="p-4 overflow-auto max-h-[calc(90vh-80px)]">
-                 {isLoadingDocument ? (
-                   <div className="text-center py-8">
-                     <p className="text-gray-500">Cargando documento...</p>
-                   </div>
-                 ) : error ? (
-                   <div className="text-center py-8">
-                     <AlertCircle className="mx-auto h-12 w-12 text-red-400 mb-4" />
-                     <p className="text-red-600">{error}</p>
-                   </div>
-                 ) : documentContent ? (
-                   <div className="space-y-4">
-                     <div className="bg-gray-50 p-4 rounded-lg">
-                       <h5 className="font-medium text-gray-900 mb-2">Información del Documento</h5>
-                       <div className="grid grid-cols-2 gap-4 text-sm">
-                         <div>
-                           <span className="font-medium text-gray-700">Tipo:</span>
-                           <span className="ml-2 text-gray-600">
-                             {selectedDocument.type ? 
-                               documentTypes.find(t => t.value === selectedDocument.type)?.label : 
-                               verificationTypes.find(t => t.value === selectedDocument.documentType)?.label
-                             }
-                           </span>
-                         </div>
-                         {documentContent.fileName && (
-                           <div>
-                             <span className="font-medium text-gray-700">Nombre del Archivo:</span>
-                             <span className="ml-2 text-gray-600">{documentContent.fileName}</span>
-                           </div>
-                         )}
-                         {documentContent.mimeType && (
-                           <div>
-                             <span className="font-medium text-gray-700">Tipo MIME:</span>
-                             <span className="ml-2 text-gray-600">{documentContent.mimeType}</span>
-                           </div>
-                         )}
-                         {selectedDocument.description && (
-                           <div>
-                             <span className="font-medium text-gray-700">Descripción:</span>
-                             <span className="ml-2 text-gray-600">{selectedDocument.description}</span>
-                           </div>
-                         )}
-                         {selectedDocument.notes && (
-                           <div>
-                             <span className="font-medium text-gray-700">Notas:</span>
-                             <span className="ml-2 text-gray-600">{selectedDocument.notes}</span>
-                           </div>
-                         )}
-                         {selectedDocument.uploadedAt && (
-                           <div>
-                             <span className="font-medium text-gray-700">Fecha de Subida:</span>
-                             <span className="ml-2 text-gray-600">
-                               {new Date(selectedDocument.uploadedAt).toLocaleDateString('es-ES')}
-                             </span>
-                           </div>
-                         )}
-                         {selectedDocument.fileSize && (
-                           <div>
-                             <span className="font-medium text-gray-700">Tamaño:</span>
-                             <span className="ml-2 text-gray-600">{formatFileSize(selectedDocument.fileSize)}</span>
-                           </div>
-                         )}
-                       </div>
-                       
-                       {documentContent.signedUrl && (
-                         <div className="mt-4 pt-4 border-t">
-                           <Button
-                             onClick={() => window.open(documentContent.signedUrl, '_blank')}
-                             className="w-full bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
-                           >
-                             <Download className="h-4 w-4" />
-                             Descargar Documento
-                           </Button>
-                         </div>
-                       )}
-                     </div>
-                     
-                     <div className="border rounded-lg p-4">
-                       <h5 className="font-medium text-gray-900 mb-2">Vista Previa del Documento</h5>
-                       {documentContent.signedUrl ? (
-                         <div className="text-center">
-                           {documentContent.mimeType?.includes('image') ? (
-                             <img 
-                               src={documentContent.signedUrl} 
-                               alt="Vista previa del documento"
-                               className="max-w-full h-auto max-h-96 mx-auto"
-                             />
-                           ) : (
-                             <div className="text-center py-8">
-                               <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                               <p className="text-gray-600 mb-2">Documento no visualizable</p>
-                               <Button
-                                 onClick={() => window.open(documentContent.signedUrl, '_blank')}
-                                 className="bg-blue-600 text-white hover:bg-blue-700"
-                               >
-                                 <Download className="h-4 w-4 mr-2" />
-                                 Descargar para Ver
-                               </Button>
-                             </div>
-                           )}
-                         </div>
-                       ) : (
-                         <div className="text-center py-8">
-                           <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                           <p className="text-gray-500">No se pudo cargar la vista previa del documento</p>
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 ) : (
-                   <div className="text-center py-8">
-                     <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                     <p className="text-gray-500">No se pudo cargar el contenido del documento</p>
-                   </div>
-                 )}
-               </div>
-             </div>
-           </div>
-         )}
+        <DocumentViewModal
+          showViewModal={showViewModal}
+          setShowViewModal={setShowViewModal}
+          selectedDocument={selectedDocument}
+          setSelectedDocument={setSelectedDocument}
+          documentContent={documentContent}
+          setDocumentContent={setDocumentContent}
+          isLoadingDocument={isLoadingDocument}
+          error={error}
+          documentTypes={documentTypes}
+          verificationTypes={verificationTypes}
+          formatFileSize={formatFileSize}
+        />
       </CardContent>
     </Card>
   );
