@@ -57,12 +57,12 @@ export default function VerificationDocumentsList({
                 
                 {/* Estado de Verificación en la información del documento */}
                 <div className="flex items-center gap-1">
-                  {doc.isVerified ? (
+                  {doc.verificationStatus === 'aceptada' ? (
                     <span className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                       <CheckCircle className="h-3 w-3" />
-                      <span>Verificado</span>
+                      <span>aceptada</span>
                     </span>
-                  ) : doc.verificationNotes ? (
+                  ) : doc.verificationStatus === 'rechazada' ? (
                     <span className="flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
                       <XCircle className="h-3 w-3" />
                       <span>Rechazado</span>
@@ -88,7 +88,7 @@ export default function VerificationDocumentsList({
               </div>
               
               {/* Información de rechazo */}
-              {!doc.isVerified && doc.verificationNotes && (
+              {doc.verificationStatus === 'rechazada' && doc.verificationNotes && (
                 <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-start gap-2">
                     <span className="text-red-500 text-xs">❌</span>

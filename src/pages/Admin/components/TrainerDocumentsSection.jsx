@@ -80,7 +80,7 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
     try {
       setVerificationLoading(true);
       await verifyTrainerDocument(selectedDocument.id, {
-        isVerified,
+        verificationStatus: isVerified ? "aceptada" : "rechazada",
         verificationNotes:
           verificationNotes.trim() ||
           (isVerified
@@ -167,10 +167,15 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
 
                     {/* Estado de Verificación */}
                     <div className="flex items-center gap-2">
-                      {document.isVerified ? (
+                      {document.verificationStatus === 'aceptada' ? (
                         <span className="flex items-center gap-1 text-green-700">
                           <CheckCircle className="h-4 w-4" />
-                          <span className="font-medium">Verificado</span>
+                          <span className="font-medium">Aceptada</span>
+                        </span>
+                      ) : document.verificationStatus === 'rechazada' ? (
+                        <span className="flex items-center gap-1 text-red-700">
+                          <XCircle className="h-4 w-4" />
+                          <span className="font-medium">Rechazada</span>
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-yellow-700">
@@ -199,6 +204,21 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                       </span>
                     )}
                   </div>
+                  
+                  {/* Información de rechazo */}
+                  {document.verificationStatus === 'rechazada' && document.verificationNotes && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <span className="text-red-500 text-sm">❌</span>
+                        <div className="text-sm">
+                          <p className="text-red-700 font-medium mb-1">Motivo de Rechazo:</p>
+                          <p className="text-red-800 bg-red-100 px-3 py-2 rounded border border-red-200">
+                            {document.verificationNotes}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   {document.firebaseUrl && (
@@ -232,12 +252,12 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                   <Button
                     onClick={() => openVerificationModal(document)}
                     className={`p-2 rounded-lg transition-colors ${
-                      document.isVerified
+                      document.verificationStatus === 'aceptada'
                         ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
                         : "bg-purple-100 text-purple-700 hover:bg-purple-200"
                     }`}
                     title={
-                      document.isVerified
+                      document.verificationStatus === 'aceptada'
                         ? "Cambiar estado de verificación"
                         : "Verificar documento"
                     }
@@ -266,8 +286,10 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {selectedDocument.isVerified
+                  {selectedDocument.verificationStatus === 'aceptada'
                     ? "Cambiar Estado de Verificación"
+                    : selectedDocument.verificationStatus === 'rechazada'
+                    ? "Revisar Documento Rechazado"
                     : "Verificar Documento"}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
@@ -292,15 +314,32 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                 </h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center gap-3">
-                    {selectedDocument.isVerified ? (
+                    {selectedDocument.verificationStatus === 'aceptada' ? (
                       <>
                         <CheckCircle className="h-6 w-6 text-green-600" />
                         <div>
                           <p className="font-medium text-green-700">
-                            Documento Verificado
+                            Documento Aceptado
                           </p>
                           <p className="text-sm text-gray-600">
-                            Verificado el{" "}
+                            Aceptado el{" "}
+                            {selectedDocument.verifiedAt
+                              ? new Date(
+                                  selectedDocument.verifiedAt
+                                ).toLocaleDateString("es-ES")
+                              : "fecha no disponible"}
+                          </p>
+                        </div>
+                      </>
+                    ) : selectedDocument.verificationStatus === 'rechazada' ? (
+                      <>
+                        <XCircle className="h-6 w-6 text-red-600" />
+                        <div>
+                          <p className="font-medium text-red-700">
+                            Documento Rechazado
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Rechazado el{" "}
                             {selectedDocument.verifiedAt
                               ? new Date(
                                   selectedDocument.verifiedAt
@@ -352,10 +391,16 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
               {selectedDocument.verificationNotes && (
                 <div className="mb-6">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Notas Anteriores
+                    {selectedDocument.verificationStatus === 'aceptada' ? "Notas Anteriores" : "Motivo de Rechazo"}
                   </h4>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-800">
+                  <div className={`rounded-lg p-3 ${
+                    selectedDocument.verificationStatus === 'aceptada'
+                      ? 'bg-blue-50 border border-blue-200' 
+                      : 'bg-red-50 border border-red-200'
+                  }`}>
+                    <p className={`text-sm ${
+                      selectedDocument.verificationStatus === 'aceptada' ? 'text-blue-800' : 'text-red-800'
+                    }`}>
                       {selectedDocument.verificationNotes}
                     </p>
                   </div>
@@ -372,7 +417,7 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                   Cancelar
                 </Button>
 
-                {selectedDocument.isVerified ? (
+                {selectedDocument.verificationStatus === 'aceptada' ? (
                   <Button
                     onClick={() => handleVerifyDocument(false)}
                     className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-lg flex items-center gap-2"
@@ -388,7 +433,7 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                     disabled={verificationLoading}
                   >
                     <CheckCircle className="h-4 w-4" />
-                    {verificationLoading ? "Verificando..." : "Aprobar"}
+                    {verificationLoading ? "Verificando..." : "Aceptar"}
                   </Button>
                 )}
               </div>

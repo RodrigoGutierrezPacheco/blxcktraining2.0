@@ -118,15 +118,15 @@ export default function DocumentViewModal({
                   <div>
                     <span className="font-medium text-gray-700">Estado:</span>
                     <span className="ml-2">
-                      {selectedDocument.isVerified ? (
+                      {selectedDocument.verificationStatus === 'aceptada' ? (
                         <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                           <CheckCircle className="h-3 w-3" />
-                          Verificado
+                          Aceptada
                         </span>
-                      ) : selectedDocument.verificationNotes ? (
+                      ) : selectedDocument.verificationStatus === 'rechazada' ? (
                         <span className="inline-flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
                           <XCircle className="h-3 w-3" />
-                          Rechazado
+                          Rechazada
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
@@ -139,7 +139,7 @@ export default function DocumentViewModal({
                 </div>
                 
                 {/* Sección de Información de Verificación */}
-                {(selectedDocument.isVerified || selectedDocument.verificationNotes || selectedDocument.verifiedAt) && (
+                {(selectedDocument.verificationStatus === 'aceptada' || selectedDocument.verificationStatus === 'rechazada' || selectedDocument.verificationNotes || selectedDocument.verifiedAt) && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <h6 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-blue-600" />
@@ -150,22 +150,22 @@ export default function DocumentViewModal({
                       {/* Notas de Verificación */}
                       {selectedDocument.verificationNotes && (
                         <div className={`p-3 rounded-lg border ${
-                          selectedDocument.isVerified 
+                          selectedDocument.verificationStatus === 'aceptada'
                             ? 'bg-white border-gray-200' 
                             : 'bg-red-50 border-red-200'
                         }`}>
                           <div className="flex items-start gap-2">
                             <MessageSquare className={`h-4 w-4 mt-0.5 ${
-                              selectedDocument.isVerified ? 'text-blue-500' : 'text-red-500'
+                              selectedDocument.verificationStatus === 'aceptada' ? 'text-blue-500' : 'text-red-500'
                             }`} />
                             <div>
                               <p className={`text-sm font-medium mb-1 ${
-                                selectedDocument.isVerified ? 'text-gray-700' : 'text-red-700'
+                                selectedDocument.verificationStatus === 'aceptada' ? 'text-gray-700' : 'text-red-700'
                               }`}>
-                                {selectedDocument.isVerified ? 'Notas de Verificación' : 'Motivo de Rechazo'}
+                                {selectedDocument.verificationStatus === 'aceptada' ? 'Notas de Verificación' : 'Motivo de Rechazo'}
                               </p>
                               <p className={`text-sm p-2 rounded border ${
-                                selectedDocument.isVerified 
+                                selectedDocument.verificationStatus === 'aceptada'
                                   ? 'text-gray-800 bg-gray-50 border-gray-200' 
                                   : 'text-red-800 bg-red-100 border-red-200'
                               }`}>
@@ -237,17 +237,17 @@ export default function DocumentViewModal({
                     {/* Estado Visual de Verificación */}
                     <div className="mt-4 p-4 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
                       <div className="text-center">
-                        {selectedDocument.isVerified ? (
+                        {selectedDocument.verificationStatus === 'aceptada' ? (
                           <div className="flex flex-col items-center gap-2">
                             <CheckCircle className="h-12 w-12 text-green-500" />
                             <div>
-                              <p className="text-lg font-semibold text-green-800">Documento Verificado</p>
+                              <p className="text-lg font-semibold text-green-800">Documento Aceptado</p>
                               <p className="text-sm text-green-600">
                                 Este documento ha sido revisado y aprobado por el equipo de verificación
                               </p>
                             </div>
                           </div>
-                        ) : selectedDocument.verificationNotes ? (
+                        ) : selectedDocument.verificationStatus === 'rechazada' ? (
                           <div className="flex flex-col items-center gap-2">
                             <XCircle className="h-12 w-12 text-red-500" />
                             <div>
