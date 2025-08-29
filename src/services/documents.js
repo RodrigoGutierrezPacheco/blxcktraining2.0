@@ -349,4 +349,39 @@ export const deleteVerificationDocument = async (documentId, trainerId) => {
   }
 };
 
+// Función para verificar/rechazar un documento del entrenador
+export const verifyTrainerDocument = async (documentId, verificationData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!documentId) {
+      throw new Error("ID del documento no válido");
+    }
+
+    const response = await fetch(`${APP_URL}users/trainer/document/${documentId}/verify`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(verificationData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error verifying trainer document:", error);
+    throw new Error(error.message || "Error al verificar el documento");
+  }
+};
+
 

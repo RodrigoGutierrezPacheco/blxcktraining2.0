@@ -1,7 +1,9 @@
 import { Button } from "../../Components/Button";
 import { X, Mail, Phone, Calendar, User, Star, MapPin, Award, Users } from "lucide-react";
+import TrainerDocumentsSection from "./TrainerDocumentsSection";
 
 export default function ViewTrainerModal({ trainer, isOpen, onClose, isLoading = false }) {
+
   if (!isOpen) return null;
 
   if (isLoading) {
@@ -313,6 +315,12 @@ export default function ViewTrainerModal({ trainer, isOpen, onClose, isLoading =
                </div>
              </div>
            </div>
+
+           {/* Documents Section */}
+           <TrainerDocumentsSection 
+             trainerId={trainer.id} 
+             trainerName={trainer.fullName || "Entrenador"} 
+           />
          </div>
 
         {/* Footer */}

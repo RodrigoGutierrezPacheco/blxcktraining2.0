@@ -85,10 +85,7 @@ export default function AllTrainers() {
     try {
       setIsModalLoading(true);
       setError("");
-      console.log("Obteniendo información del entrenador ID:", trainer.id);
-      // Obtener información completa del entrenador por ID
       const trainerData = await getTrainerById(trainer.id);
-      console.log("Datos obtenidos del entrenador:", trainerData);
       setSelectedTrainer(trainerData);
       setShowViewModal(true);
     } catch (err) {
@@ -102,10 +99,7 @@ export default function AllTrainers() {
     try {
       setIsModalLoading(true);
       setError("");
-      console.log("Obteniendo información del entrenador ID:", trainer.id);
-      // Obtener información completa del entrenador por ID
       const trainerData = await getTrainerById(trainer.id);
-      console.log("Datos obtenidos del entrenador:", trainerData);
       setSelectedTrainer(trainerData);
       setShowEditModal(true);
     } catch (err) {
@@ -285,6 +279,9 @@ export default function AllTrainers() {
                     Usuarios asignados
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Documentos de Verificación
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -293,7 +290,7 @@ export default function AllTrainers() {
                 {filteredTrainers.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="8"
+                      colSpan="9"
                       className="px-6 py-12 text-center text-gray-500"
                     >
                       {searchTerm
@@ -382,6 +379,14 @@ export default function AllTrainers() {
                           <User className="h-4 w-4 text-gray-400" />
                           <span className="text-sm text-gray-900">
                             {trainer.assignedUsersCount}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-900">
+                            {trainer.verificationDocumentsCount || 0}
                           </span>
                         </div>
                       </td>
