@@ -384,4 +384,48 @@ export const verifyTrainerDocument = async (documentId, verificationData) => {
   }
 };
 
+// Función para reemplazar un documento de verificación del entrenador
+export const replaceVerificationDocument = async (trainerId, documentType, file) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    if (!file) {
+      throw new Error("No se ha seleccionado ningún archivo");
+    }
+
+    if (!documentType) {
+      throw new Error("Tipo de documento no especificado");
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${APP_URL}trainer-verification/replace/${trainerId}/${documentType}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error replacing verification document:", error);
+    throw new Error(error.message || "Error al reemplazar el documento de verificación");
+  }
+};
+
 

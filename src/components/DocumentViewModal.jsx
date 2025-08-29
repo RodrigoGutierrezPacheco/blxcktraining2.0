@@ -1,5 +1,7 @@
-import { X, AlertCircle, Download, FileText, CheckCircle, XCircle, MessageSquare, Calendar, User } from "lucide-react";
+import { X, AlertCircle, Download, FileText, CheckCircle, XCircle, MessageSquare, Calendar, User, Upload, RefreshCw } from "lucide-react";
 import { Button } from "../pages/Components/Button";
+import { useState } from "react";
+import { replaceVerificationDocument } from "../services/documents";
 
 export default function DocumentViewModal({ 
   showViewModal, 
@@ -14,6 +16,11 @@ export default function DocumentViewModal({
   verificationTypes, 
   formatFileSize 
 }) {
+  const [showReplaceModal, setShowReplaceModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isReplacing, setIsReplacing] = useState(false);
+  const [replaceError, setReplaceError] = useState("");
+
   console.log("selectedDocument", selectedDocument);
   if (!showViewModal || !selectedDocument) return null;
 
@@ -21,6 +28,52 @@ export default function DocumentViewModal({
     setShowViewModal(false);
     setSelectedDocument(null);
     setDocumentContent(null);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setReplaceError("");
+    }
+  };
+
+  const handleReplaceDocument = async () => {
+    if (!selectedFile) {
+      setReplaceError("Por favor selecciona un archivo");
+      return;
+    }
+
+    try {
+      setIsReplacing(true);
+      setReplaceError("");
+      
+      await replaceVerificationDocument(
+        selectedDocument.trainerId || selectedDocument.userId, 
+        selectedDocument.documentType, 
+        selectedFile
+      );
+
+      // Cerrar modal y recargar
+      setShowReplaceModal(false);
+      setSelectedFile(null);
+      alert("Documento reemplazado exitosamente. El estado se ha restablecido a pendiente.");
+      
+      // Recargar la página o emitir evento para actualizar
+      window.location.reload();
+      
+    } catch (err) {
+      console.error("Error replacing document:", err);
+      setReplaceError(err.message || "Error al reemplazar el documento");
+    } finally {
+      setIsReplacing(false);
+    }
+  };
+
+  const closeReplaceModal = () => {
+    setShowReplaceModal(false);
+    setSelectedFile(null);
+    setReplaceError("");
   };
 
   return (
@@ -284,6 +337,22 @@ export default function DocumentViewModal({
                     </Button>
                   </div>
                 )}
+
+                {/* Botón para reemplazar documento rechazado */}
+                {selectedDocument.verificationStatus === 'rechazada' && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button
+                      onClick={() => setShowReplaceModal(true)}
+                      className="w-full bg-orange-600 text-white hover:bg-orange-700 flex items-center justify-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Reemplazar Documento
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-2 text-center">
+                      Sube un nuevo archivo para reemplazar el documento rechazado
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="border rounded-lg p-4">
@@ -326,6 +395,82 @@ export default function DocumentViewModal({
           )}
         </div>
       </div>
+
+      {/* Modal para reemplazar documento */}
+      {showReplaceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Reemplazar Documento
+              </h3>
+              <Button
+                onClick={closeReplaceModal}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-4">
+                  Selecciona un nuevo archivo para reemplazar el documento rechazado. 
+                  El estado se restablecerá a pendiente para nueva verificación.
+                </p>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nuevo Archivo
+                  </label>
+                  <input
+                    type="file"
+                    onChange={handleFileSelect}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Formatos permitidos: PDF, JPG, JPEG, PNG (máx. 10MB)
+                  </p>
+                </div>
+
+                {replaceError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{replaceError}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  onClick={closeReplaceModal}
+                  className="bg-gray-300 text-gray-700 hover:bg-gray-400 px-4 py-2 rounded-lg"
+                  disabled={isReplacing}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleReplaceDocument}
+                  className="bg-orange-600 text-white hover:bg-orange-700 px-4 py-2 rounded-lg flex items-center gap-2"
+                  disabled={isReplacing || !selectedFile}
+                >
+                  {isReplacing ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Reemplazando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      Reemplazar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
