@@ -1,4 +1,4 @@
-import { X, AlertCircle, Download, FileText } from "lucide-react";
+import { X, AlertCircle, Download, FileText, CheckCircle, XCircle, MessageSquare, Calendar, User } from "lucide-react";
 import { Button } from "../pages/Components/Button";
 
 export default function DocumentViewModal({ 
@@ -99,7 +99,136 @@ export default function DocumentViewModal({
                       <span className="ml-2 text-gray-600">{formatFileSize(selectedDocument.fileSize)}</span>
                     </div>
                   )}
+                  
+                  {/* Estado de Verificación */}
+                  <div>
+                    <span className="font-medium text-gray-700">Estado:</span>
+                    <span className="ml-2">
+                      {selectedDocument.isVerified ? (
+                        <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <CheckCircle className="h-3 w-3" />
+                          Verificado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <XCircle className="h-3 w-3" />
+                          Pendiente
+                        </span>
+                      )}
+                    </span>
+                  </div>
                 </div>
+                
+                {/* Sección de Información de Verificación */}
+                {(selectedDocument.isVerified || selectedDocument.verificationNotes) && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h6 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-blue-600" />
+                      Información de Verificación
+                    </h6>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Notas de Verificación */}
+                      {selectedDocument.verificationNotes && (
+                        <div className="bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="flex items-start gap-2">
+                            <MessageSquare className="h-4 w-4 text-blue-500 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Notas de Verificación</p>
+                              <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded border">
+                                {selectedDocument.verificationNotes}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Fecha de Verificación */}
+                      {selectedDocument.verifiedAt && (
+                        <div className="bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-green-500" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Fecha de Verificación</p>
+                              <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded border">
+                                {new Date(selectedDocument.verifiedAt).toLocaleDateString('es-ES', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Verificado Por */}
+                      {selectedDocument.verifiedBy && (
+                        <div className="bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-purple-500" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Verificado Por</p>
+                              <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded border font-mono">
+                                {selectedDocument.verifiedBy}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Última Actualización */}
+                      {selectedDocument.updatedAt && (
+                        <div className="bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-orange-500" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Última Actualización</p>
+                              <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded border">
+                                {new Date(selectedDocument.updatedAt).toLocaleDateString('es-ES', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Estado Visual de Verificación */}
+                    <div className="mt-4 p-4 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
+                      <div className="text-center">
+                        {selectedDocument.isVerified ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <CheckCircle className="h-12 w-12 text-green-500" />
+                            <div>
+                              <p className="text-lg font-semibold text-green-800">Documento Verificado</p>
+                              <p className="text-sm text-green-600">
+                                Este documento ha sido revisado y aprobado por el equipo de verificación
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <XCircle className="h-12 w-12 text-yellow-500" />
+                            <div>
+                              <p className="text-lg font-semibold text-yellow-800">Documento Pendiente</p>
+                              <p className="text-sm text-yellow-600">
+                                Este documento está en espera de revisión y verificación
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 {documentContent.signedUrl && (
                   <div className="mt-4 pt-4 border-t">
@@ -148,7 +277,7 @@ export default function DocumentViewModal({
             </div>
           ) : (
             <div className="text-center py-8">
-              <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <AlertCircle className="mx-auto h-12 w-12 text-red-400 mb-4" />
               <p className="text-gray-500">No se pudo cargar el contenido del documento</p>
             </div>
           )}

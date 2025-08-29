@@ -1,10 +1,23 @@
 import { useState, useEffect } from "react";
 import { Button } from "../../Components/Button";
-import { FileText, Download, Eye, RefreshCw, X, CheckCircle, XCircle, MessageSquare } from "lucide-react";
-import { getTrainerVerificationDocuments, verifyTrainerDocument } from "../../../services/documents";
+import {
+  FileText,
+  Download,
+  Eye,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  MessageSquare,
+} from "lucide-react";
+import {
+  getTrainerVerificationDocuments,
+  verifyTrainerDocument,
+} from "../../../services/documents";
+import DocumentViewModal from "./DocumentViewModal";
 
 export default function TrainerDocumentsSection({ trainerId, trainerName }) {
   const [documents, setDocuments] = useState([]);
+  console.log("docuemtns", documents);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsError, setDocumentsError] = useState("");
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -21,7 +34,7 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
 
   const fetchTrainerDocuments = async () => {
     if (!trainerId) return;
-    
+
     try {
       setDocumentsLoading(true);
       setDocumentsError("");
@@ -62,14 +75,18 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
 
   const handleVerifyDocument = async (isVerified) => {
     if (!selectedDocument) return;
-    
+
     try {
       setVerificationLoading(true);
       await verifyTrainerDocument(selectedDocument.id, {
         isVerified,
-        verificationNotes: verificationNotes.trim() || (isVerified ? "Documento verificado correctamente" : "Documento rechazado")
+        verificationNotes:
+          verificationNotes.trim() ||
+          (isVerified
+            ? "Documento verificado correctamente"
+            : "Documento rechazado"),
       });
-      
+
       // Recargar documentos para mostrar el nuevo estado
       await fetchTrainerDocuments();
       closeVerificationModal();
@@ -94,11 +111,13 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
           className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 text-sm rounded-lg flex items-center gap-2"
           disabled={documentsLoading}
         >
-          <RefreshCw className={`h-4 w-4 ${documentsLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`h-4 w-4 ${documentsLoading ? "animate-spin" : ""}`}
+          />
           {documentsLoading ? "Actualizando..." : "Actualizar"}
         </Button>
       </div>
-      
+
       {documentsLoading ? (
         <div className="bg-gray-50 p-6 rounded-lg text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-3"></div>
@@ -111,7 +130,9 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
       ) : documents.length === 0 ? (
         <div className="bg-gray-50 p-6 rounded-lg text-center">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600">No hay documentos de verificación registrados</p>
+          <p className="text-gray-600">
+            No hay documentos de verificación registrados
+          </p>
           <p className="text-sm text-gray-500 mt-2">
             {trainerName} aún no ha subido documentos de verificación
           </p>
@@ -119,9 +140,11 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
       ) : (
         <div className="space-y-3">
           {documents.map((document) => (
-            <div key={document.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+            <div
+              key={document.id}
+              className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+            >
               <div className="flex items-center justify-between">
-
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <FileText className="h-5 w-5 text-blue-600" />
@@ -130,88 +153,97 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
                         {document.documentType || "Documento de Verificación"}
                       </h4>
                       {document.originalName && (
-                        <p className="text-sm text-gray-600">{document.originalName}</p>
+                        <p className="text-sm text-gray-600">
+                          {document.originalName}
+                        </p>
                       )}
                     </div>
                   </div>
-                                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                       {document.documentType}
-                     </span>
-                     
-                     {/* Estado de Verificación */}
-                     <div className="flex items-center gap-2">
-                       {document.isVerified ? (
-                         <span className="flex items-center gap-1 text-green-700">
-                           <CheckCircle className="h-4 w-4" />
-                           <span className="font-medium">Verificado</span>
-                         </span>
-                       ) : (
-                         <span className="flex items-center gap-1 text-yellow-700">
-                           <XCircle className="h-4 w-4" />
-                           <span className="font-medium">Pendiente</span>
-                         </span>
-                       )}
-                     </div>
-                     
-                     {document.createdAt && (
-                       <span className="flex items-center gap-1">
-                         <span>Subido:</span>
-                         <span className="font-medium">
-                           {new Date(document.createdAt).toLocaleDateString('es-ES')}
-                         </span>
-                       </span>
-                     )}
-                     {document.fileSize && (
-                       <span className="flex items-center gap-1">
-                         <span>Tamaño:</span>
-                         <span className="font-medium">
-                           {(document.fileSize / 1024).toFixed(2)} KB
-                         </span>
-                       </span>
-                     )}
-                   </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                      {document.documentType}
+                    </span>
+
+                    {/* Estado de Verificación */}
+                    <div className="flex items-center gap-2">
+                      {document.isVerified ? (
+                        <span className="flex items-center gap-1 text-green-700">
+                          <CheckCircle className="h-4 w-4" />
+                          <span className="font-medium">Verificado</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-yellow-700">
+                          <XCircle className="h-4 w-4" />
+                          <span className="font-medium">Pendiente</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {document.createdAt && (
+                      <span className="flex items-center gap-1">
+                        <span>Subido:</span>
+                        <span className="font-medium">
+                          {new Date(document.createdAt).toLocaleDateString(
+                            "es-ES"
+                          )}
+                        </span>
+                      </span>
+                    )}
+                    {document.fileSize && (
+                      <span className="flex items-center gap-1">
+                        <span>Tamaño:</span>
+                        <span className="font-medium">
+                          {(document.fileSize / 1024).toFixed(2)} KB
+                        </span>
+                      </span>
+                    )}
+                  </div>
                 </div>
-                                 <div className="flex items-center gap-2 ml-4">
-                   {document.firebaseUrl && (
-                     <>
-                       <Button
-                         onClick={() => handleViewDocument(document)}
-                         className="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"
-                         title="Ver documento"
-                       >
-                         <Eye className="h-4 w-4" />
-                       </Button>
-                       <Button
-                         onClick={() => {
-                           const a = document.createElement('a');
-                           a.href = document.firebaseUrl;
-                           a.download = document.originalName || 'documento-verificacion';
-                           document.body.appendChild(a);
-                           a.click();
-                           document.body.removeChild(a);
-                         }}
-                         className="bg-green-100 text-green-700 hover:bg-green-200 p-2 rounded-lg transition-colors"
-                         title="Descargar documento"
-                       >
-                         <Download className="h-4 w-4" />
-                       </Button>
-                     </>
-                   )}
-                   
-                   {/* Botón de Verificación */}
-                   <Button
-                     onClick={() => openVerificationModal(document)}
-                     className={`p-2 rounded-lg transition-colors ${
-                       document.isVerified 
-                         ? "bg-orange-100 text-orange-700 hover:bg-orange-200" 
-                         : "bg-purple-100 text-purple-700 hover:bg-purple-200"
-                     }`}
-                     title={document.isVerified ? "Cambiar estado de verificación" : "Verificar documento"}
-                   >
-                     <MessageSquare className="h-4 w-4" />
-                   </Button>
-                 </div>
+                <div className="flex items-center gap-2 ml-4">
+                  {document.firebaseUrl && (
+                    <>
+                      <Button
+                        onClick={() => handleViewDocument(document)}
+                        className="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"
+                        title="Ver documento"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          const a = document.createElement("a");
+                          a.href = document.firebaseUrl;
+                          a.download =
+                            document.originalName || "documento-verificacion";
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                        }}
+                        className="bg-green-100 text-green-700 hover:bg-green-200 p-2 rounded-lg transition-colors"
+                        title="Descargar documento"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+
+                  {/* Botón de Verificación */}
+                  <Button
+                    onClick={() => openVerificationModal(document)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      document.isVerified
+                        ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                        : "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                    }`}
+                    title={
+                      document.isVerified
+                        ? "Cambiar estado de verificación"
+                        : "Verificar documento"
+                    }
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
@@ -219,21 +251,31 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
       )}
 
       {/* Document View Modal */}
-      {showDocumentModal && selectedDocument && (
+      <DocumentViewModal
+        document={selectedDocument}
+        isOpen={showDocumentModal}
+        onClose={closeDocumentModal}
+      />
+
+      {/* Verification Modal */}
+      {showVerificationModal && selectedDocument && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Visualizar Documento
+                  {selectedDocument.isVerified
+                    ? "Cambiar Estado de Verificación"
+                    : "Verificar Documento"}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  {selectedDocument.documentType || "Documento de Verificación"}
+                  {selectedDocument.documentType} -{" "}
+                  {selectedDocument.originalName}
                 </p>
               </div>
               <Button
-                onClick={closeDocumentModal}
+                onClick={closeVerificationModal}
                 className="text-gray-400 hover:text-gray-600 p-1"
               >
                 <X className="h-6 w-6" />
@@ -242,252 +284,117 @@ export default function TrainerDocumentsSection({ trainerId, trainerName }) {
 
             {/* Content */}
             <div className="p-6">
-              {/* Document Info */}
+              {/* Current Status */}
               <div className="mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                     <div className="bg-gray-50 p-4 rounded-lg">
-                     <p className="text-sm text-gray-500 mb-1">Tipo de Documento</p>
-                     <p className="font-medium text-gray-900">
-                       {selectedDocument.documentType || "No especificado"}
-                     </p>
-                   </div>
-                   {selectedDocument.createdAt && (
-                     <div className="bg-gray-50 p-4 rounded-lg">
-                       <p className="text-sm text-gray-500 mb-1">Fecha de Subida</p>
-                       <p className="font-medium text-gray-900">
-                         {new Date(selectedDocument.createdAt).toLocaleDateString('es-ES', {
-                           day: 'numeric',
-                           month: 'long',
-                           year: 'numeric',
-                           hour: '2-digit',
-                           minute: '2-digit'
-                         })}
-                       </p>
-                     </div>
-                   )}
-                </div>
-                
-                {selectedDocument.originalName && (
-                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                    <p className="text-sm text-gray-500 mb-1">Nombre Original</p>
-                    <p className="text-gray-900">{selectedDocument.originalName}</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Estado Actual
+                </h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {selectedDocument.isVerified ? (
+                      <>
+                        <CheckCircle className="h-6 w-6 text-green-600" />
+                        <div>
+                          <p className="font-medium text-green-700">
+                            Documento Verificado
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Verificado el{" "}
+                            {selectedDocument.verifiedAt
+                              ? new Date(
+                                  selectedDocument.verifiedAt
+                                ).toLocaleDateString("es-ES")
+                              : "fecha no disponible"}
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-6 w-6 text-yellow-600" />
+                        <div>
+                          <p className="font-medium text-yellow-700">
+                            Documento Pendiente de Verificación
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Aún no ha sido revisado
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
-                )}
+                </div>
+              </div>
 
-                {selectedDocument.fileSize && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Tamaño del Archivo</p>
-                    <p className="font-medium text-gray-900">
-                      {(selectedDocument.fileSize / 1024).toFixed(2)} KB
+              {/* Verification Notes */}
+              <div className="mb-6">
+                <label
+                  htmlFor="verificationNotes"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Notas de Verificación
+                </label>
+                <textarea
+                  id="verificationNotes"
+                  value={verificationNotes}
+                  onChange={(e) => setVerificationNotes(e.target.value)}
+                  placeholder="Agregar notas sobre la verificación del documento..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Las notas son opcionales pero recomendadas para documentar la
+                  decisión.
+                </p>
+              </div>
+
+              {/* Previous Notes */}
+              {selectedDocument.verificationNotes && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Notas Anteriores
+                  </h4>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      {selectedDocument.verificationNotes}
                     </p>
                   </div>
-                )}
-              </div>
-
-              {/* Document Viewer */}
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Vista Previa del Documento</h3>
-                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  {selectedDocument.firebaseUrl ? (
-                    <div className="space-y-4">
-                      {/* PDF Viewer */}
-                      {selectedDocument.firebaseUrl.toLowerCase().includes('.pdf') ? (
-                        <iframe
-                          src={selectedDocument.firebaseUrl}
-                          className="w-full h-96 border border-gray-300 rounded-lg"
-                          title="Vista previa del documento"
-                        />
-                      ) : (
-                        /* Image Viewer */
-                        <img
-                          src={selectedDocument.firebaseUrl}
-                          alt={selectedDocument.documentType || "Documento"}
-                          className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'block';
-                          }}
-                        />
-                      )}
-                      
-                      {/* Fallback for unsupported formats */}
-                      <div className="hidden">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                          <FileText className="h-16 w-16 text-blue-400 mx-auto mb-3" />
-                          <p className="text-blue-800 font-medium mb-2">
-                            Documento no compatible con vista previa
-                          </p>
-                          <p className="text-blue-600 text-sm mb-4">
-                            Este tipo de archivo no puede ser visualizado en el navegador
-                          </p>
-                                                     <Button
-                             onClick={() => window.open(selectedDocument.firebaseUrl, '_blank')}
-                             className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg"
-                           >
-                             Abrir en Nueva Pestaña
-                           </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                      <FileText className="h-16 w-16 text-red-400 mx-auto mb-3" />
-                      <p className="text-red-800 font-medium">URL del documento no disponible</p>
-                      <p className="text-red-600 text-sm">
-                        No se puede acceder al archivo del documento
-                      </p>
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
 
               {/* Actions */}
               <div className="flex justify-end gap-3">
                 <Button
-                  onClick={closeDocumentModal}
+                  onClick={closeVerificationModal}
                   className="bg-gray-300 text-gray-700 hover:bg-gray-400 px-4 py-2 rounded-lg"
+                  disabled={verificationLoading}
                 >
-                  Cerrar
+                  Cancelar
                 </Button>
-                {selectedDocument.firebaseUrl && (
+
+                {selectedDocument.isVerified ? (
                   <Button
-                    onClick={() => {
-                      const a = document.createElement('a');
-                      a.href = selectedDocument.firebaseUrl;
-                      a.download = selectedDocument.originalName || 'documento-verificacion';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                    }}
-                    className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg flex items-center gap-2"
+                    onClick={() => handleVerifyDocument(false)}
+                    className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-lg flex items-center gap-2"
+                    disabled={verificationLoading}
                   >
-                    <Download className="h-4 w-4" />
-                    Descargar
+                    <XCircle className="h-4 w-4" />
+                    {verificationLoading ? "Rechazando..." : "Rechazar"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleVerifyDocument(true)}
+                    className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg flex items-center gap-2"
+                    disabled={verificationLoading}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    {verificationLoading ? "Verificando..." : "Aprobar"}
                   </Button>
                 )}
               </div>
             </div>
-                     </div>
-         </div>
-       )}
-
-       {/* Verification Modal */}
-       {showVerificationModal && selectedDocument && (
-         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-             {/* Header */}
-             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-               <div>
-                 <h2 className="text-xl font-semibold text-gray-900">
-                   {selectedDocument.isVerified ? "Cambiar Estado de Verificación" : "Verificar Documento"}
-                 </h2>
-                 <p className="text-sm text-gray-600 mt-1">
-                   {selectedDocument.documentType} - {selectedDocument.originalName}
-                 </p>
-               </div>
-               <Button
-                 onClick={closeVerificationModal}
-                 className="text-gray-400 hover:text-gray-600 p-1"
-               >
-                 <X className="h-6 w-6" />
-               </Button>
-             </div>
-
-             {/* Content */}
-             <div className="p-6">
-               {/* Current Status */}
-               <div className="mb-6">
-                 <h3 className="text-lg font-medium text-gray-900 mb-4">Estado Actual</h3>
-                 <div className="bg-gray-50 p-4 rounded-lg">
-                   <div className="flex items-center gap-3">
-                     {selectedDocument.isVerified ? (
-                       <>
-                         <CheckCircle className="h-6 w-6 text-green-600" />
-                         <div>
-                           <p className="font-medium text-green-700">Documento Verificado</p>
-                           <p className="text-sm text-gray-600">
-                             Verificado el {selectedDocument.verifiedAt ? 
-                               new Date(selectedDocument.verifiedAt).toLocaleDateString('es-ES') : 
-                               'fecha no disponible'
-                             }
-                           </p>
-                         </div>
-                       </>
-                     ) : (
-                       <>
-                         <XCircle className="h-6 w-6 text-yellow-600" />
-                         <div>
-                           <p className="font-medium text-yellow-700">Documento Pendiente de Verificación</p>
-                           <p className="text-sm text-gray-600">Aún no ha sido revisado</p>
-                         </div>
-                       </>
-                     )}
-                   </div>
-                 </div>
-               </div>
-
-               {/* Verification Notes */}
-               <div className="mb-6">
-                 <label htmlFor="verificationNotes" className="block text-sm font-medium text-gray-700 mb-2">
-                   Notas de Verificación
-                 </label>
-                 <textarea
-                   id="verificationNotes"
-                   value={verificationNotes}
-                   onChange={(e) => setVerificationNotes(e.target.value)}
-                   placeholder="Agregar notas sobre la verificación del documento..."
-                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   rows={4}
-                 />
-                 <p className="text-sm text-gray-500 mt-1">
-                   Las notas son opcionales pero recomendadas para documentar la decisión.
-                 </p>
-               </div>
-
-               {/* Previous Notes */}
-               {selectedDocument.verificationNotes && (
-                 <div className="mb-6">
-                   <h4 className="text-sm font-medium text-gray-700 mb-2">Notas Anteriores</h4>
-                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                     <p className="text-sm text-blue-800">{selectedDocument.verificationNotes}</p>
-                   </div>
-                 </div>
-               )}
-
-               {/* Actions */}
-               <div className="flex justify-end gap-3">
-                 <Button
-                   onClick={closeVerificationModal}
-                   className="bg-gray-300 text-gray-700 hover:bg-gray-400 px-4 py-2 rounded-lg"
-                   disabled={verificationLoading}
-                 >
-                   Cancelar
-                 </Button>
-                 
-                 {selectedDocument.isVerified ? (
-                   <Button
-                     onClick={() => handleVerifyDocument(false)}
-                     className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-lg flex items-center gap-2"
-                     disabled={verificationLoading}
-                   >
-                     <XCircle className="h-4 w-4" />
-                     {verificationLoading ? "Rechazando..." : "Rechazar"}
-                   </Button>
-                 ) : (
-                   <Button
-                     onClick={() => handleVerifyDocument(true)}
-                     className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg flex items-center gap-2"
-                     disabled={verificationLoading}
-                   >
-                     <CheckCircle className="h-4 w-4" />
-                     {verificationLoading ? "Verificando..." : "Aprobar"}
-                   </Button>
-                 )}
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
-     </div>
-   );
- }
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,15 +1,16 @@
-import { FileText, Eye, Download, Trash2 } from "lucide-react";
+import { FileText, Eye, Download, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "../pages/Components/Button";
 
-export default function VerificationDocumentsList({ 
-  isLoadingVerification, 
-  verificationDocuments, 
-  verificationTypes, 
-  handleViewDocument, 
-  handleDeleteVerificationDocument, 
-  formatFileSize, 
-  getFileIcon 
+export default function VerificationDocumentsList({
+  isLoadingVerification,
+  verificationDocuments,
+  verificationTypes,
+  handleViewDocument,
+  handleDeleteVerificationDocument,
+  formatFileSize,
+  getFileIcon,
 }) {
+  console.log("verificationDocuments", verificationDocuments);
   if (isLoadingVerification) {
     return (
       <div className="text-center py-6">
@@ -39,11 +40,12 @@ export default function VerificationDocumentsList({
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl">
-              {getFileIcon(doc.fileType || 'application/pdf')}
+              {getFileIcon(doc.fileType || "application/pdf")}
             </span>
             <div>
               <h5 className="font-medium text-gray-900">
-                {verificationTypes.find(t => t.value === doc.documentType)?.label || doc.documentType}
+                {verificationTypes.find((t) => t.value === doc.documentType)
+                  ?.label || doc.documentType}
               </h5>
               {doc.notes && (
                 <p className="text-sm text-gray-600">{doc.notes}</p>
@@ -52,6 +54,22 @@ export default function VerificationDocumentsList({
                 <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
                   Verificación
                 </span>
+                
+                {/* Estado de Verificación en la información del documento */}
+                <div className="flex items-center gap-1">
+                  {doc.isVerified ? (
+                    <span className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>Verificado</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                      <XCircle className="h-3 w-3" />
+                      <span>Pendiente</span>
+                    </span>
+                  )}
+                </div>
+                
                 {doc.fileSize && (
                   <span className="text-xs text-gray-500">
                     {formatFileSize(doc.fileSize)}
@@ -59,14 +77,29 @@ export default function VerificationDocumentsList({
                 )}
                 {doc.uploadedAt && (
                   <span className="text-xs text-gray-500">
-                    {new Date(doc.uploadedAt).toLocaleDateString('es-ES')}
+                    {new Date(doc.uploadedAt).toLocaleDateString("es-ES")}
                   </span>
                 )}
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
+            {/* Estado de Verificación */}
+            <div className="flex items-center gap-1">
+              {doc.isVerified ? (
+                <span className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium border border-green-200">
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  <span>Verificado</span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-medium border border-yellow-200">
+                  <XCircle className="h-3.5 w-3.5" />
+                  <span>Pendiente</span>
+                </span>
+              )}
+            </div>
+            
             <Button
               onClick={() => handleViewDocument(doc.id, true)}
               className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
@@ -76,7 +109,7 @@ export default function VerificationDocumentsList({
             </Button>
             {doc.downloadUrl && (
               <Button
-                onClick={() => window.open(doc.downloadUrl, '_blank')}
+                onClick={() => window.open(doc.downloadUrl, "_blank")}
                 className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
                 title="Descargar"
               >
