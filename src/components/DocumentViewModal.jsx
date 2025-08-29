@@ -14,6 +14,7 @@ export default function DocumentViewModal({
   verificationTypes, 
   formatFileSize 
 }) {
+  console.log("selectedDocument", selectedDocument);
   if (!showViewModal || !selectedDocument) return null;
 
   const handleClose = () => {
@@ -85,11 +86,17 @@ export default function DocumentViewModal({
                       <span className="ml-2 text-gray-600">{selectedDocument.notes}</span>
                     </div>
                   )}
-                  {selectedDocument.uploadedAt && (
+                  {selectedDocument.createdAt && (
                     <div>
                       <span className="font-medium text-gray-700">Fecha de Subida:</span>
                       <span className="ml-2 text-gray-600">
-                        {new Date(selectedDocument.uploadedAt).toLocaleDateString('es-ES')}
+                        {new Date(selectedDocument.createdAt).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </span>
                     </div>
                   )}
@@ -97,6 +104,13 @@ export default function DocumentViewModal({
                     <div>
                       <span className="font-medium text-gray-700">Tamaño:</span>
                       <span className="ml-2 text-gray-600">{formatFileSize(selectedDocument.fileSize)}</span>
+                    </div>
+                  )}
+                  
+                  {selectedDocument.originalName && (
+                    <div>
+                      <span className="font-medium text-gray-700">Nombre Original:</span>
+                      <span className="ml-2 text-gray-600">{selectedDocument.originalName}</span>
                     </div>
                   )}
                   
@@ -109,6 +123,11 @@ export default function DocumentViewModal({
                           <CheckCircle className="h-3 w-3" />
                           Verificado
                         </span>
+                      ) : selectedDocument.verificationNotes ? (
+                        <span className="inline-flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <XCircle className="h-3 w-3" />
+                          Rechazado
+                        </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                           <XCircle className="h-3 w-3" />
@@ -120,7 +139,7 @@ export default function DocumentViewModal({
                 </div>
                 
                 {/* Sección de Información de Verificación */}
-                {(selectedDocument.isVerified || selectedDocument.verificationNotes) && (
+                {(selectedDocument.isVerified || selectedDocument.verificationNotes || selectedDocument.verifiedAt) && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <h6 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-blue-600" />
@@ -130,12 +149,26 @@ export default function DocumentViewModal({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Notas de Verificación */}
                       {selectedDocument.verificationNotes && (
-                        <div className="bg-white p-3 rounded-lg border border-gray-200">
+                        <div className={`p-3 rounded-lg border ${
+                          selectedDocument.isVerified 
+                            ? 'bg-white border-gray-200' 
+                            : 'bg-red-50 border-red-200'
+                        }`}>
                           <div className="flex items-start gap-2">
-                            <MessageSquare className="h-4 w-4 text-blue-500 mt-0.5" />
+                            <MessageSquare className={`h-4 w-4 mt-0.5 ${
+                              selectedDocument.isVerified ? 'text-blue-500' : 'text-red-500'
+                            }`} />
                             <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">Notas de Verificación</p>
-                              <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded border">
+                              <p className={`text-sm font-medium mb-1 ${
+                                selectedDocument.isVerified ? 'text-gray-700' : 'text-red-700'
+                              }`}>
+                                {selectedDocument.isVerified ? 'Notas de Verificación' : 'Motivo de Rechazo'}
+                              </p>
+                              <p className={`text-sm p-2 rounded border ${
+                                selectedDocument.isVerified 
+                                  ? 'text-gray-800 bg-gray-50 border-gray-200' 
+                                  : 'text-red-800 bg-red-100 border-red-200'
+                              }`}>
                                 {selectedDocument.verificationNotes}
                               </p>
                             </div>
@@ -211,6 +244,16 @@ export default function DocumentViewModal({
                               <p className="text-lg font-semibold text-green-800">Documento Verificado</p>
                               <p className="text-sm text-green-600">
                                 Este documento ha sido revisado y aprobado por el equipo de verificación
+                              </p>
+                            </div>
+                          </div>
+                        ) : selectedDocument.verificationNotes ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <XCircle className="h-12 w-12 text-red-500" />
+                            <div>
+                              <p className="text-lg font-semibold text-red-800">Documento Rechazado</p>
+                              <p className="text-sm text-red-600">
+                                Este documento fue revisado pero no cumple con los requisitos de verificación
                               </p>
                             </div>
                           </div>

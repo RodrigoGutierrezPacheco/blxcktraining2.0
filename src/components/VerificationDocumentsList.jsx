@@ -62,6 +62,11 @@ export default function VerificationDocumentsList({
                       <CheckCircle className="h-3 w-3" />
                       <span>Verificado</span>
                     </span>
+                  ) : doc.verificationNotes ? (
+                    <span className="flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                      <XCircle className="h-3 w-3" />
+                      <span>Rechazado</span>
+                    </span>
                   ) : (
                     <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                       <XCircle className="h-3 w-3" />
@@ -81,24 +86,25 @@ export default function VerificationDocumentsList({
                   </span>
                 )}
               </div>
+              
+              {/* Información de rechazo */}
+              {!doc.isVerified && doc.verificationNotes && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-500 text-xs">❌</span>
+                    <div className="text-xs">
+                      <p className="text-red-700 font-medium mb-1">Motivo de Rechazo:</p>
+                      <p className="text-red-800 bg-red-100 px-2 py-1 rounded border border-red-200">
+                        {doc.verificationNotes}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Estado de Verificación */}
-            <div className="flex items-center gap-1">
-              {doc.isVerified ? (
-                <span className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium border border-green-200">
-                  <CheckCircle className="h-3.5 w-3.5" />
-                  <span>Verificado</span>
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-medium border border-yellow-200">
-                  <XCircle className="h-3.5 w-3.5" />
-                  <span>Pendiente</span>
-                </span>
-              )}
-            </div>
             
             <Button
               onClick={() => handleViewDocument(doc.id, true)}
