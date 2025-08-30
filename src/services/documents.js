@@ -97,7 +97,7 @@ export const getTrainerDocuments = async (trainerId) => {
       throw new Error("ID del entrenador no válido");
     }
 
-    const response = await fetch(`${APP_URL}trainers/${trainerId}/documents`, {
+    const response = await fetch(`${APP_URL}trainer-education/documents/${trainerId}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -425,6 +425,89 @@ export const replaceVerificationDocument = async (trainerId, documentType, file)
   } catch (error) {
     console.error("Error replacing verification document:", error);
     throw new Error(error.message || "Error al reemplazar el documento de verificación");
+  }
+};
+
+// Función para subir documento de educación del entrenador
+export const uploadTrainerEducationDocument = async (trainerId, documentData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    if (!documentData.file) {
+      throw new Error("No se ha seleccionado ningún archivo");
+    }
+
+    if (!documentData.title) {
+      throw new Error("El título del documento es obligatorio");
+    }
+
+    if (!documentData.description) {
+      throw new Error("La descripción del documento es obligatoria");
+    }
+
+    const formData = new FormData();
+    formData.append('file', documentData.file);
+    formData.append('title', documentData.title);
+    formData.append('description', documentData.description);
+
+    const response = await fetch(`${APP_URL}trainer-education/upload/${trainerId}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error uploading trainer education document:", error);
+    throw new Error(error.message || "Error al subir el documento de educación");
+  }
+};
+
+// Función para obtener documentos de educación del entrenador
+export const getTrainerEducationDocuments = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainer-education/documents/${trainerId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error getting trainer education documents:", error);
+    throw new Error(error.message || "Error al obtener los documentos de educación");
   }
 };
 

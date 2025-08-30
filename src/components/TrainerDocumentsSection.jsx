@@ -3,17 +3,16 @@ import { Card, CardContent } from "../pages/Components/Card";
 import { Button } from "../pages/Components/Button";
 import { Upload, Plus } from "lucide-react";
 import { 
-  uploadTrainerDocument, 
   getTrainerDocuments, 
   deleteTrainerDocument,
   uploadVerificationDocument,
   getTrainerVerificationDocuments,
   getTrainerDocument,
   deleteVerificationDocument,
+  getTrainerEducationDocuments,
   validateFileType,
   validateFileSize,
   VERIFICATION_ALLOWED_TYPES,
-  DOCUMENT_ALLOWED_TYPES,
   MAX_FILE_SIZE_MB
 } from "../services/documents";
 
@@ -28,8 +27,10 @@ export default function TrainerDocumentsSection({ trainerId }) {
   console.log("trainerId", trainerId);
   const [documents, setDocuments] = useState([]);
   const [verificationDocuments, setVerificationDocuments] = useState([]);
+  const [educationDocuments, setEducationDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingVerification, setIsLoadingVerification] = useState(false);
+  const [isLoadingEducation, setIsLoadingEducation] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [showVerificationForm, setShowVerificationForm] = useState(false);
@@ -37,12 +38,6 @@ export default function TrainerDocumentsSection({ trainerId }) {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
   const [documentContent, setDocumentContent] = useState(null);
-  const [uploadForm, setUploadForm] = useState({
-    title: "",
-    description: "",
-    type: "certification",
-    file: null
-  });
   const [verificationForm, setVerificationForm] = useState({
     documentType: "identification",
     notes: "",
@@ -69,6 +64,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
     if (trainerId) {
       fetchDocuments();
       fetchVerificationDocuments();
+      fetchEducationDocuments();
     }
   }, [trainerId]);
 
@@ -100,53 +96,49 @@ export default function TrainerDocumentsSection({ trainerId }) {
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!validateFileType(file, DOCUMENT_ALLOWED_TYPES)) {
-        setError("Solo se permiten archivos PDF, imágenes y documentos de Word");
-        return;
-      }
-      
-      if (!validateFileSize(file, MAX_FILE_SIZE_MB)) {
-        setError(`El archivo no puede ser mayor a ${MAX_FILE_SIZE_MB}MB`);
-        return;
-      }
-      
-      setUploadForm(prev => ({ ...prev, file }));
+  const fetchEducationDocuments = async () => {
+    try {
+      setIsLoadingEducation(true);
       setError(null);
+      const docs = await getTrainerEducationDocuments(trainerId);
+      setEducationDocuments(docs);
+    } catch (err) {
+      console.error("Error fetching education documents:", err);
+      setError(err.message);
+    } finally {
+      setIsLoadingEducation(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!uploadForm.title.trim() || !uploadForm.file) {
-      setError("Por favor completa todos los campos requeridos");
-      return;
-    }
-
+  const handleViewDocument = async (documentId, isVerification = false, isEducation = false) => {
     try {
-      setIsUploading(true);
+      setIsLoadingDocument(true);
       setError(null);
       
-      await uploadTrainerDocument(trainerId, uploadForm);
+      let document;
+      if (isEducation) {
+        document = educationDocuments.find(doc => doc.id === documentId);
+      } else if (isVerification) {
+        document = verificationDocuments.find(doc => doc.id === documentId);
+      } else {
+        document = documents.find(doc => doc.id === documentId);
+      }
       
-      setUploadForm({
-        title: "",
-        description: "",
-        type: "certification",
-        file: null
-      });
-      setShowUploadForm(false);
+      if (!document) {
+        throw new Error("Documento no encontrado");
+      }
       
-      await fetchDocuments();
+      setSelectedDocument(document);
       
+      const documentData = await getTrainerDocument(documentId, trainerId);
+      setDocumentContent(documentData);
+      
+      setShowViewModal(true);
     } catch (err) {
-      console.error("Error uploading document:", err);
+      console.error("Error viewing document:", err);
       setError(err.message);
     } finally {
-      setIsUploading(false);
+      setIsLoadingDocument(false);
     }
   };
 
@@ -225,39 +217,15 @@ export default function TrainerDocumentsSection({ trainerId }) {
       
       alert("Documento de verificación subido exitosamente");
       await fetchVerificationDocuments();
+      // También refetch de otros documentos para mantener consistencia
+      await fetchDocuments();
+      await fetchEducationDocuments();
       
     } catch (err) {
       console.error("Error uploading verification document:", err);
       setError(err.message);
     } finally {
       setIsUploading(false);
-    }
-  };
-
-  const handleViewDocument = async (documentId, isVerification = false) => {
-    try {
-      setIsLoadingDocument(true);
-      setError(null);
-      
-      const document = isVerification 
-        ? verificationDocuments.find(doc => doc.id === documentId)
-        : documents.find(doc => doc.id === documentId);
-      
-      if (!document) {
-        throw new Error("Documento no encontrado");
-      }
-      
-      setSelectedDocument(document);
-      
-      const documentData = await getTrainerDocument(documentId, trainerId);
-      setDocumentContent(documentData);
-      
-      setShowViewModal(true);
-    } catch (err) {
-      console.error("Error viewing document:", err);
-      setError(err.message);
-    } finally {
-      setIsLoadingDocument(false);
     }
   };
 
@@ -270,11 +238,15 @@ export default function TrainerDocumentsSection({ trainerId }) {
   };
 
   const getFileIcon = (fileType) => {
+    if (!fileType) return '📎'; // Manejar caso donde fileType es null o undefined
+    
     if (fileType.includes('pdf')) return '📄';
     if (fileType.includes('image')) return '🖼️';
     if (fileType.includes('word')) return '📝';
     return '📎';
   };
+
+
 
   return (
     <Card className="w-full">
@@ -308,7 +280,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
 
         {/* Lista de Documentos Regulares */}
         <DocumentsList
-          isLoading={isLoading}
+          isLoading={isLoading || isLoadingEducation}
           documents={documents}
           documentTypes={documentTypes}
           handleViewDocument={handleViewDocument}
@@ -349,12 +321,12 @@ export default function TrainerDocumentsSection({ trainerId }) {
         <UploadFormModal
           showUploadForm={showUploadForm}
           setShowUploadForm={setShowUploadForm}
-          uploadForm={uploadForm}
-          setUploadForm={setUploadForm}
-          handleSubmit={handleSubmit}
-          handleFileChange={handleFileChange}
-          isUploading={isUploading}
-          documentTypes={documentTypes}
+          onDocumentUploaded={() => {
+            // Refetch de todos los documentos cuando se sube uno nuevo
+            fetchDocuments();
+            fetchVerificationDocuments();
+            fetchEducationDocuments();
+          }}
         />
 
         <DocumentViewModal
