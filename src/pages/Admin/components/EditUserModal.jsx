@@ -100,7 +100,13 @@ export default function EditUserModal({ isOpen, user, onClose, onEditSuccess }) 
       const dataToSend = {};
       Object.keys(editUserData).forEach(key => {
         if (editUserData[key] !== "" && editUserData[key] !== null) {
-          dataToSend[key] = editUserData[key];
+          if (key === 'dateOfBirth' && editUserData[key]) {
+            // Convertir YYYY-MM-DD a ISO string para el backend
+            const date = new Date(editUserData[key]);
+            dataToSend[key] = date.toISOString();
+          } else {
+            dataToSend[key] = editUserData[key];
+          }
         }
       });
 
