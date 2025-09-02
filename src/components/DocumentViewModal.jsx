@@ -1,7 +1,7 @@
 import { X, AlertCircle, Download, FileText, CheckCircle, XCircle, MessageSquare, Calendar, User, Upload, RefreshCw } from "lucide-react";
 import { Button } from "../pages/Components/Button";
 import { useState } from "react";
-import { replaceVerificationDocument } from "../services/documents";
+import { replaceVerificationDocument, replaceTrainerEducationDocument } from "../services/documents";
 
 export default function DocumentViewModal({ 
   showViewModal, 
@@ -14,12 +14,14 @@ export default function DocumentViewModal({
   error, 
   documentTypes, 
   verificationTypes, 
-  formatFileSize 
+  formatFileSize,
+  isEducationDocument = false,
 }) {
   const [showReplaceModal, setShowReplaceModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isReplacing, setIsReplacing] = useState(false);
   const [replaceError, setReplaceError] = useState("");
+  const [replaceNotes, setReplaceNotes] = useState("");
 
   console.log("selectedDocument", selectedDocument);
   if (!showViewModal || !selectedDocument) return null;
@@ -48,15 +50,27 @@ export default function DocumentViewModal({
       setIsReplacing(true);
       setReplaceError("");
       
-      await replaceVerificationDocument(
-        selectedDocument.trainerId || selectedDocument.userId, 
-        selectedDocument.documentType, 
-        selectedFile
-      );
+      if (isEducationDocument) {
+        // Para documentos de educación
+        await replaceTrainerEducationDocument(
+          selectedDocument.trainerId || selectedDocument.userId, 
+          selectedDocument.id, 
+          selectedFile,
+          replaceNotes
+        );
+      } else {
+        // Para documentos de verificación
+        await replaceVerificationDocument(
+          selectedDocument.trainerId || selectedDocument.userId, 
+          selectedDocument.documentType, 
+          selectedFile
+        );
+      }
 
       // Cerrar modal y recargar
       setShowReplaceModal(false);
       setSelectedFile(null);
+      setReplaceNotes("");
       alert("Documento reemplazado exitosamente. El estado se ha restablecido a pendiente.");
       
       // Recargar la página o emitir evento para actualizar
@@ -74,6 +88,7 @@ export default function DocumentViewModal({
     setShowReplaceModal(false);
     setSelectedFile(null);
     setReplaceError("");
+    setReplaceNotes("");
   };
 
   return (
@@ -167,32 +182,32 @@ export default function DocumentViewModal({
                     </div>
                   )}
                   
-                  {/* Estado de Verificación */}
-                  <div>
-                    <span className="font-medium text-gray-700">Estado:</span>
-                    <span className="ml-2">
-                      {selectedDocument.verificationStatus === 'aceptada' ? (
-                        <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                          <CheckCircle className="h-3 w-3" />
-                          Aceptada
-                        </span>
-                      ) : selectedDocument.verificationStatus === 'rechazada' ? (
-                        <span className="inline-flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                          <XCircle className="h-3 w-3" />
-                          Rechazada
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                          <XCircle className="h-3 w-3" />
-                          Pendiente
-                        </span>
-                      )}
-                    </span>
-                  </div>
+                  {/* Estado de Verificación - Solo para documentos de verificación */}
+                    <div>
+                      <span className="font-medium text-gray-700">Estado:</span>
+                      <span className="ml-2">
+                        {selectedDocument.verificationStatus === 'aceptada' ? (
+                          <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                            <CheckCircle className="h-3 w-3" />
+                            Aceptada
+                          </span>
+                        ) : selectedDocument.verificationStatus === 'rechazada' ? (
+                          <span className="inline-flex items-center gap-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                            <XCircle className="h-3 w-3" />
+                            Rechazada
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                            <XCircle className="h-3 w-3" />
+                            Pendiente
+                          </span>
+                        )}
+                      </span>
+                    </div>
                 </div>
                 
-                {/* Sección de Información de Verificación */}
-                {(selectedDocument.verificationStatus === 'aceptada' || selectedDocument.verificationStatus === 'rechazada' || selectedDocument.verificationNotes || selectedDocument.verifiedAt) && (
+                {/* Sección de Información de Verificación - Solo para documentos de verificación */}
+                { (selectedDocument.verificationStatus === 'aceptada' || selectedDocument.verificationStatus === 'rechazada' || selectedDocument.verificationNotes || selectedDocument.verifiedAt) && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <h6 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-blue-600" />
@@ -326,10 +341,10 @@ export default function DocumentViewModal({
                   </div>
                 )}
                 
-                {documentContent.signedUrl && (
+                {(documentContent.signedUrl || documentContent.firebaseUrl )&& (
                   <div className="mt-4 pt-4 border-t">
                     <Button
-                      onClick={() => window.open(documentContent.signedUrl, '_blank')}
+                      onClick={() => window.open(documentContent.signedUrl || documentContent.firebaseUrl, '_blank')}
                       className="w-full bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
                     >
                       <Download className="h-4 w-4" />
@@ -338,7 +353,7 @@ export default function DocumentViewModal({
                   </div>
                 )}
 
-                {/* Botón para reemplazar documento rechazado */}
+                {/* Botón para reemplazar documento rechazado - Para documentos de verificación y educación rechazados */}
                 {selectedDocument.verificationStatus === 'rechazada' && (
                   <div className="mt-4 pt-4 border-t">
                     <Button
@@ -357,11 +372,11 @@ export default function DocumentViewModal({
               
               <div className="border rounded-lg p-4">
                 <h5 className="font-medium text-gray-900 mb-2">Vista Previa del Documento</h5>
-                {documentContent.signedUrl ? (
+                {documentContent.signedUrl || documentContent.firebaseUrl ? (
                   <div className="text-center">
                     {documentContent.mimeType?.includes('image') ? (
                       <img 
-                        src={documentContent.signedUrl} 
+                        src={documentContent.signedUrl || documentContent.firebaseUrl} 
                         alt="Vista previa del documento"
                         className="max-w-full h-auto max-h-96 mx-auto"
                       />
@@ -370,9 +385,10 @@ export default function DocumentViewModal({
                         <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
                         <p className="text-gray-600 mb-2">Documento no visualizable</p>
                         <Button
-                          onClick={() => window.open(documentContent.signedUrl, '_blank')}
+                          onClick={() => window.open(documentContent.signedUrl || documentContent.firebaseUrl, '_blank')}
                           className="bg-blue-600 text-white hover:bg-blue-700"
                         >
+                          {console.log("documentContent", documentContent)}
                           <Download className="h-4 w-4 mr-2" />
                           Descargar para Ver
                         </Button>
@@ -433,6 +449,25 @@ export default function DocumentViewModal({
                     Formatos permitidos: PDF, JPG, JPEG, PNG (máx. 10MB)
                   </p>
                 </div>
+
+                {/* Campo de notas solo para documentos de educación */}
+                {isEducationDocument && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Notas del Reemplazo (Opcional)
+                    </label>
+                    <textarea
+                      value={replaceNotes}
+                      onChange={(e) => setReplaceNotes(e.target.value)}
+                      placeholder="Ej: Documento anterior expirado, se reemplaza con el vigente"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={3}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Explica brevemente el motivo del reemplazo
+                    </p>
+                  </div>
+                )}
 
                 {replaceError && (
                   <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">

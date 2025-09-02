@@ -283,7 +283,7 @@ export const DOCUMENT_ALLOWED_TYPES = [
 // Tamaño máximo de archivo (10MB)
 export const MAX_FILE_SIZE_MB = 10;
 
-// Función para obtener un documento específico del entrenador
+// Función para obtener un documento específico del entrenador (verificación)
 export const getTrainerDocument = async (documentId, trainerId) => {
   try {
     const token = localStorage.getItem("tokenBlck");
@@ -313,6 +313,39 @@ export const getTrainerDocument = async (documentId, trainerId) => {
   } catch (error) {
     console.error("Error getting trainer document:", error);
     throw new Error(error.message || "Error al obtener el documento");
+  }
+};
+
+// Función para obtener un documento de educación específico del entrenador
+export const getTrainerEducationDocument = async (documentId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!documentId) {
+      throw new Error("ID del documento no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainer-education/document/${documentId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error getting trainer education document:", error);
+    throw new Error(error.message || "Error al obtener el documento de educación");
   }
 };
 
@@ -381,6 +414,41 @@ export const verifyTrainerDocument = async (documentId, verificationData) => {
   } catch (error) {
     console.error("Error verifying trainer document:", error);
     throw new Error(error.message || "Error al verificar el documento");
+  }
+};
+
+// Función para verificar/rechazar un documento de educación del entrenador
+export const verifyTrainerEducationDocument = async (documentId, verificationData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!documentId) {
+      throw new Error("ID del documento no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainer-education/verify/${documentId}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(verificationData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error verifying trainer education document:", error);
+    throw new Error(error.message || "Error al verificar el documento de educación");
   }
 };
 
@@ -508,6 +576,85 @@ export const getTrainerEducationDocuments = async (trainerId) => {
   } catch (error) {
     console.error("Error getting trainer education documents:", error);
     throw new Error(error.message || "Error al obtener los documentos de educación");
+  }
+};
+
+// Función para eliminar un documento de educación del entrenador
+export const deleteTrainerEducationDocument = async (documentId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!documentId) {
+      throw new Error("ID del documento no válido");
+    }
+
+    const response = await fetch(`${APP_URL}trainer-education/document/${documentId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error deleting trainer education document:", error);
+    throw new Error(error.message || "Error al eliminar el documento de educación");
+  }
+};
+
+// Función para reemplazar un documento de educación del entrenador
+export const replaceTrainerEducationDocument = async (trainerId, documentId, file, notes = "") => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId || !documentId || !file) {
+      throw new Error("Faltan datos requeridos para reemplazar el documento");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    if (notes) {
+      formData.append("notes", notes);
+    }
+
+    const response = await fetch(
+      `${APP_URL}trainer-education/replace/${trainerId}/${documentId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error replacing education document:", error);
+    throw new Error(
+      error.message || "Error al reemplazar el documento de educación"
+    );
   }
 };
 

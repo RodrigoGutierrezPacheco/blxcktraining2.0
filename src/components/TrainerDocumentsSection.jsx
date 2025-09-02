@@ -4,12 +4,14 @@ import { Button } from "../pages/Components/Button";
 import { Upload, Plus } from "lucide-react";
 import { 
   getTrainerDocuments, 
-  deleteTrainerDocument,
+  // deleteTrainerDocument, // No se usa actualmente
   uploadVerificationDocument,
   getTrainerVerificationDocuments,
   getTrainerDocument,
+  getTrainerEducationDocument,
   deleteVerificationDocument,
   getTrainerEducationDocuments,
+  deleteTrainerEducationDocument,
   validateFileType,
   validateFileSize,
   VERIFICATION_ALLOWED_TYPES,
@@ -28,7 +30,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
   const [documents, setDocuments] = useState([]);
   const [verificationDocuments, setVerificationDocuments] = useState([]);
   const [educationDocuments, setEducationDocuments] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false); // No se usa actualmente
   const [isLoadingVerification, setIsLoadingVerification] = useState(false);
   const [isLoadingEducation, setIsLoadingEducation] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,7 +72,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
 
   const fetchDocuments = async () => {
     try {
-      setIsLoading(true);
+      // setIsLoading(true); // No se usa actualmente
       setError(null);
       const docs = await getTrainerDocuments(trainerId);
       setDocuments(docs);
@@ -78,7 +80,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
       console.error("Error fetching documents:", err);
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false); // No se usa actualmente
     }
   };
 
@@ -130,7 +132,14 @@ export default function TrainerDocumentsSection({ trainerId }) {
       
       setSelectedDocument(document);
       
-      const documentData = await getTrainerDocument(documentId, trainerId);
+      // Use the correct endpoint based on document type
+      let documentData;
+      if (isEducation) {
+        documentData = await getTrainerEducationDocument(documentId);
+      } else {
+        documentData = await getTrainerDocument(documentId, trainerId);
+      }
+      
       setDocumentContent(documentData);
       
       setShowViewModal(true);
@@ -142,19 +151,19 @@ export default function TrainerDocumentsSection({ trainerId }) {
     }
   };
 
-  const handleDeleteDocument = async (documentId) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este documento?")) {
-      return;
-    }
+  // const handleDeleteDocument = async (documentId) => {
+  //   if (!confirm("¿Estás seguro de que quieres eliminar este documento?")) {
+  //     return;
+  //   }
 
-    try {
-      await deleteTrainerDocument(trainerId, documentId);
-      await fetchDocuments();
-    } catch (err) {
-      console.error("Error deleting document:", err);
-      setError(err.message);
-    }
-  };
+  //   try {
+  //     await deleteTrainerDocument(trainerId, documentId);
+  //     await fetchDocuments();
+  //   } catch (err) {
+  //     console.error("Error deleting document:", err);
+  //     setError(err.message);
+  //   }
+  // };
 
   const handleDeleteVerificationDocument = async (documentId) => {
     if (!confirm("¿Estás seguro de que quieres eliminar este documento de verificación?")) {
@@ -167,6 +176,21 @@ export default function TrainerDocumentsSection({ trainerId }) {
       alert("Documento de verificación eliminado exitosamente");
     } catch (err) {
       console.error("Error deleting verification document:", err);
+      setError(err.message);
+    }
+  };
+
+  const handleDeleteEducationDocument = async (documentId) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este documento de educación?")) {
+      return;
+    }
+
+    try {
+      await deleteTrainerEducationDocument(documentId);
+      await fetchEducationDocuments();
+      alert("Documento de educación eliminado exitosamente");
+    } catch (err) {
+      console.error("Error deleting education document:", err);
       setError(err.message);
     }
   };
@@ -278,16 +302,23 @@ export default function TrainerDocumentsSection({ trainerId }) {
           </div>
         </div>
 
-        {/* Lista de Documentos Regulares */}
-        <DocumentsList
-          isLoading={isLoading || isLoadingEducation}
-          documents={documents}
-          documentTypes={documentTypes}
-          handleViewDocument={handleViewDocument}
-          handleDeleteDocument={handleDeleteDocument}
-          formatFileSize={formatFileSize}
-          getFileIcon={getFileIcon}
-        />
+        {/* Sección de Documentos de Educación */}
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+            Documentos de Educación
+          </h4>
+          
+          <DocumentsList
+            isLoading={isLoadingEducation}
+            documents={educationDocuments}
+            documentTypes={documentTypes}
+            handleViewDocument={(docId) => handleViewDocument(docId, false, true)}
+            handleDeleteDocument={handleDeleteEducationDocument}
+            formatFileSize={formatFileSize}
+            getFileIcon={getFileIcon}
+            isEducationSection={true}
+          />
+        </div>
 
         {/* Sección de Documentos de Verificación */}
         <div className="mt-8">
@@ -341,6 +372,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
           documentTypes={documentTypes}
           verificationTypes={verificationTypes}
           formatFileSize={formatFileSize}
+          isEducationDocument={selectedDocument && educationDocuments.some(doc => doc.id === selectedDocument.id)}
         />
       </CardContent>
     </Card>

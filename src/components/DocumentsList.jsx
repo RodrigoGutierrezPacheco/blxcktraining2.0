@@ -8,10 +8,12 @@ export default function DocumentsList({
   handleViewDocument, 
   handleDeleteDocument, 
   formatFileSize, 
-  getFileIcon 
+  getFileIcon,
+  isEducationSection = false // Nueva prop para indicar si es la sección de educación
 }) {
   // Función para determinar si un documento es de educación
   const isEducationDocument = (docType) => {
+    if (isEducationSection) return true; // Si es la sección de educación, todos los documentos son de educación
     const educationTypes = ['certification', 'diploma', 'course', 'workshop', 'seminar'];
     return educationTypes.includes(docType);
   };
@@ -96,6 +98,13 @@ export default function DocumentsList({
           border: 'border-green-200',
           icon: <CheckCircle className="h-3 w-3 text-green-600" />
         };
+        case 'aceptada':
+          return {
+            bg: 'bg-green-100',
+            text: 'text-green-800',
+            border: 'border-green-200',
+            icon: <CheckCircle className="h-3 w-3 text-green-600" />
+          };
       case 'rechazado':
         return {
           bg: 'bg-red-100',
@@ -133,7 +142,6 @@ export default function DocumentsList({
     );
   }
 
-  console.log("documents", documents)
   return (
     <div className="space-y-3">
       {documents.map((doc) => {
@@ -196,7 +204,7 @@ export default function DocumentsList({
             
             <div className="flex items-center gap-2">
               <Button
-                onClick={() => handleViewDocument(doc.id, false)}
+                onClick={() => handleViewDocument(doc.id, false, isEducation)}
                 className={`p-2 ${
                   isEducation 
                     ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-100' 
