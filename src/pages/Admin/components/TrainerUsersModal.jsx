@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { getUsersByTrainer, getUsersWithoutTrainer, assignTrainerToUser } from "../../../services/admin";
+import { getUsersByTrainer, getUsersWithoutTrainer, assignTrainerToUser, removeTrainerFromUser } from "../../../services/admin";
 import { Button } from "../../Components/Button";
+import RoutineSelectionModal from "./RoutineSelectionModal";
 import {
   X,
   User,
@@ -13,6 +14,7 @@ import {
   UserPlus,
   UserMinus,
   Search,
+  Dumbbell,
 } from "lucide-react";
 
 export default function TrainerUsersModal({ 
@@ -28,6 +30,8 @@ export default function TrainerUsersModal({
   const [successMessage, setSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState("assigned"); // "assigned" or "available"
   const [searchTerm, setSearchTerm] = useState("");
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchUsers = useCallback(async () => {
     if (!trainer?.id) return;
@@ -93,6 +97,37 @@ export default function TrainerUsersModal({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRemoveUser = async (userId) => {
+    if (!trainer?.id) {
+      setError("No se ha seleccionado un entrenador válido");
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError("");
+      await removeTrainerFromUser(userId);
+      setSuccessMessage("Usuario removido exitosamente");
+      setTimeout(() => setSuccessMessage(""), 3000);
+      // Recargar datos
+      await fetchUsers();
+    } catch (err) {
+      setError(err.message || "Error al remover el usuario");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangeRoutine = (user) => {
+    setSelectedUser(user);
+    setShowRoutineModal(true);
+  };
+
+  const handleRoutineAssigned = () => {
+    // Recargar datos después de asignar rutina
+    fetchUsers();
   };
 
   if (!isOpen) return null;
@@ -278,10 +313,28 @@ export default function TrainerUsersModal({
                             </div>
                             
                             <div className="flex-shrink-0">
-                              <div className="bg-white border border-gray-200 rounded-lg px-3 py-1">
-                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {user.role || "user"}
-                                </span>
+                              <div className="flex flex-col gap-2">
+                                <div className="bg-white border border-gray-200 rounded-lg px-3 py-1">
+                                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {user.role || "user"}
+                                  </span>
+                                </div>
+                                <Button
+                                  onClick={() => handleChangeRoutine(user)}
+                                  className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1 text-sm flex items-center gap-1"
+                                  disabled={isLoading}
+                                >
+                                  <Dumbbell className="h-3 w-3" />
+                                  Cambiar Rutina
+                                </Button>
+                                <Button
+                                  onClick={() => handleRemoveUser(user.id)}
+                                  className="bg-red-600 text-white hover:bg-red-700 px-3 py-1 text-sm flex items-center gap-1"
+                                  disabled={isLoading}
+                                >
+                                  <UserMinus className="h-3 w-3" />
+                                  Remover
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -445,6 +498,17 @@ export default function TrainerUsersModal({
           </Button>
         </div>
       </div>
+
+      {/* Routine Selection Modal */}
+      <RoutineSelectionModal
+        isOpen={showRoutineModal}
+        onClose={() => {
+          setShowRoutineModal(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+        onRoutineAssigned={handleRoutineAssigned}
+      />
     </div>
   );
 }

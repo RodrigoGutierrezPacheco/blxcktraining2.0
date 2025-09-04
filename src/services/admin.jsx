@@ -886,3 +886,63 @@ export const getUsersWithoutTrainer = async () => {
     throw new Error(error.message || "Error al obtener los usuarios sin entrenador");
   }
 };
+
+// Reasignar rutina a usuario
+export const reassignRoutine = async (reassignData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}routines/reassign`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(reassignData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error reasignando rutina:", error);
+    throw new Error(error.message || "Error al reasignar la rutina");
+  }
+};
+
+// Obtener rutinas por entrenador
+export const getRoutinesByTrainer = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}routines/trainer/${trainerId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error obteniendo rutinas del entrenador:", error);
+    throw new Error(error.message || "Error al obtener las rutinas del entrenador");
+  }
+};

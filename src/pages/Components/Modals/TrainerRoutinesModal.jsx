@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../Button";
 import {
   X,
@@ -24,6 +24,8 @@ export default function TrainerRoutinesModal({
   routinesData,
   onEditRoutine,
   onRoutineCreated,
+  openCreateModal = false,
+  trainerId,
 }) {
   const [viewMode, setViewMode] = useState("list"); // 'list' o 'details'
   const [selectedRoutine, setSelectedRoutine] = useState(null);
@@ -31,6 +33,13 @@ export default function TrainerRoutinesModal({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [routineToDelete, setRoutineToDelete] = useState(null);
+
+  // Effect to open create modal when openCreateModal prop is true
+  useEffect(() => {
+    if (isOpen && openCreateModal) {
+      setShowCreateModal(true);
+    }
+  }, [isOpen, openCreateModal]);
 
   const handleViewDetails = async (routineId) => {
     try {
@@ -595,6 +604,7 @@ export default function TrainerRoutinesModal({
             isOpen={showCreateModal}
             onClose={handleCloseCreateModal}
             onRoutineCreated={handleRoutineCreated}
+            trainerId={trainerId}
           />
 
           {/* Modal de Eliminar Rutina */}

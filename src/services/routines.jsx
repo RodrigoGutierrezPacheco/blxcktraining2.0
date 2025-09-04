@@ -260,3 +260,47 @@ export const deleteRoutine = async (routineId) => {
     throw new Error(error.message || "Error al eliminar la rutina");
   }
 };
+
+export const createRoutine = async (routineData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!routineData || !routineData.name) {
+      throw new Error("Datos de rutina no válidos");
+    }
+
+    const apiUrl = `${APP_URL}routines`;
+    
+    console.log("Creating routine:", routineData.name);
+    console.log("API URL:", apiUrl);
+    console.log("Routine data:", JSON.stringify(routineData, null, 2));
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(routineData)
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Routine creation successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error creating routine:", error);
+    throw new Error(error.message || "Error al crear la rutina");
+  }
+};

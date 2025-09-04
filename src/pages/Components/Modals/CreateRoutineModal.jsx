@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Button } from "../Button";
 import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell } from "lucide-react";
+import { createRoutine } from "../../../services/routines";
 
 export default function CreateRoutineModal({ 
   isOpen, 
   onClose, 
-  onRoutineCreated 
+  onRoutineCreated,
+  trainerId
 }) {
   const [routine, setRoutine] = useState({
     name: "",
@@ -42,11 +44,13 @@ export default function CreateRoutineModal({
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
       setError(null);
+      setSuccessMessage(null);
       
       // Validar datos antes de enviar
       if (!routine.name || !routine.name.trim()) {
@@ -97,6 +101,7 @@ export default function CreateRoutineModal({
         comments: routine.comments ? routine.comments.trim() : "",
         totalWeeks: routine.weeks.length,
         isActive: routine.isActive,
+        trainer_id: trainerId,
         weeks: routine.weeks.map((week, weekIndex) => ({
           weekNumber: weekIndex + 1,
           name: week.name.trim(),
@@ -118,18 +123,24 @@ export default function CreateRoutineModal({
         }))
       };
 
-      // TODO: Implementar la llamada a la API para crear la rutina
+      // Llamar a la API para crear la rutina
       console.log("Datos a enviar para crear rutina:", createData);
       
-      // Simular creación exitosa
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const createdRoutine = await createRoutine(createData);
+      console.log("Rutina creada exitosamente:", createdRoutine);
+      
+      // Mostrar mensaje de éxito
+      setSuccessMessage("¡Rutina creada exitosamente!");
       
       // Notificar que se creó la rutina
       if (onRoutineCreated) {
         onRoutineCreated();
       }
       
-      onClose();
+      // Cerrar el modal después de un breve delay para mostrar el mensaje de éxito
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -294,6 +305,12 @@ export default function CreateRoutineModal({
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
               <p className="text-red-700">{error}</p>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+              <p className="text-green-700">{successMessage}</p>
             </div>
           )}
 
@@ -608,13 +625,18 @@ export default function CreateRoutineModal({
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || successMessage}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
                     Creando Rutina...
+                  </>
+                ) : successMessage ? (
+                  <>
+                    <Save className="h-5 w-5 mr-2" />
+                    ¡Creada!
                   </>
                 ) : (
                   <>

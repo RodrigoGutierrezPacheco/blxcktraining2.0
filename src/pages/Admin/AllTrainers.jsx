@@ -7,6 +7,7 @@ import ViewTrainerModal from "./components/ViewTrainerModal";
 import EditTrainerModal from "./components/EditTrainerModal";
 import CreateTrainerModal from "./components/CreateTrainerModal";
 import TrainerUsersModal from "./components/TrainerUsersModal";
+import TrainerRoutinesModal from "./components/TrainerRoutinesModal";
 import {
   Dumbbell,
   ArrowLeft,
@@ -37,6 +38,7 @@ export default function AllTrainers() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUsersModal, setShowUsersModal] = useState(false);
+  const [showRoutinesModal, setShowRoutinesModal] = useState(false);
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
 
@@ -154,6 +156,11 @@ export default function AllTrainers() {
   const handleViewUsers = (trainer) => {
     setSelectedTrainer(trainer);
     setShowUsersModal(true);
+  };
+
+  const handleViewRoutines = (trainer) => {
+    setSelectedTrainer(trainer);
+    setShowRoutinesModal(true);
   };
 
   const confirmDeleteTrainer = async () => {
@@ -382,16 +389,28 @@ export default function AllTrainers() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleViewUsers(trainer)}
-                          className="flex items-center gap-2 border hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
-                          title="Ver usuarios asignados"
-                        >
-                          <User className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm text-gray-900 hover:text-blue-600">
-                            {trainer.assignedUsersCount}
-                          </span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewUsers(trainer)}
+                            className="flex items-center gap-2 border hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
+                            title="Ver usuarios asignados"
+                          >
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-900 hover:text-blue-600">
+                              {trainer.assignedUsersCount}
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => handleViewRoutines(trainer)}
+                            className="flex items-center gap-2 border hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
+                            title="Ver rutinas del entrenador"
+                          >
+                            <Dumbbell className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-900 hover:text-purple-600">
+                              Rutinas
+                            </span>
+                          </button>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -483,6 +502,16 @@ export default function AllTrainers() {
         isOpen={showUsersModal}
         onClose={() => {
           setShowUsersModal(false);
+          setSelectedTrainer(null);
+        }}
+        trainer={selectedTrainer}
+      />
+
+      {/* Trainer Routines Modal */}
+      <TrainerRoutinesModal
+        isOpen={showRoutinesModal}
+        onClose={() => {
+          setShowRoutinesModal(false);
           setSelectedTrainer(null);
         }}
         trainer={selectedTrainer}

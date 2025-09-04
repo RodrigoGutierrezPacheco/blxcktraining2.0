@@ -5,7 +5,8 @@ import { Dumbbell, BookOpen, Plus } from "lucide-react";
 export default function TrainerRoutinesSection({ 
   routinesData, 
   isLoadingRoutines, 
-  handleViewRoutines 
+  handleViewRoutines,
+  handleCreateRoutine 
 }) {
   return (
     <Card className="border-2 border-black">
@@ -55,6 +56,7 @@ export default function TrainerRoutinesSection({
               Crea rutinas personalizadas para tus clientes
             </p>
             <Button
+              onClick={handleCreateRoutine}
               className="bg-green-600 text-white hover:bg-green-700"
             >
               <Plus className="mr-2 h-4 w-4" />

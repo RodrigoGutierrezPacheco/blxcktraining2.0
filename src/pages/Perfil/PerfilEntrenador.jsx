@@ -35,6 +35,7 @@ export default function PerfilEntrenador() {
   const [showTrainerRoutinesModal, setShowTrainerRoutinesModal] = useState(false);
   const [showEditRoutineModal, setShowEditRoutineModal] = useState(false);
   const [editingRoutineId, setEditingRoutineId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -142,8 +143,14 @@ export default function PerfilEntrenador() {
     setShowTrainerRoutinesModal(true);
   };
 
+  const handleCreateRoutine = () => {
+    setOpenCreateModal(true);
+    setShowTrainerRoutinesModal(true);
+  };
+
   const handleCloseTrainerRoutinesModal = () => {
     setShowTrainerRoutinesModal(false);
+    setOpenCreateModal(false);
   };
 
   const handleEditRoutine = (routineId) => {
@@ -280,6 +287,7 @@ export default function PerfilEntrenador() {
           routinesData={routinesData}
           isLoadingRoutines={isLoadingRoutines}
           handleViewRoutines={handleViewRoutines}
+          handleCreateRoutine={handleCreateRoutine}
         />
       </div>
 
@@ -348,6 +356,8 @@ export default function PerfilEntrenador() {
               fetchTrainerRoutines();
             }
           }}
+          openCreateModal={openCreateModal}
+          trainerId={user?.id}
         />
       )}
 
