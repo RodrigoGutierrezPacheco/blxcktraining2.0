@@ -6,6 +6,7 @@ import { updateTrainer, getTrainerById } from "../../services/trainers";
 import ViewTrainerModal from "./components/ViewTrainerModal";
 import EditTrainerModal from "./components/EditTrainerModal";
 import CreateTrainerModal from "./components/CreateTrainerModal";
+import TrainerUsersModal from "./components/TrainerUsersModal";
 import {
   Dumbbell,
   ArrowLeft,
@@ -35,6 +36,7 @@ export default function AllTrainers() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showUsersModal, setShowUsersModal] = useState(false);
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
 
@@ -147,6 +149,11 @@ export default function AllTrainers() {
     } catch (err) {
       setError(err.message || "Error al cambiar la verificación del entrenador");
     }
+  };
+
+  const handleViewUsers = (trainer) => {
+    setSelectedTrainer(trainer);
+    setShowUsersModal(true);
   };
 
   const confirmDeleteTrainer = async () => {
@@ -375,12 +382,16 @@ export default function AllTrainers() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleViewUsers(trainer)}
+                          className="flex items-center gap-2 border hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
+                          title="Ver usuarios asignados"
+                        >
                           <User className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm text-gray-900 hover:text-blue-600">
                             {trainer.assignedUsersCount}
                           </span>
-                        </div>
+                        </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -465,6 +476,16 @@ export default function AllTrainers() {
           setSelectedTrainer(null);
         }}
         onSave={handleSaveTrainer}
+      />
+
+      {/* Trainer Users Modal */}
+      <TrainerUsersModal
+        isOpen={showUsersModal}
+        onClose={() => {
+          setShowUsersModal(false);
+          setSelectedTrainer(null);
+        }}
+        trainer={selectedTrainer}
       />
 
       {/* Trainer Actions Modal */}

@@ -219,3 +219,44 @@ export const updateRoutine = async (routineId, routineData) => {
     throw new Error(error.message || "Error al actualizar la rutina");
   }
 };
+
+export const deleteRoutine = async (routineId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!routineId) {
+      throw new Error("ID de rutina no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/${routineId}`;
+    
+    console.log("Deleting routine:", routineId);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Routine deletion successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error deleting routine:", error);
+    throw new Error(error.message || "Error al eliminar la rutina");
+  }
+};

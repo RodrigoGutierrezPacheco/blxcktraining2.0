@@ -12,9 +12,11 @@ import {
   CheckCircle2,
   XCircle,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { getRoutineById } from "../../../services/routines";
 import CreateRoutineModal from "./CreateRoutineModal";
+import DeleteRoutineModal from "./DeleteRoutineModal";
 
 export default function TrainerRoutinesModal({
   isOpen,
@@ -27,6 +29,8 @@ export default function TrainerRoutinesModal({
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [isLoadingRoutine, setIsLoadingRoutine] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [routineToDelete, setRoutineToDelete] = useState(null);
 
   const handleViewDetails = async (routineId) => {
     try {
@@ -62,11 +66,28 @@ export default function TrainerRoutinesModal({
     }
   };
 
+  const handleDeleteRoutine = (routine) => {
+    setRoutineToDelete(routine);
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setRoutineToDelete(null);
+  };
+
+  const handleRoutineDeleted = () => {
+    // Notificar que se eliminó una rutina
+    if (onRoutineCreated) {
+      onRoutineCreated();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50">
+      <div className="bg-white/95 backdrop-blur-md w-full h-full overflow-y-auto shadow-2xl border border-gray-200">
         <div className="p-6">
           {/* Header con navegación */}
           <div className="flex justify-between items-center mb-6">
@@ -189,6 +210,13 @@ export default function TrainerRoutinesModal({
                           className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2"
                         >
                           Editar
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteRoutine(routine)}
+                          className="bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-2"
+                        >
+                          <Trash2 className="mr-1 h-4 w-4" />
+                          Eliminar
                         </Button>
                       </div>
                     </div>
@@ -567,6 +595,14 @@ export default function TrainerRoutinesModal({
             isOpen={showCreateModal}
             onClose={handleCloseCreateModal}
             onRoutineCreated={handleRoutineCreated}
+          />
+
+          {/* Modal de Eliminar Rutina */}
+          <DeleteRoutineModal
+            isOpen={showDeleteModal}
+            onClose={handleCloseDeleteModal}
+            routine={routineToDelete}
+            onRoutineDeleted={handleRoutineDeleted}
           />
         </div>
       </div>
