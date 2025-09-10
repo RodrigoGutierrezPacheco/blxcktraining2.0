@@ -36,6 +36,7 @@ export const exercisesService = {
         body: JSON.stringify({
           name: exerciseData.name,
           description: exerciseData.description,
+          imageId: exerciseData.imageId,
           muscleGroupId: exerciseData.muscleGroupId,
         }),
       });
@@ -78,6 +79,35 @@ export const exercisesService = {
       return data;
     } catch (error) {
       console.error('Error updating exercise:', error);
+      throw error;
+    }
+  },
+
+  // Actualizar un ejercicio con imagen
+  async updateExerciseWithImage(token, id, exerciseData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/exercises/${id}/with-image`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: exerciseData.name,
+          description: exerciseData.description,
+          muscleGroupId: exerciseData.muscleGroupId,
+          imagePath: exerciseData.imagePath,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error updating exercise with image:', error);
       throw error;
     }
   },
