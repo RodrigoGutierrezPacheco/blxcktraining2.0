@@ -179,4 +179,32 @@ export const exercisesService = {
       throw error;
     }
   },
+
+  // Desasignar imagen de un ejercicio
+  async unassignImage(token, exerciseId, imageId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/exercises/unassign-image`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          exerciseId: exerciseId,
+          imageId: imageId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("data", data)
+      return data;
+    } catch (error) {
+      console.error('Error unassigning image from exercise:', error);
+      throw error;
+    }
+  },
 };

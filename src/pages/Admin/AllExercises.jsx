@@ -134,6 +134,7 @@ export default function AllExercises() {
         isActive: item.isActive,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
+        imageId: item.image?.imageId,
       }));
 
       setExercises(transformedData);
