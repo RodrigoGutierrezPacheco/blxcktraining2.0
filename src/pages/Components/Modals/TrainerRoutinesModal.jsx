@@ -14,6 +14,8 @@ import {
   Plus,
   Trash2,
   Image,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { getRoutineById } from "../../../services/routines";
 import { exercisesService } from "../../../services/exercises";
@@ -42,6 +44,8 @@ export default function TrainerRoutinesModal({
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
   const [exerciseImageData, setExerciseImageData] = useState(null);
   const [showExerciseImage, setShowExerciseImage] = useState(false);
+  const [expandedWeeks, setExpandedWeeks] = useState(new Set());
+  const [expandedDays, setExpandedDays] = useState(new Set());
 
   // Effect to open create modal when openCreateModal prop is true
   useEffect(() => {
@@ -56,6 +60,11 @@ export default function TrainerRoutinesModal({
       const routineData = await getRoutineById(routineId);
       setSelectedRoutine(routineData);
       setViewMode("details");
+      
+      // Expandir automáticamente la primera semana
+      if (routineData.weeks && routineData.weeks.length > 0) {
+        setExpandedWeeks(new Set([0]));
+      }
     } catch (error) {
       console.error("Error al cargar la rutina:", error);
       // Aquí podrías mostrar un mensaje de error al usuario
@@ -67,6 +76,8 @@ export default function TrainerRoutinesModal({
   const handleBackToList = () => {
     setViewMode("list");
     setSelectedRoutine(null);
+    setExpandedWeeks(new Set());
+    setExpandedDays(new Set());
   };
 
   const handleCreateRoutine = () => {
@@ -114,6 +125,27 @@ export default function TrainerRoutinesModal({
     setShowExerciseImage(false);
     setExerciseImageData(null);
     setSelectedExerciseId(null);
+  };
+
+  const toggleWeek = (weekIndex) => {
+    const newExpandedWeeks = new Set(expandedWeeks);
+    if (newExpandedWeeks.has(weekIndex)) {
+      newExpandedWeeks.delete(weekIndex);
+    } else {
+      newExpandedWeeks.add(weekIndex);
+    }
+    setExpandedWeeks(newExpandedWeeks);
+  };
+
+  const toggleDay = (weekIndex, dayIndex) => {
+    const dayKey = `${weekIndex}-${dayIndex}`;
+    const newExpandedDays = new Set(expandedDays);
+    if (newExpandedDays.has(dayKey)) {
+      newExpandedDays.delete(dayKey);
+    } else {
+      newExpandedDays.add(dayKey);
+    }
+    setExpandedDays(newExpandedDays);
   };
 
   const handleCloseDeleteModal = () => {
@@ -292,16 +324,16 @@ export default function TrainerRoutinesModal({
               ) : selectedRoutine ? (
                 <div className="space-y-6">
                   {/* Header de la rutina */}
-                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center gap-3">
-                      <div className="bg-white/20 p-3 rounded-full">
-                        <Dumbbell className="h-8 w-8 text-white" />
+                      <div className="bg-gray-100 p-3 rounded-lg">
+                        <Dumbbell className="h-6 w-6 text-gray-600" />
                       </div>
                       <div>
-                        <h3 className="text-3xl font-bold">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           {selectedRoutine.name}
                         </h3>
-                        <p className="text-blue-100 text-lg">
+                        <p className="text-gray-600">
                           {selectedRoutine.description}
                         </p>
                       </div>
@@ -310,16 +342,16 @@ export default function TrainerRoutinesModal({
 
                   {/* Información de la Rutina */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-blue-600 p-2 rounded-full">
-                          <Calendar className="h-5 w-5 text-white" />
+                        <div className="bg-gray-100 p-2 rounded-lg">
+                          <Calendar className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-blue-600 font-medium">
+                          <p className="text-sm text-gray-500 font-medium">
                             Duración
                           </p>
-                          <p className="text-lg font-bold text-blue-800">
+                          <p className="text-lg font-semibold text-gray-900">
                             {selectedRoutine.totalWeeks} semana
                             {selectedRoutine.totalWeeks !== 1 ? "s" : ""}
                           </p>
@@ -327,27 +359,27 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-green-600 p-2 rounded-full">
-                          <Target className="h-5 w-5 text-white" />
+                        <div className="bg-gray-100 p-2 rounded-lg">
+                          <Target className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-green-600 font-medium">
+                          <p className="text-sm text-gray-500 font-medium">
                             Estado
                           </p>
                           <div className="flex items-center gap-2">
                             {selectedRoutine.isActive ? (
                               <>
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                <span className="text-lg font-bold text-green-800">
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                <span className="text-lg font-semibold text-gray-900">
                                   Activa
                                 </span>
                               </>
                             ) : (
                               <>
-                                <XCircle className="h-4 w-4 text-red-600" />
-                                <span className="text-lg font-bold text-red-800">
+                                <XCircle className="h-4 w-4 text-red-500" />
+                                <span className="text-lg font-semibold text-gray-900">
                                   Inactiva
                                 </span>
                               </>
@@ -357,16 +389,16 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-purple-600 p-2 rounded-full">
-                          <Clock className="h-5 w-5 text-white" />
+                        <div className="bg-gray-100 p-2 rounded-lg">
+                          <Clock className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-purple-600 font-medium">
+                          <p className="text-sm text-gray-500 font-medium">
                             Creada
                           </p>
-                          <p className="text-lg font-bold text-purple-800">
+                          <p className="text-lg font-semibold text-gray-900">
                             {new Date(
                               selectedRoutine.createdAt
                             ).toLocaleDateString("es-ES")}
@@ -375,16 +407,16 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-orange-600 p-2 rounded-full">
-                          <Users className="h-5 w-5 text-white" />
+                        <div className="bg-gray-100 p-2 rounded-lg">
+                          <Users className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-orange-600 font-medium">
+                          <p className="text-sm text-gray-500 font-medium">
                             Total Ejercicios
                           </p>
-                          <p className="text-lg font-bold text-orange-800">
+                          <p className="text-lg font-semibold text-gray-900">
                             {selectedRoutine.weeks?.reduce(
                               (total, week) =>
                                 total +
@@ -403,56 +435,50 @@ export default function TrainerRoutinesModal({
 
                   {/* Comentarios */}
                   {selectedRoutine.comments && (
-                    <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
-                      <h4 className="text-lg font-semibold text-yellow-800 mb-3 flex items-center gap-2">
-                        <Target className="h-5 w-5" />
+                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <Target className="h-5 w-5 text-gray-600" />
                         Comentarios de la Rutina
                       </h4>
-                      <p className="text-yellow-700 leading-relaxed">
+                      <p className="text-gray-700 leading-relaxed">
                         {selectedRoutine.comments}
                       </p>
                     </div>
                   )}
 
                   {/* Resumen de la Rutina */}
-                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
-                    <h4 className="text-lg font-semibold text-indigo-800 mb-4 flex items-center gap-2">
-                      <Dumbbell className="h-5 w-5" />
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Dumbbell className="h-5 w-5 text-gray-600" />
                       Resumen de la Rutina
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="text-center">
-                        <div className="bg-indigo-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-bold">
+                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                          <span className="text-2xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.length || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-indigo-600 font-medium">
+                        <p className="text-sm text-gray-500 font-medium">
                           Semanas
-                        </p>
-                        <p className="text-lg font-bold text-indigo-800">
-                          Total
                         </p>
                       </div>
                       <div className="text-center">
-                        <div className="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-bold">
+                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                          <span className="text-2xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.reduce(
                               (total, week) => total + (week.days?.length || 0),
                               0
                             ) || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-purple-600 font-medium">
+                        <p className="text-sm text-gray-500 font-medium">
                           Días de Entrenamiento
-                        </p>
-                        <p className="text-lg font-bold text-purple-800">
-                          Total
                         </p>
                       </div>
                       <div className="text-center">
-                        <div className="bg-green-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-bold">
+                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                          <span className="text-2xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.reduce(
                               (total, week) =>
                                 total +
@@ -465,11 +491,8 @@ export default function TrainerRoutinesModal({
                             ) || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-green-600 font-medium">
+                        <p className="text-sm text-gray-500 font-medium">
                           Ejercicios
-                        </p>
-                        <p className="text-lg font-bold text-green-800">
-                          Total
                         </p>
                       </div>
                     </div>
@@ -477,15 +500,15 @@ export default function TrainerRoutinesModal({
 
                   {/* Plan de Entrenamiento */}
                   <div className="space-y-6">
-                    <h4 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                      <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-full">
-                        {showExerciseImage ? <Image className="h-6 w-6 text-white" /> : <Calendar className="h-6 w-6 text-white" />}
+                    <h4 className="text-xl font-semibold text-gray-900 flex items-center gap-3">
+                      <div className="bg-gray-100 p-2 rounded-lg">
+                        {showExerciseImage ? <Image className="h-5 w-5 text-gray-600" /> : <Calendar className="h-5 w-5 text-gray-600" />}
                       </div>
                       {showExerciseImage ? 'Imagen del Ejercicio' : 'Plan de Entrenamiento'}
                       {showExerciseImage && (
                         <Button
                           onClick={handleBackToRoutine}
-                          className="ml-auto bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                          className="ml-auto bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
                         >
                           <ArrowLeft className="h-4 w-4 mr-2" />
                           Regresar a Rutina
@@ -590,154 +613,174 @@ export default function TrainerRoutinesModal({
                       selectedRoutine.weeks?.map((week, weekIndex) => (
                       <div
                         key={week.id || weekIndex}
-                        className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden"
+                        className="bg-white border border-gray-200 rounded-lg overflow-hidden"
                       >
                         {/* Header de la Semana */}
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200">
+                        <div className="bg-gray-50 p-4 border-b border-gray-200">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <div className="bg-blue-600 text-white px-4 py-2 rounded-full text-lg font-bold">
+                              <div className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-semibold">
                                 Semana {week.weekNumber}
                               </div>
                               <div>
-                                <h5 className="text-xl font-bold text-gray-800">
+                                <h5 className="text-lg font-semibold text-gray-900">
                                   {week.name}
                                 </h5>
                                 {week.comments && (
-                                  <p className="text-gray-600 mt-1 italic">
-                                    "{week.comments}"
+                                  <p className="text-gray-600 mt-1 text-sm">
+                                    {week.comments}
                                   </p>
                                 )}
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600">
-                                Total de días
-                              </p>
-                              <p className="text-2xl font-bold text-blue-600">
-                                {week.days?.length || 0}
-                              </p>
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                <p className="text-sm text-gray-500">
+                                  {week.days?.length || 0} días
+                                </p>
+                              </div>
+                              <Button
+                                onClick={() => toggleWeek(weekIndex)}
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
+                              >
+                                {expandedWeeks.has(weekIndex) ? (
+                                  <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4" />
+                                )}
+                              </Button>
                             </div>
                           </div>
                         </div>
 
                         {/* Días */}
-                        <div className="p-6 space-y-6">
-                          {week.days?.map((day, dayIndex) => (
+                        {expandedWeeks.has(weekIndex) && (
+                          <div className="p-4 space-y-4">
+                            {week.days?.map((day, dayIndex) => (
                             <div
                               key={day.id || dayIndex}
-                              className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden"
+                              className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden"
                             >
                               {/* Header del Día */}
-                              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 border-b border-gray-200">
+                              <div className="bg-white p-4 border-b border-gray-200">
                                 <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-4">
-                                    <div className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                  <div className="flex items-center gap-3">
+                                    <div className="bg-gray-900 text-white px-2 py-1 rounded text-xs font-semibold">
                                       Día {day.dayNumber}
                                     </div>
                                     <div>
-                                      <h6 className="text-lg font-semibold text-gray-800">
+                                      <h6 className="text-base font-semibold text-gray-900">
                                         {day.name}
                                       </h6>
                                       {day.comments && (
-                                        <p className="text-gray-600 mt-1 italic text-sm">
-                                          "{day.comments}"
+                                        <p className="text-gray-600 mt-1 text-xs">
+                                          {day.comments}
                                         </p>
                                       )}
                                     </div>
                                   </div>
-                                  <div className="text-right">
-                                    <p className="text-sm text-gray-600">
-                                      Ejercicios
-                                    </p>
-                                    <p className="text-xl font-bold text-indigo-600">
-                                      {day.exercises?.length || 0}
-                                    </p>
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-right">
+                                      <p className="text-xs text-gray-500">
+                                        {day.exercises?.length || 0} ejercicios
+                                      </p>
+                                    </div>
+                                    <Button
+                                      onClick={() => toggleDay(weekIndex, dayIndex)}
+                                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1 rounded transition-all duration-200"
+                                    >
+                                      {expandedDays.has(`${weekIndex}-${dayIndex}`) ? (
+                                        <ChevronUp className="h-3 w-3" />
+                                      ) : (
+                                        <ChevronDown className="h-3 w-3" />
+                                      )}
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Ejercicios */}
-                              <div className="p-4">
-                                <div className="space-y-4">
-                                  {day.exercises?.map(
+                              {expandedDays.has(`${weekIndex}-${dayIndex}`) && (
+                                <div className="p-4">
+                                  <div className="space-y-3">
+                                    {day.exercises?.map(
                                     (exercise, exerciseIndex) => (
                                       <div
                                         key={exercise.id || exerciseIndex}
-                                        className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+                                        className="bg-white border border-gray-200 rounded-lg p-4"
                                       >
                                         <div className="flex items-center justify-between mb-3">
                                           <div className="flex items-center gap-3">
-                                            <div className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                            <div className="bg-gray-900 text-white px-2 py-1 rounded text-xs font-semibold">
                                               {exercise.order}
                                             </div>
-                                            <h6 className="text-lg font-semibold text-gray-800">
+                                            <h6 className="text-base font-semibold text-gray-900">
                                               {exercise.name}
                                             </h6>
                                           </div>
                                           {exercise.comments && (
-                                            <span className="text-sm text-gray-500 italic">
-                                              💡 {exercise.comments}
+                                            <span className="text-xs text-gray-500">
+                                              {exercise.comments}
                                             </span>
                                           )}
                                         </div>
 
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                          <div className="text-center bg-purple-50 rounded-lg p-3 border border-purple-200">
-                                            <p className="text-sm text-purple-600 font-medium">
+                                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium">
                                               Series
                                             </p>
-                                            <p className="text-2xl font-bold text-purple-700">
+                                            <p className="text-lg font-semibold text-gray-900">
                                               {exercise.sets}
                                             </p>
                                           </div>
-                                          <div className="text-center bg-blue-50 rounded-lg p-3 border border-blue-200">
-                                            <p className="text-sm text-blue-600 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium">
                                               Repeticiones
                                             </p>
-                                            <p className="text-2xl font-bold text-blue-700">
+                                            <p className="text-lg font-semibold text-gray-900">
                                               {exercise.repetitions}
                                             </p>
                                           </div>
-                                          <div className="text-center bg-green-50 rounded-lg p-3 border border-green-200">
-                                            <p className="text-sm text-green-600 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium">
                                               Descanso entre series
                                             </p>
-                                            <p className="text-lg font-bold text-green-700">
+                                            <p className="text-sm font-semibold text-gray-900">
                                               {exercise.restBetweenSets}s
                                             </p>
                                           </div>
-                                          <div className="text-center bg-orange-50 rounded-lg p-3 border border-orange-200">
-                                            <p className="text-sm text-orange-600 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium">
                                               Descanso entre ejercicios
                                             </p>
-                                            <p className="text-lg font-bold text-orange-700">
+                                            <p className="text-sm font-semibold text-gray-900">
                                               {exercise.restBetweenExercises}s
                                             </p>
                                           </div>
                                           <div 
-                                            className={`text-center rounded-lg p-3 border transition-all duration-200 ${
+                                            className={`text-center rounded-lg p-2 border transition-all duration-200 ${
                                               exercise.exerciseId 
                                                 ? 'bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer' 
                                                 : 'bg-gray-50 border-gray-200'
                                             }`}
                                             onClick={exercise.exerciseId ? () => handleViewExerciseImage(exercise.exerciseId) : undefined}
                                           >
-                                            <p className={`text-sm font-medium ${
-                                              exercise.exerciseId ? 'text-green-600' : 'text-gray-600'
+                                            <p className={`text-xs font-medium ${
+                                              exercise.exerciseId ? 'text-green-600' : 'text-gray-500'
                                             }`}>
                                               Imagen
                                             </p>
-                                            <div className="flex items-center justify-center gap-2 mt-1">
+                                            <div className="flex items-center justify-center gap-1 mt-1">
                                               {exercise.exerciseId ? (
                                                 <>
-                                                  <Image className="h-4 w-4 text-green-600" />
-                                                  <p className="text-lg font-bold text-green-700">
+                                                  <Image className="h-3 w-3 text-green-600" />
+                                                  <p className="text-sm font-semibold text-green-700">
                                                     Ver
                                                   </p>
                                                 </>
                                               ) : (
-                                                <p className="text-lg font-bold text-gray-600">
+                                                <p className="text-sm font-semibold text-gray-600">
                                                   No
                                                 </p>
                                               )}
@@ -746,12 +789,14 @@ export default function TrainerRoutinesModal({
                                         </div>
                                       </div>
                                     )
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
                           ))}
-                        </div>
+                          </div>
+                        )}
                       </div>
                       ))
                     )}
