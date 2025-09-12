@@ -44,6 +44,7 @@ export default function TrainerRoutinesModal({
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
   const [exerciseImageData, setExerciseImageData] = useState(null);
   const [showExerciseImage, setShowExerciseImage] = useState(false);
+  const [showExerciseImageModal, setShowExerciseImageModal] = useState(false);
   const [expandedWeeks, setExpandedWeeks] = useState(new Set());
   const [expandedDays, setExpandedDays] = useState(new Set());
 
@@ -53,6 +54,20 @@ export default function TrainerRoutinesModal({
       setShowCreateModal(true);
     }
   }, [isOpen, openCreateModal]);
+
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleViewDetails = async (routineId) => {
     try {
@@ -106,7 +121,7 @@ export default function TrainerRoutinesModal({
       setSelectedExerciseId(exerciseId);
       const imageData = await exercisesService.getExerciseImage(token, exerciseId);
       setExerciseImageData(imageData);
-      setShowExerciseImage(true);
+      setShowExerciseImageModal(true);
     } catch (error) {
       console.error('Error loading exercise image:', error);
       // Fallback al modal original si hay error
@@ -123,6 +138,12 @@ export default function TrainerRoutinesModal({
 
   const handleBackToRoutine = () => {
     setShowExerciseImage(false);
+    setExerciseImageData(null);
+    setSelectedExerciseId(null);
+  };
+
+  const closeExerciseImageModal = () => {
+    setShowExerciseImageModal(false);
     setExerciseImageData(null);
     setSelectedExerciseId(null);
   };
@@ -877,6 +898,64 @@ export default function TrainerRoutinesModal({
             onClose={closeImageViewModal}
             exerciseId={selectedExerciseId}
           />
+
+          {/* Modal interno para mostrar imagen del ejercicio */}
+          {showExerciseImageModal && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4 overflow-y-hidden">
+              <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200">
+                {/* Header del modal */}
+                <div className="bg-white border-b border-gray-200 p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {exerciseImageData?.exerciseName || 'Imagen del Ejercicio'}
+                      </h3>
+                    </div>
+                    <Button
+                      onClick={closeExerciseImageModal}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Contenido del modal - Solo la imagen */}
+                <div className="p-6 flex items-center justify-center min-h-[500px]">
+                  {isLoadingRoutine ? (
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-600 mx-auto"></div>
+                      <p className="text-gray-600 mt-4">Cargando imagen del ejercicio...</p>
+                    </div>
+                  ) : exerciseImageData?.image?.url ? (
+                    <div className="text-center">
+                      <img
+                        src={exerciseImageData.image.url}
+                        alt={exerciseImageData.exerciseName}
+                        className="max-w-full h-auto max-h-[70vh] rounded-lg shadow-lg"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <div 
+                        className="hidden bg-gray-100 rounded-lg p-12 text-center"
+                        style={{ minHeight: '300px', display: 'none' }}
+                      >
+                        <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600">No se pudo cargar la imagen</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">No hay imagen disponible para este ejercicio</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

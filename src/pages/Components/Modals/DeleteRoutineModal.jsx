@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../Button";
 import { deleteRoutine } from "../../../services/routines";
 import {
@@ -18,6 +18,20 @@ export default function DeleteRoutineModal({
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
+
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleDeleteRoutine = async () => {
     if (!routine?.id) {

@@ -20,6 +20,20 @@ export default function ExerciseImageViewModal({
     }
   }, [isOpen, exerciseId, token]);
 
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const fetchExerciseImage = async () => {
     try {
       setLoading(true);

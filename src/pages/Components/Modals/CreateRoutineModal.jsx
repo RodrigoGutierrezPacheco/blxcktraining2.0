@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../Button";
 import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image, ChevronDown, ChevronUp } from "lucide-react";
 import { createRoutine } from "../../../services/routines";
@@ -53,6 +53,20 @@ console.log("routine", routine);
   });
   const [expandedWeeks, setExpandedWeeks] = useState(new Set([0])); // Primera semana expandida por defecto
   const [expandedDays, setExpandedDays] = useState(new Set());
+
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleSave = async () => {
     try {
