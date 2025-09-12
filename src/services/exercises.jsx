@@ -231,26 +231,49 @@ export const exercisesService = {
     }
   },
 
-  // Obtener ejercicios de una carpeta específica
-  async getExercisesByFolder(token, folderId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/exercises/folders/${folderId}/exercises`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // Obtener ejercicios de una carpeta específica
+      async getExercisesByFolder(token, folderId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/exercises/folders/${folderId}/exercises`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
 
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching exercises by folder:', error);
-      throw error;
-    }
-  },
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error fetching exercises by folder:', error);
+          throw error;
+        }
+      },
+
+      // Obtener imagen de un ejercicio específico
+      async getExerciseImage(token, exerciseId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/exercises/${exerciseId}/image`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error fetching exercise image:', error);
+          throw error;
+        }
+      },
 };

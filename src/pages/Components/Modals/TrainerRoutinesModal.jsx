@@ -13,10 +13,14 @@ import {
   XCircle,
   Plus,
   Trash2,
+  Image,
 } from "lucide-react";
 import { getRoutineById } from "../../../services/routines";
+import { exercisesService } from "../../../services/exercises";
+import { useAuth } from "../../../context/useAuth";
 import CreateRoutineModal from "./CreateRoutineModal";
 import DeleteRoutineModal from "./DeleteRoutineModal";
+import ExerciseImageViewModal from "./ExerciseImageViewModal";
 
 export default function TrainerRoutinesModal({
   isOpen,
@@ -27,12 +31,17 @@ export default function TrainerRoutinesModal({
   openCreateModal = false,
   trainerId,
 }) {
+  const { token } = useAuth();
   const [viewMode, setViewMode] = useState("list"); // 'list' o 'details'
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [isLoadingRoutine, setIsLoadingRoutine] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [routineToDelete, setRoutineToDelete] = useState(null);
+  const [showImageViewModal, setShowImageViewModal] = useState(false);
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+  const [exerciseImageData, setExerciseImageData] = useState(null);
+  const [showExerciseImage, setShowExerciseImage] = useState(false);
 
   // Effect to open create modal when openCreateModal prop is true
   useEffect(() => {
@@ -78,6 +87,33 @@ export default function TrainerRoutinesModal({
   const handleDeleteRoutine = (routine) => {
     setRoutineToDelete(routine);
     setShowDeleteModal(true);
+  };
+
+  const handleViewExerciseImage = async (exerciseId) => {
+    try {
+      setIsLoadingRoutine(true);
+      setSelectedExerciseId(exerciseId);
+      const imageData = await exercisesService.getExerciseImage(token, exerciseId);
+      setExerciseImageData(imageData);
+      setShowExerciseImage(true);
+    } catch (error) {
+      console.error('Error loading exercise image:', error);
+      // Fallback al modal original si hay error
+      setShowImageViewModal(true);
+    } finally {
+      setIsLoadingRoutine(false);
+    }
+  };
+
+  const closeImageViewModal = () => {
+    setShowImageViewModal(false);
+    setSelectedExerciseId(null);
+  };
+
+  const handleBackToRoutine = () => {
+    setShowExerciseImage(false);
+    setExerciseImageData(null);
+    setSelectedExerciseId(null);
   };
 
   const handleCloseDeleteModal = () => {
@@ -443,12 +479,115 @@ export default function TrainerRoutinesModal({
                   <div className="space-y-6">
                     <h4 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                       <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-full">
-                        <Calendar className="h-6 w-6 text-white" />
+                        {showExerciseImage ? <Image className="h-6 w-6 text-white" /> : <Calendar className="h-6 w-6 text-white" />}
                       </div>
-                      Plan de Entrenamiento
+                      {showExerciseImage ? 'Imagen del Ejercicio' : 'Plan de Entrenamiento'}
+                      {showExerciseImage && (
+                        <Button
+                          onClick={handleBackToRoutine}
+                          className="ml-auto bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                        >
+                          <ArrowLeft className="h-4 w-4 mr-2" />
+                          Regresar a Rutina
+                        </Button>
+                      )}
                     </h4>
 
-                    {selectedRoutine.weeks?.map((week, weekIndex) => (
+                    {showExerciseImage ? (
+                      /* Vista de Imagen del Ejercicio */
+                      <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+                        {isLoadingRoutine ? (
+                          <div className="text-center py-12">
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+                            <p className="text-gray-600 mt-4 text-lg">Cargando imagen del ejercicio...</p>
+                          </div>
+                        ) : exerciseImageData ? (
+                          <div className="p-6 space-y-6">
+                            {/* Información del ejercicio */}
+                            <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
+                              <h5 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <Image className="h-5 w-5 text-blue-600" />
+                                Información del Ejercicio
+                              </h5>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    ID del Ejercicio
+                                  </label>
+                                  <p className="text-gray-600 font-mono text-sm bg-white p-2 rounded border">
+                                    {exerciseImageData.exerciseId}
+                                  </p>
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Nombre del Ejercicio
+                                  </label>
+                                  <p className="text-gray-800 font-semibold text-lg">
+                                    {exerciseImageData.exerciseName}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Imagen del ejercicio */}
+                            <div className="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-xl p-6 border border-gray-200">
+                              <h5 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <Image className="h-5 w-5 text-indigo-600" />
+                                Imagen del Ejercicio
+                              </h5>
+                              
+                              {exerciseImageData.image?.url ? (
+                                <div className="text-center">
+                                  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm inline-block">
+                                    <img
+                                      src={exerciseImageData.image.url}
+                                      alt={exerciseImageData.exerciseName}
+                                      className="max-w-full h-auto max-h-96 rounded-lg shadow-md"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'block';
+                                      }}
+                                    />
+                                    <div 
+                                      className="hidden bg-gray-100 rounded-lg p-8 text-center"
+                                      style={{ minHeight: '200px', display: 'none' }}
+                                    >
+                                      <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                      <p className="text-gray-600 text-lg">No se pudo cargar la imagen</p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="mt-4 space-y-2">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                        {exerciseImageData.image.type?.toUpperCase() || 'Imagen'}
+                                      </span>
+                                      {exerciseImageData.image.imageId && (
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-mono">
+                                          ID: {exerciseImageData.image.imageId}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-center py-8">
+                                  <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                  <p className="text-gray-600 text-lg">No hay imagen disponible para este ejercicio</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-6 text-center">
+                            <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 text-lg">No se pudo cargar la información del ejercicio</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* Vista del Plan de Entrenamiento */
+                      selectedRoutine.weeks?.map((week, weekIndex) => (
                       <div
                         key={week.id || weekIndex}
                         className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden"
@@ -576,6 +715,34 @@ export default function TrainerRoutinesModal({
                                               {exercise.restBetweenExercises}s
                                             </p>
                                           </div>
+                                          <div 
+                                            className={`text-center rounded-lg p-3 border transition-all duration-200 ${
+                                              exercise.exerciseId 
+                                                ? 'bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer' 
+                                                : 'bg-gray-50 border-gray-200'
+                                            }`}
+                                            onClick={exercise.exerciseId ? () => handleViewExerciseImage(exercise.exerciseId) : undefined}
+                                          >
+                                            <p className={`text-sm font-medium ${
+                                              exercise.exerciseId ? 'text-green-600' : 'text-gray-600'
+                                            }`}>
+                                              Imagen
+                                            </p>
+                                            <div className="flex items-center justify-center gap-2 mt-1">
+                                              {exercise.exerciseId ? (
+                                                <>
+                                                  <Image className="h-4 w-4 text-green-600" />
+                                                  <p className="text-lg font-bold text-green-700">
+                                                    Ver
+                                                  </p>
+                                                </>
+                                              ) : (
+                                                <p className="text-lg font-bold text-gray-600">
+                                                  No
+                                                </p>
+                                              )}
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     )
@@ -586,7 +753,8 @@ export default function TrainerRoutinesModal({
                           ))}
                         </div>
                       </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               ) : (
@@ -613,6 +781,13 @@ export default function TrainerRoutinesModal({
             onClose={handleCloseDeleteModal}
             routine={routineToDelete}
             onRoutineDeleted={handleRoutineDeleted}
+          />
+
+          {/* Modal de Imagen del Ejercicio */}
+          <ExerciseImageViewModal
+            isOpen={showImageViewModal}
+            onClose={closeImageViewModal}
+            exerciseId={selectedExerciseId}
           />
         </div>
       </div>
