@@ -21,7 +21,6 @@ export const getUserRoutineByEmail = async (userEmail) => {
       }
     });
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -29,7 +28,6 @@ export const getUserRoutineByEmail = async (userEmail) => {
     }
 
     const data = await response.json();
-    console.log("User routine data:", data);
     
     // Si no hay rutinas asignadas, retornar null
     if (!data || data.length === 0) {
@@ -58,8 +56,6 @@ export const getTrainerRoutines = async (trainerId) => {
 
     const apiUrl = `${APP_URL}routines/trainer/${trainerId}`;
     
-    console.log("Fetching routines for trainer ID:", trainerId);
-    console.log("API URL:", apiUrl);
 
     const response = await fetch(apiUrl, {
       method: "GET",
@@ -69,7 +65,6 @@ export const getTrainerRoutines = async (trainerId) => {
       }
     });
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -77,7 +72,6 @@ export const getTrainerRoutines = async (trainerId) => {
     }
 
     const data = await response.json();
-    console.log("Trainer routines data:", data);
     
     return data;
   } catch (error) {
@@ -99,8 +93,6 @@ export const assignRoutineToUser = async (routineId, userId, startDate, endDate,
 
     const apiUrl = `${APP_URL}routines/assign`;
     
-    console.log("Assigning routine:", routineId, "to user:", userId);
-    console.log("API URL:", apiUrl);
 
     const response = await fetch(apiUrl, {
       method: "POST",
@@ -118,7 +110,6 @@ export const assignRoutineToUser = async (routineId, userId, startDate, endDate,
       })
     });
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -126,7 +117,6 @@ export const assignRoutineToUser = async (routineId, userId, startDate, endDate,
     }
 
     const data = await response.json();
-    console.log("Routine assignment successful:", data);
     
     return data;
   } catch (error) {
@@ -148,8 +138,6 @@ export const getRoutineById = async (routineId) => {
 
     const apiUrl = `${APP_URL}routines/${routineId}`;
     
-    console.log("Fetching routine by ID:", routineId);
-    console.log("API URL:", apiUrl);
 
     const response = await fetch(apiUrl, {
       method: "GET",
@@ -159,7 +147,6 @@ export const getRoutineById = async (routineId) => {
       }
     });
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -167,7 +154,6 @@ export const getRoutineById = async (routineId) => {
     }
 
     const data = await response.json();
-    console.log("Routine data:", data);
     
     return data;
   } catch (error) {
@@ -189,9 +175,6 @@ export const updateRoutine = async (routineId, routineData) => {
 
     const apiUrl = `${APP_URL}routines/${routineId}`;
     
-    console.log("Updating routine:", routineId);
-    console.log("API URL:", apiUrl);
-    console.log("Update data:", JSON.stringify(routineData, null, 2));
 
     const response = await fetch(apiUrl, {
       method: "PATCH",

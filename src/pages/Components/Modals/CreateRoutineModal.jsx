@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "../Button";
-import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell } from "lucide-react";
+import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image } from "lucide-react";
 import { createRoutine } from "../../../services/routines";
+import ExerciseImageModal from "./ExerciseImageModal";
 
 export default function CreateRoutineModal({ 
   isOpen, 
@@ -33,7 +34,8 @@ export default function CreateRoutineModal({
                 restBetweenSets: 60,
                 restBetweenExercises: 120,
                 comments: "",
-                order: 1
+                order: 1,
+                exerciseId: null
               }
             ]
           }
@@ -45,6 +47,10 @@ export default function CreateRoutineModal({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState({
+    isOpen: false,
+    exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
+  });
 
   const handleSave = async () => {
     try {
@@ -173,7 +179,8 @@ export default function CreateRoutineModal({
               restBetweenSets: 60,
               restBetweenExercises: 120,
               comments: "",
-              order: 1
+              order: 1,
+              exerciseId: null
             }
           ]
         }
@@ -216,7 +223,8 @@ export default function CreateRoutineModal({
           restBetweenSets: 60,
           restBetweenExercises: 120,
           comments: "",
-          order: 1
+          order: 1,
+          exerciseId: null
         }
       ]
     };
@@ -248,7 +256,8 @@ export default function CreateRoutineModal({
       restBetweenSets: 60,
       restBetweenExercises: 120,
       comments: "",
-      order: day.exercises.length + 1
+      order: day.exercises.length + 1,
+      exerciseId: null
     };
     
     const updatedExercises = [...day.exercises, newExercise];
@@ -269,6 +278,20 @@ export default function CreateRoutineModal({
       index === exerciseIndex ? { ...exercise, [field]: value } : exercise
     );
     updateDay(weekIndex, dayIndex, 'exercises', updatedExercises);
+  };
+
+  const openImageModal = (weekIndex, dayIndex, exerciseIndex) => {
+    setImageModalOpen({
+      isOpen: true,
+      exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
+    });
+  };
+
+  const closeImageModal = () => {
+    setImageModalOpen({
+      isOpen: false,
+      exercisePath: null
+    });
   };
 
   if (!isOpen) return null;
@@ -518,8 +541,8 @@ export default function CreateRoutineModal({
                           </div>
 
                           {day.exercises.map((exercise, exerciseIndex) => (
-                            <div key={exerciseIndex} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                              <div className="flex justify-between items-start mb-4">
+                            <div key={exerciseIndex} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm items-center justify-center">
+                              <div className="flex justify-between  mb-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
                                   <div>
                                     <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -594,14 +617,23 @@ export default function CreateRoutineModal({
                                     />
                                   </div>
                                 </div>
-                                {day.exercises.length > 1 && (
+                                <div className="flex flex-col gap-2 ml-3 items-center justify-center">
                                   <Button
-                                    onClick={() => removeExercise(weekIndex, dayIndex, exerciseIndex)}
-                                    className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-full ml-3 transition-all duration-200 hover:scale-110"
+                                    onClick={() => openImageModal(weekIndex, dayIndex, exerciseIndex)}
+                                    className="bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 p-2 rounded-full transition-all duration-200 hover:scale-110"
+                                    title="Agregar imagen al ejercicio"
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Image className="h-3 w-3" />
                                   </Button>
-                                )}
+                                  {day.exercises.length > 1 && (
+                                    <Button
+                                      onClick={() => removeExercise(weekIndex, dayIndex, exerciseIndex)}
+                                      className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-full transition-all duration-200 hover:scale-110"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -649,6 +681,13 @@ export default function CreateRoutineModal({
           </div>
         </div>
       </div>
+
+      {/* Modal de Imagen para Ejercicios */}
+      <ExerciseImageModal
+        isOpen={imageModalOpen.isOpen}
+        onClose={closeImageModal}
+        exercisePath={imageModalOpen.exercisePath}
+      />
     </div>
   );
 }

@@ -26,7 +26,6 @@ import VerificationDocumentsList from "./VerificationDocumentsList";
 import DocumentViewModal from "./DocumentViewModal";
 
 export default function TrainerDocumentsSection({ trainerId }) {
-  console.log("trainerId", trainerId);
   const [documents, setDocuments] = useState([]);
   const [verificationDocuments, setVerificationDocuments] = useState([]);
   const [educationDocuments, setEducationDocuments] = useState([]);

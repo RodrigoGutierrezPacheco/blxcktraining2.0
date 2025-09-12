@@ -10,7 +10,6 @@ export default function VerificationDocumentsList({
   formatFileSize,
   getFileIcon,
 }) {
-  console.log("verificationDocuments", verificationDocuments);
   if (isLoadingVerification) {
     return (
       <div className="text-center py-6">

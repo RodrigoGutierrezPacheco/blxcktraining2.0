@@ -54,10 +54,6 @@ export const getTrainerById = async (trainerId) => {
 
     const apiUrl = `${APP_URL}users/trainer/${trainerId}`;
     
-    console.log("Fetching trainer data for ID:", trainerId);
-    console.log("Using token:", token ? `${token.substring(0, 20)}...` : "No token");
-    console.log("API URL:", apiUrl);
-    console.log("APP_URL from env:", APP_URL);
 
     const response = await fetch(apiUrl, {
       method: "GET",
@@ -67,15 +63,10 @@ export const getTrainerById = async (trainerId) => {
       }
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response status text:", response.statusText);
-    console.log("Response headers:", Object.fromEntries(response.headers.entries()));
 
     // Verificar si la respuesta tiene contenido
     const responseText = await response.text();
     
-    console.log("Response text length:", responseText.length);
-    console.log("Response text:", responseText);
     
     if (!responseText) {
       throw new Error("La respuesta del servidor está vacía");
@@ -93,7 +84,6 @@ export const getTrainerById = async (trainerId) => {
       throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
     }
 
-    console.log("Parsed trainer data:", data);
     return data;
   } catch (error) {
     console.log("error backend", error);
@@ -149,8 +139,6 @@ export const getUsersByTrainer = async (trainerId) => {
 
     const apiUrl = `${APP_URL}users/by-trainer/${trainerId}`;
     
-    console.log("Fetching users for trainer ID:", trainerId);
-    console.log("API URL:", apiUrl);
 
     const response = await fetch(apiUrl, {
       method: "GET",
@@ -160,7 +148,6 @@ export const getUsersByTrainer = async (trainerId) => {
       }
     });
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -168,7 +155,6 @@ export const getUsersByTrainer = async (trainerId) => {
     }
 
     const data = await response.json();
-    console.log("Users data:", data);
     
     // Filtrar solo los campos que queremos mostrar
     const filteredUsers = data.map(user => ({

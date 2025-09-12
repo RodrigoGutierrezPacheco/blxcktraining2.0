@@ -14,7 +14,6 @@ import { useState } from "react";
 import EditTrainerProfileModal from "./Modals/EditTrainerProfileModal";
 
 export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
-  console.log("tr ", trainerData)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleEditClick = () => {

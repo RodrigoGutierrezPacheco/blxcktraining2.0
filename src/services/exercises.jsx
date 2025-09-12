@@ -207,4 +207,27 @@ export const exercisesService = {
       throw error;
     }
   },
+
+  // Obtener carpetas de ejercicios
+  async getExerciseFolders(token) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/exercises/folders`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching exercise folders:', error);
+      throw error;
+    }
+  },
 };
