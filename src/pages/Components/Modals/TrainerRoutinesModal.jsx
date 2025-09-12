@@ -167,28 +167,38 @@ export default function TrainerRoutinesModal({
       <div className="bg-white/95 backdrop-blur-md w-full h-full overflow-y-auto shadow-2xl border border-gray-200">
         <div className="p-6">
           {/* Header con navegación */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
               {viewMode === "details" && (
                 <Button
                   onClick={handleBackToList}
-                  className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
                 >
-                  <ArrowLeft className="h-5 w-5" />
+                    <ArrowLeft className="h-4 w-4" />
                 </Button>
               )}
-              <h3 className="text-2xl font-bold text-black flex items-center gap-2">
-                <Dumbbell className="h-6 w-6" />
+                <div className="bg-gray-100 p-2 rounded-lg">
+                  <Dumbbell className="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
                 {viewMode === "list"
                   ? "Mis Rutinas Creadas"
                   : "Detalles de la Rutina"}
               </h3>
+                  <p className="text-gray-600 text-sm">
+                    {viewMode === "list"
+                      ? "Gestiona tus rutinas de entrenamiento"
+                      : "Información detallada de la rutina"}
+                  </p>
+                </div>
             </div>
             <div className="flex items-center gap-3">
               {viewMode === "list" && (
                 <Button
                   onClick={handleCreateRoutine}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 px-4 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Crear Rutina
@@ -196,10 +206,11 @@ export default function TrainerRoutinesModal({
               )}
               <Button
                 onClick={onClose}
-                className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
               >
-                <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
               </Button>
+              </div>
             </div>
           </div>
 
@@ -212,11 +223,11 @@ export default function TrainerRoutinesModal({
                   {routinesData.map((routine) => (
                     <div
                       key={routine.id}
-                      className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200"
+                      className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200"
                     >
-                      <div className="flex justify-between items-start mb-3">
+                      <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h4 className="text-lg font-semibold text-black mb-2">
+                          <h4 className="text-lg font-semibold text-gray-900 mb-2">
                             {routine.name}
                           </h4>
                           <p className="text-gray-600 mb-3">
@@ -225,12 +236,12 @@ export default function TrainerRoutinesModal({
                         </div>
                         <div className="flex items-center gap-2">
                           {routine.isActive ? (
-                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex items-center gap-1">
+                            <span className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded text-xs font-medium flex items-center gap-1">
                               <CheckCircle className="h-3 w-3" />
                               Activa
                             </span>
                           ) : (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                            <span className="px-3 py-1 bg-gray-50 text-gray-600 border border-gray-200 rounded text-xs font-medium">
                               Inactiva
                             </span>
                           )}
@@ -266,9 +277,9 @@ export default function TrainerRoutinesModal({
                       </div>
 
                       {routine.comments && (
-                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                          <p className="text-sm text-blue-700">
-                            <span className="font-medium">Comentarios:</span>{" "}
+                        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                          <p className="text-sm text-gray-700">
+                            <span className="font-medium text-gray-900">Comentarios:</span>{" "}
                             {routine.comments}
                           </p>
                         </div>
@@ -277,20 +288,20 @@ export default function TrainerRoutinesModal({
                       <div className="mt-4 flex gap-2">
                         <Button
                           onClick={() => handleViewDetails(routine.id)}
-                          className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
+                          className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2 rounded-lg font-medium transition-all duration-200"
                         >
                           <Dumbbell className="mr-1 h-4 w-4" />
                           Ver Detalles
                         </Button>
                         <Button
                           onClick={() => onEditRoutine(routine.id)}
-                          className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2"
+                          className="bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm px-3 py-2 rounded-lg font-medium transition-all duration-200"
                         >
                           Editar
                         </Button>
                         <Button
                           onClick={() => handleDeleteRoutine(routine)}
-                          className="bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-2"
+                          className="bg-red-500 text-white hover:bg-red-600 text-sm px-3 py-2 rounded-lg font-medium transition-all duration-200"
                         >
                           <Trash2 className="mr-1 h-4 w-4" />
                           Eliminar
@@ -300,14 +311,23 @@ export default function TrainerRoutinesModal({
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Dumbbell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-lg mb-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+                  <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <Dumbbell className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     No tienes rutinas creadas aún
-                  </p>
-                  <p className="text-gray-500">
+                  </h3>
+                  <p className="text-gray-600 mb-4">
                     Crea tu primera rutina para comenzar a entrenar clientes
                   </p>
+                  <Button
+                    onClick={handleCreateRoutine}
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Crear Primera Rutina
+                  </Button>
                 </div>
               )}
             </>
@@ -325,12 +345,12 @@ export default function TrainerRoutinesModal({
                 <div className="space-y-6">
                   {/* Header de la rutina */}
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div className="bg-gray-100 p-3 rounded-lg">
                         <Dumbbell className="h-6 w-6 text-gray-600" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900">
+                        <h3 className="text-2xl font-semibold text-gray-900 mb-1">
                           {selectedRoutine.name}
                         </h3>
                         <p className="text-gray-600">
@@ -342,13 +362,13 @@ export default function TrainerRoutinesModal({
 
                   {/* Información de la Rutina */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-gray-100 p-2 rounded-lg">
+                        <div className="bg-white p-2 rounded-lg border border-gray-200">
                           <Calendar className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-medium">
+                          <p className="text-xs text-gray-500 font-medium">
                             Duración
                           </p>
                           <p className="text-lg font-semibold text-gray-900">
@@ -359,13 +379,13 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-gray-100 p-2 rounded-lg">
+                        <div className="bg-white p-2 rounded-lg border border-gray-200">
                           <Target className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-medium">
+                          <p className="text-xs text-gray-500 font-medium">
                             Estado
                           </p>
                           <div className="flex items-center gap-2">
@@ -389,13 +409,13 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-gray-100 p-2 rounded-lg">
+                        <div className="bg-white p-2 rounded-lg border border-gray-200">
                           <Clock className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-medium">
+                          <p className="text-xs text-gray-500 font-medium">
                             Creada
                           </p>
                           <p className="text-lg font-semibold text-gray-900">
@@ -407,13 +427,13 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-gray-100 p-2 rounded-lg">
+                        <div className="bg-white p-2 rounded-lg border border-gray-200">
                           <Users className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-medium">
+                          <p className="text-xs text-gray-500 font-medium">
                             Total Ejercicios
                           </p>
                           <p className="text-lg font-semibold text-gray-900">
@@ -435,9 +455,9 @@ export default function TrainerRoutinesModal({
 
                   {/* Comentarios */}
                   {selectedRoutine.comments && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <Target className="h-5 w-5 text-gray-600" />
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                      <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <Target className="h-4 w-4 text-gray-600" />
                         Comentarios de la Rutina
                       </h4>
                       <p className="text-gray-700 leading-relaxed">
@@ -447,38 +467,38 @@ export default function TrainerRoutinesModal({
                   )}
 
                   {/* Resumen de la Rutina */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Dumbbell className="h-5 w-5 text-gray-600" />
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Dumbbell className="h-4 w-4 text-gray-600" />
                       Resumen de la Rutina
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="text-center">
-                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-semibold text-gray-900">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="bg-gray-100 rounded-lg w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                          <span className="text-xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.length || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-xs text-gray-500 font-medium">
                           Semanas
                         </p>
                       </div>
-                      <div className="text-center">
-                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-semibold text-gray-900">
+                      <div className="text-center bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="bg-gray-100 rounded-lg w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                          <span className="text-xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.reduce(
                               (total, week) => total + (week.days?.length || 0),
                               0
                             ) || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-xs text-gray-500 font-medium">
                           Días de Entrenamiento
                         </p>
                       </div>
-                      <div className="text-center">
-                        <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                          <span className="text-2xl font-semibold text-gray-900">
+                      <div className="text-center bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="bg-gray-100 rounded-lg w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                          <span className="text-xl font-semibold text-gray-900">
                             {selectedRoutine.weeks?.reduce(
                               (total, week) =>
                                 total +
@@ -491,7 +511,7 @@ export default function TrainerRoutinesModal({
                             ) || 0}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-xs text-gray-500 font-medium">
                           Ejercicios
                         </p>
                       </div>
@@ -500,52 +520,63 @@ export default function TrainerRoutinesModal({
 
                   {/* Plan de Entrenamiento */}
                   <div className="space-y-6">
-                    <h4 className="text-xl font-semibold text-gray-900 flex items-center gap-3">
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        {showExerciseImage ? <Image className="h-5 w-5 text-gray-600" /> : <Calendar className="h-5 w-5 text-gray-600" />}
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-gray-100 p-2 rounded-lg">
+                            {showExerciseImage ? <Image className="h-4 w-4 text-gray-600" /> : <Calendar className="h-4 w-4 text-gray-600" />}
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-900">
+                              {showExerciseImage ? 'Imagen del Ejercicio' : 'Plan de Entrenamiento'}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {showExerciseImage ? 'Vista detallada del ejercicio' : 'Estructura completa de la rutina'}
+                            </p>
+                          </div>
+                        </div>
+                        {showExerciseImage && (
+                          <Button
+                            onClick={handleBackToRoutine}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                          >
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Regresar a Rutina
+                          </Button>
+                        )}
                       </div>
-                      {showExerciseImage ? 'Imagen del Ejercicio' : 'Plan de Entrenamiento'}
-                      {showExerciseImage && (
-                        <Button
-                          onClick={handleBackToRoutine}
-                          className="ml-auto bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
-                        >
-                          <ArrowLeft className="h-4 w-4 mr-2" />
-                          Regresar a Rutina
-                        </Button>
-                      )}
-                    </h4>
+                    </div>
 
                     {showExerciseImage ? (
                       /* Vista de Imagen del Ejercicio */
-                      <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+                      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                         {isLoadingRoutine ? (
                           <div className="text-center py-12">
-                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-600 mx-auto"></div>
                             <p className="text-gray-600 mt-4 text-lg">Cargando imagen del ejercicio...</p>
                           </div>
                         ) : exerciseImageData ? (
                           <div className="p-6 space-y-6">
                             {/* Información del ejercicio */}
-                            <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
-                              <h5 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Image className="h-5 w-5 text-blue-600" />
+                            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                              <h5 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Image className="h-4 w-4 text-gray-600" />
                                 Información del Ejercicio
                               </h5>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                                     ID del Ejercicio
                                   </label>
-                                  <p className="text-gray-600 font-mono text-sm bg-white p-2 rounded border">
+                                  <p className="text-gray-600 font-mono text-sm bg-white p-2 rounded border border-gray-200">
                                     {exerciseImageData.exerciseId}
                                   </p>
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                  <label className="block text-xs font-semibold text-gray-700 mb-1">
                                     Nombre del Ejercicio
                                   </label>
-                                  <p className="text-gray-800 font-semibold text-lg">
+                                  <p className="text-gray-900 font-semibold text-lg">
                                     {exerciseImageData.exerciseName}
                                   </p>
                                 </div>
@@ -553,9 +584,9 @@ export default function TrainerRoutinesModal({
                             </div>
 
                             {/* Imagen del ejercicio */}
-                            <div className="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-xl p-6 border border-gray-200">
-                              <h5 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Image className="h-5 w-5 text-indigo-600" />
+                            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                              <h5 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Image className="h-4 w-4 text-gray-600" />
                                 Imagen del Ejercicio
                               </h5>
                               
@@ -582,11 +613,11 @@ export default function TrainerRoutinesModal({
                                   
                                   <div className="mt-4 space-y-2">
                                     <div className="flex items-center justify-center gap-2">
-                                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-medium border border-gray-200">
                                         {exerciseImageData.image.type?.toUpperCase() || 'Imagen'}
                                       </span>
                                       {exerciseImageData.image.imageId && (
-                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium font-mono">
+                                        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs font-medium font-mono border border-gray-200">
                                           ID: {exerciseImageData.image.imageId}
                                         </span>
                                       )}
@@ -634,7 +665,7 @@ export default function TrainerRoutinesModal({
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <div className="text-right">
+                            <div className="text-right">
                                 <p className="text-sm text-gray-500">
                                   {week.days?.length || 0} días
                                 </p>
@@ -656,7 +687,7 @@ export default function TrainerRoutinesModal({
                         {/* Días */}
                         {expandedWeeks.has(weekIndex) && (
                           <div className="p-4 space-y-4">
-                            {week.days?.map((day, dayIndex) => (
+                          {week.days?.map((day, dayIndex) => (
                             <div
                               key={day.id || dayIndex}
                               className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden"
@@ -680,7 +711,7 @@ export default function TrainerRoutinesModal({
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-3">
-                                    <div className="text-right">
+                                  <div className="text-right">
                                       <p className="text-xs text-gray-500">
                                         {day.exercises?.length || 0} ejercicios
                                       </p>
@@ -701,9 +732,9 @@ export default function TrainerRoutinesModal({
 
                               {/* Ejercicios */}
                               {expandedDays.has(`${weekIndex}-${dayIndex}`) && (
-                                <div className="p-4">
+                              <div className="p-4">
                                   <div className="space-y-3">
-                                    {day.exercises?.map(
+                                  {day.exercises?.map(
                                     (exercise, exerciseIndex) => (
                                       <div
                                         key={exercise.id || exerciseIndex}
@@ -726,32 +757,32 @@ export default function TrainerRoutinesModal({
                                         </div>
 
                                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
-                                            <p className="text-xs text-gray-500 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium mb-1">
                                               Series
                                             </p>
                                             <p className="text-lg font-semibold text-gray-900">
                                               {exercise.sets}
                                             </p>
                                           </div>
-                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
-                                            <p className="text-xs text-gray-500 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium mb-1">
                                               Repeticiones
                                             </p>
                                             <p className="text-lg font-semibold text-gray-900">
                                               {exercise.repetitions}
                                             </p>
                                           </div>
-                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
-                                            <p className="text-xs text-gray-500 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium mb-1">
                                               Descanso entre series
                                             </p>
                                             <p className="text-sm font-semibold text-gray-900">
                                               {exercise.restBetweenSets}s
                                             </p>
                                           </div>
-                                          <div className="text-center bg-gray-50 rounded-lg p-2 border border-gray-200">
-                                            <p className="text-xs text-gray-500 font-medium">
+                                          <div className="text-center bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                            <p className="text-xs text-gray-500 font-medium mb-1">
                                               Descanso entre ejercicios
                                             </p>
                                             <p className="text-sm font-semibold text-gray-900">
@@ -759,19 +790,19 @@ export default function TrainerRoutinesModal({
                                             </p>
                                           </div>
                                           <div 
-                                            className={`text-center rounded-lg p-2 border transition-all duration-200 ${
+                                            className={`text-center rounded-lg p-3 border transition-all duration-200 ${
                                               exercise.exerciseId 
                                                 ? 'bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer' 
                                                 : 'bg-gray-50 border-gray-200'
                                             }`}
                                             onClick={exercise.exerciseId ? () => handleViewExerciseImage(exercise.exerciseId) : undefined}
                                           >
-                                            <p className={`text-xs font-medium ${
+                                            <p className={`text-xs font-medium mb-1 ${
                                               exercise.exerciseId ? 'text-green-600' : 'text-gray-500'
                                             }`}>
                                               Imagen
                                             </p>
-                                            <div className="flex items-center justify-center gap-1 mt-1">
+                                            <div className="flex items-center justify-center gap-1">
                                               {exercise.exerciseId ? (
                                                 <>
                                                   <Image className="h-3 w-3 text-green-600" />
@@ -789,13 +820,13 @@ export default function TrainerRoutinesModal({
                                         </div>
                                       </div>
                                     )
-                                    )}
-                                  </div>
+                                  )}
                                 </div>
+                              </div>
                               )}
                             </div>
                           ))}
-                          </div>
+                        </div>
                         )}
                       </div>
                       ))
@@ -803,10 +834,22 @@ export default function TrainerRoutinesModal({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-red-600">
-                    Error al cargar los detalles de la rutina
+                <div className="bg-white border border-red-200 rounded-lg p-8 text-center">
+                  <div className="bg-red-50 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <XCircle className="h-8 w-8 text-red-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Error al cargar la rutina
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    No se pudieron cargar los detalles de la rutina
                   </p>
+                  <Button
+                    onClick={handleBackToList}
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Volver a la lista
+                  </Button>
                 </div>
               )}
             </>
