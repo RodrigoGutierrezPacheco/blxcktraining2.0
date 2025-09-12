@@ -43,7 +43,7 @@ export default function CreateRoutineModal({
       }
     ]
   });
-
+console.log("routine", routine);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -123,15 +123,15 @@ export default function CreateRoutineModal({
               restBetweenSets: parseInt(exercise.restBetweenSets),
               restBetweenExercises: parseInt(exercise.restBetweenExercises),
               comments: exercise.comments ? exercise.comments.trim() : "",
-              order: exerciseIndex + 1
+              order: exerciseIndex + 1,
+              exerciseId: exercise.exerciseId || null
             }))
           }))
         }))
       };
 
-      // Llamar a la API para crear la rutina
       console.log("Datos a enviar para crear rutina:", createData);
-      
+
       const createdRoutine = await createRoutine(createData);
       console.log("Rutina creada exitosamente:", createdRoutine);
       
@@ -272,6 +272,7 @@ export default function CreateRoutineModal({
   };
 
   const updateExercise = (weekIndex, dayIndex, exerciseIndex, field, value) => {
+    console.log(`Actualizando ejercicio [${weekIndex}][${dayIndex}][${exerciseIndex}].${field} =`, value);
     const week = routine.weeks[weekIndex];
     const day = week.days[dayIndex];
     const updatedExercises = day.exercises.map((exercise, index) => 
@@ -292,6 +293,40 @@ export default function CreateRoutineModal({
       isOpen: false,
       exercisePath: null
     });
+  };
+
+  const handleExerciseSelect = (exercise) => {
+    console.log("exercise recibido:", exercise);
+    if (!imageModalOpen.exercisePath) {
+      console.log("No hay exercisePath");
+      return;
+    }
+    
+    // Parsear la ruta del ejercicio (formato: "weekIndex-dayIndex-exerciseIndex")
+    const [weekIndex, dayIndex, exerciseIndex] = imageModalOpen.exercisePath.split('-').map(Number);
+    console.log("Índices parseados:", { weekIndex, dayIndex, exerciseIndex });
+    
+    // Actualizar el ejercicio seleccionado con la información del ejercicio
+    const week = routine.weeks[weekIndex];
+    const day = week.days[dayIndex];
+    const updatedExercises = day.exercises.map((ex, index) => 
+      index === exerciseIndex 
+        ? { ...ex, exerciseId: exercise.id, name: exercise.name }
+        : ex
+    );
+    updateDay(weekIndex, dayIndex, 'exercises', updatedExercises);
+    
+    console.log('Ejercicio actualizado en rutina:', {
+      weekIndex,
+      dayIndex, 
+      exerciseIndex,
+      exerciseId: exercise.id,
+      name: exercise.name,
+      updatedExercise: updatedExercises[exerciseIndex]
+    });
+    
+    // Cerrar el modal
+    closeImageModal();
   };
 
   if (!isOpen) return null;
@@ -545,14 +580,24 @@ export default function CreateRoutineModal({
                               <div className="flex justify-between  mb-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
                                   <div>
-                                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-2">
                                       Nombre del Ejercicio *
+                                      {exercise.exerciseId && (
+                                        <span className="text-green-600 text-xs flex items-center gap-1">
+                                          <Image className="h-3 w-3" />
+                                          Imagen
+                                        </span>
+                                      )}
                                     </label>
                                     <input
                                       type="text"
                                       value={exercise.name}
                                       onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'name', e.target.value)}
-                                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
+                                      className={`w-full p-2 border rounded-lg focus:ring-2 focus:border-transparent text-sm transition-all duration-200 ${
+                                        exercise.exerciseId 
+                                          ? 'border-green-300 focus:ring-green-500 bg-green-50' 
+                                          : 'border-gray-300 focus:ring-purple-500'
+                                      }`}
                                       placeholder="Ej: Press de Banca"
                                     />
                                   </div>
@@ -620,8 +665,12 @@ export default function CreateRoutineModal({
                                 <div className="flex flex-col gap-2 ml-3 items-center justify-center">
                                   <Button
                                     onClick={() => openImageModal(weekIndex, dayIndex, exerciseIndex)}
-                                    className="bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 p-2 rounded-full transition-all duration-200 hover:scale-110"
-                                    title="Agregar imagen al ejercicio"
+                                    className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
+                                      exercise.exerciseId 
+                                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700' 
+                                        : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700'
+                                    }`}
+                                    title={exercise.exerciseId ? "Cambiar imagen del ejercicio" : "Agregar imagen al ejercicio"}
                                   >
                                     <Image className="h-3 w-3" />
                                   </Button>
@@ -687,6 +736,7 @@ export default function CreateRoutineModal({
         isOpen={imageModalOpen.isOpen}
         onClose={closeImageModal}
         exercisePath={imageModalOpen.exercisePath}
+        onExerciseSelect={handleExerciseSelect}
       />
     </div>
   );

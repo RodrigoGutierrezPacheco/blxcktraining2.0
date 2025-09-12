@@ -9,7 +9,8 @@ import ExerciseImageContent from "./ExerciseImageContent";
 export default function ExerciseImageModal({ 
   isOpen, 
   onClose, 
-  exercisePath 
+  exercisePath,
+  onExerciseSelect
 }) {
   const { token } = useAuth();
   const [folders, setFolders] = useState([]);
@@ -17,8 +18,6 @@ export default function ExerciseImageModal({
   const [error, setError] = useState(null);
   const [currentView, setCurrentView] = useState('folders'); // 'folders' o 'exercises'
   const [selectedFolder, setSelectedFolder] = useState(null);
-
-  console.log("exercisePath", exercisePath);
 
   useEffect(() => {
     if (isOpen && token) {
@@ -51,9 +50,11 @@ export default function ExerciseImageModal({
   };
 
   const handleExerciseSelect = (exercise) => {
-    console.log('Ejercicio seleccionado:', exercise);
-    // Aquí puedes implementar la lógica para seleccionar el ejercicio
-    // Por ejemplo, cerrar el modal y pasar el ejercicio seleccionado
+    if (onExerciseSelect) {
+      onExerciseSelect(exercise);
+    } else {
+      console.log('Ejercicio seleccionado:', exercise);
+    }
   };
 
   if (!isOpen) return null;

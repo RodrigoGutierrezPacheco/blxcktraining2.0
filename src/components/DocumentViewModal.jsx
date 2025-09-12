@@ -23,7 +23,6 @@ export default function DocumentViewModal({
   const [replaceError, setReplaceError] = useState("");
   const [replaceNotes, setReplaceNotes] = useState("");
 
-  console.log("selectedDocument", selectedDocument);
   if (!showViewModal || !selectedDocument) return null;
 
   const handleClose = () => {

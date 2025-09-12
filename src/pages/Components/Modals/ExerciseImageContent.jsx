@@ -22,7 +22,6 @@ export default function ExerciseImageContent({
     try {
       setIsLoadingExercises(true);
       setError(null);
-      console.log('Fetching exercises for folder:', folder.id); // Debug log
       const data = await exercisesService.getExercisesByFolder(token, folder.id);
       setExercises(data);
       setFilteredExercises(data);
