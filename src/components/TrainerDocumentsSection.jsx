@@ -4,7 +4,6 @@ import { Button } from "../pages/Components/Button";
 import { Upload, Plus } from "lucide-react";
 import {
   getTrainerDocuments,
-  // deleteTrainerDocument, // No se usa actualmente
   uploadVerificationDocument,
   getTrainerVerificationDocuments,
   getTrainerDocument,
@@ -286,51 +285,50 @@ export default function TrainerDocumentsSection({ trainerId }) {
   };
 
   const getFileIcon = (fileType) => {
-    if (!fileType) return "📎"; // Manejar caso donde fileType es null o undefined
+    if (!fileType) return "📄"; // Manejar caso donde fileType es null o undefined
 
     if (fileType.includes("pdf")) return "📄";
     if (fileType.includes("image")) return "🖼️";
     if (fileType.includes("word")) return "📝";
-    return "📎";
+    return "📄";
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-white border border-gray-200 shadow-sm">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-lg font-medium text-gray-900">
               Documentos del Entrenador
             </h3>
-            <p className="text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 mt-1">
               Gestiona tus certificaciones, diplomas y otros documentos
-              importantes
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Button
               onClick={() => {
                 setError(null); // Limpiar errores previos
                 setShowVerificationForm(true);
               }}
-              className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
+              className="bg-gray-600 text-white hover:bg-gray-700 flex items-center gap-2 px-4 py-2"
             >
               <Upload className="h-4 w-4" />
               Verificación
             </Button>
             <Button
               onClick={() => setShowUploadForm(true)}
-              className="bg-black text-white hover:bg-gray-800 flex items-center gap-2"
+              className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2 px-4 py-2"
             >
               <Plus className="h-4 w-4" />
-              Subir Documento
+              Subir
             </Button>
           </div>
         </div>
 
         {/* Sección de Documentos de Educación */}
         <div className="mt-8">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+          <h4 className="text-base font-medium text-gray-900 mb-4">
             Documentos de Educación
           </h4>
 
@@ -350,7 +348,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
 
         {/* Sección de Documentos de Verificación */}
         <div className="mt-8">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+          <h4 className="text-base font-medium text-gray-900 mb-4">
             Documentos de Verificación
           </h4>
 

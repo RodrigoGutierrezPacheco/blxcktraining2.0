@@ -227,7 +227,7 @@ export default function PerfilEntrenador() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {/* Profile Header */}
-      <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-6xl mx-auto">
+      <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative">
             <img
@@ -260,43 +260,35 @@ export default function PerfilEntrenador() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-6">
-        {/* Trainer Information Section */}
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6">
+        {/* Left Column - Trainer Information */}
         <div className="lg:col-span-1">
           <TrainerInfo trainerData={trainerData} formatDate={formatDate} />
         </div>
 
-        {/* Trainer Stats & Bio Section */}
-        <div className="lg:col-span-2">
-          <TrainerStatsBio trainerData={trainerData} usersData={usersData} />
+        {/* Right Column - All Sections */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Clients Section */}
+          <ClientsSection
+            usersData={usersData}
+            formatUserDate={formatUserDate}
+            handleViewUser={handleViewUser}
+            handleViewRoutine={handleViewRoutine}
+            handleAssignRoutine={handleAssignRoutine}
+            loadingRoutine={loadingRoutine}
+          />
+
+          {/* Trainer Routines Section */}
+          <TrainerRoutinesSection
+            routinesData={routinesData}
+            isLoadingRoutines={isLoadingRoutines}
+            handleViewRoutines={handleViewRoutines}
+            handleCreateRoutine={handleCreateRoutine}
+          />
+
+          {/* Trainer Documents Section */}
+          <TrainerDocumentsSection trainerId={user?.id} />
         </div>
-      </div>
-
-      {/* Clients Section */}
-      <div className="max-w-6xl mx-auto mt-6">
-        <ClientsSection
-          usersData={usersData}
-          formatUserDate={formatUserDate}
-          handleViewUser={handleViewUser}
-          handleViewRoutine={handleViewRoutine}
-          handleAssignRoutine={handleAssignRoutine}
-          loadingRoutine={loadingRoutine}
-        />
-      </div>
-
-      {/* Trainer Routines Section */}
-      <div className="max-w-6xl mx-auto mt-6">
-        <TrainerRoutinesSection
-          routinesData={routinesData}
-          isLoadingRoutines={isLoadingRoutines}
-          handleViewRoutines={handleViewRoutines}
-          handleCreateRoutine={handleCreateRoutine}
-        />
-      </div>
-
-      {/* Trainer Documents Section */}
-      <div className="max-w-6xl mx-auto mt-6">
-        <TrainerDocumentsSection trainerId={user?.id} />
       </div>
 
       {/* User Details Modal */}

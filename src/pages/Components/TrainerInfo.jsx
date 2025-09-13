@@ -31,7 +31,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
   };
 
   return (
-    <Card className="border border-gray-200 h-full">
+    <Card className="border border-gray-200 h-fit">
       <CardContent className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Dumbbell className="h-5 w-5 text-gray-600" />

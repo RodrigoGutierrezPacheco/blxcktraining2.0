@@ -11,80 +11,76 @@ export default function ClientsSection({
   loadingRoutine 
 }) {
   return (
-    <Card className="border-2 border-black">
+    <Card className="bg-white border border-gray-200 shadow-sm">
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-black flex items-center gap-2">
-            <Users className="h-6 w-6" />
+          <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+            <Users className="h-5 w-5 text-gray-600" />
             Mis Clientes
           </h2>
-          <div className="text-lg font-semibold text-gray-700">
+          <div className="text-sm font-medium text-gray-600">
             Total: {usersData.length} usuario
             {usersData.length !== 1 ? "s" : ""}
           </div>
         </div>
 
         {usersData.length > 0 ? (
-          <div className="grid gap-4">
+          <div className="space-y-4">
             {usersData.map((user) => (
               <div
                 key={user.id}
-                className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                className="bg-white p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-black mb-2">
+                    <h3 className="text-base font-medium text-gray-900 mb-3">
                       {user.fullName}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
-                      <div>
-                        <span className="font-medium">Email:</span>{" "}
-                        {user.email}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</span>
+                        <span className="text-sm text-gray-900 mt-1">{user.email}</span>
                       </div>
                       {user.age && (
-                        <div>
-                          <span className="font-medium">Edad:</span>{" "}
-                          {user.age} años
+                        <div className="flex flex-col">
+                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Edad</span>
+                          <span className="text-sm text-gray-900 mt-1">{user.age} años</span>
                         </div>
                       )}
                       {user.weight && (
-                        <div>
-                          <span className="font-medium">Peso:</span>{" "}
-                          {user.weight} kg
+                        <div className="flex flex-col">
+                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Peso</span>
+                          <span className="text-sm text-gray-900 mt-1">{user.weight} kg</span>
                         </div>
                       )}
                       {user.height && (
-                        <div>
-                          <span className="font-medium">Altura:</span>{" "}
-                          {user.height} cm
+                        <div className="flex flex-col">
+                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Altura</span>
+                          <span className="text-sm text-gray-900 mt-1">{user.height} cm</span>
                         </div>
                       )}
-                      <div>
-                        <span className="font-medium">Registrado:</span>{" "}
-                        {formatUserDate(user.createdAt)}
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Registrado</span>
+                        <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.createdAt)}</span>
                       </div>
                     </div>
 
                     {(user.chronicDiseases || user.healthIssues) && (
-                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                        <h4 className="font-medium text-yellow-800 mb-2">
-                          Información de Salud:
+                      <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                          Información de Salud
                         </h4>
                         {user.chronicDiseases && (
-                          <p className="text-sm text-yellow-700">
-                            <span className="font-medium">
-                              Enfermedades crónicas:
-                            </span>{" "}
-                            {user.chronicDiseases}
-                          </p>
+                          <div className="mb-2">
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Enfermedades crónicas</span>
+                            <p className="text-sm text-gray-900 mt-1">{user.chronicDiseases}</p>
+                          </div>
                         )}
                         {user.healthIssues && (
-                          <p className="text-sm text-yellow-700 mt-1">
-                            <span className="font-medium">
-                              Problemas de salud:
-                            </span>{" "}
-                            {user.healthIssues}
-                          </p>
+                          <div>
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud</span>
+                            <p className="text-sm text-gray-900 mt-1">{user.healthIssues}</p>
+                          </div>
                         )}
                       </div>
                     )}
@@ -93,7 +89,7 @@ export default function ClientsSection({
                   <div className="flex flex-col gap-2 ml-4">
                     <Button
                       onClick={() => handleViewUser(user)}
-                      className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
+                      className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
                     >
                       <Eye className="mr-1 h-4 w-4" />
                       Ver Detalles
@@ -102,7 +98,7 @@ export default function ClientsSection({
                       <Button
                         onClick={() => handleViewRoutine(user)}
                         disabled={loadingRoutine}
-                        className="bg-purple-600 text-white hover:bg-purple-700 text-sm px-3 py-2"
+                        className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2"
                       >
                         <BookOpen className="mr-1 h-4 w-4" />
                         {loadingRoutine ? "Cargando..." : "Ver Rutina"}
@@ -110,7 +106,7 @@ export default function ClientsSection({
                     ) : (
                       <Button
                         onClick={() => handleAssignRoutine(user)}
-                        className="bg-green-600 text-white hover:bg-green-700 text-sm px-3 py-2"
+                        className="bg-gray-700 text-white hover:bg-gray-600 text-sm px-3 py-2"
                       >
                         <Plus className="mr-1 h-4 w-4" />
                         Asignar Rutina
@@ -122,12 +118,12 @@ export default function ClientsSection({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg mb-2">
+          <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+            <Users className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+            <p className="text-sm text-gray-600 mb-1">
               No tienes usuarios asignados aún
             </p>
-            <p className="text-gray-500">
+            <p className="text-xs text-gray-500">
               Los usuarios que se registren con tu código aparecerán aquí
             </p>
           </div>
