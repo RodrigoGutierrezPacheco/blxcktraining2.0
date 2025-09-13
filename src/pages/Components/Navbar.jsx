@@ -64,7 +64,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <a href="/" className="flex items-center space-x-2">
               <div className="flex items-center justify-center">
-                <img src="/public/images/BTNegro.png" alt="BlxckTraining" className="w-8 h-8" />
+                <img src="/images/BTNegro.png" alt="BlxckTraining" className="w-8 h-8" />
               </div>
               <span className="text-lg font-medium text-gray-900">
                 BLXCK<span className="text-gray-500">TRAINING</span>
