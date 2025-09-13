@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "../Button";
 import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image, ChevronDown, ChevronUp } from "lucide-react";
 import { getRoutineById, updateRoutine } from "../../../services/routines";
 import ExerciseImageModal from "./ExerciseImageModal";
+import ExerciseImageViewModal from "./ExerciseImageViewModal";
 
 export default function EditRoutineModal({ 
   isOpen, 
@@ -26,30 +27,17 @@ export default function EditRoutineModal({
     isOpen: false,
     exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
   });
+  const [imageViewModalOpen, setImageViewModalOpen] = useState({
+    isOpen: false,
+    exerciseId: null,
+    exerciseName: null,
+    exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
+  });
   const [expandedWeeks, setExpandedWeeks] = useState(new Set([0])); // Primera semana expandida por defecto
   const [expandedDays, setExpandedDays] = useState(new Set());
 
-  useEffect(() => {
-    if (isOpen && routineId) {
-      fetchRoutine();
-    }
-  }, [isOpen, routineId]);
 
-  // Effect to block body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup function to restore scroll when component unmounts
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  const fetchRoutine = async () => {
+  const fetchRoutine = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -65,7 +53,26 @@ export default function EditRoutineModal({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [routineId]);
+  useEffect(() => {
+    if (isOpen && routineId) {
+      fetchRoutine();
+    }
+  }, [isOpen, routineId, fetchRoutine]);
+
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleSave = async () => {
     try {
@@ -146,12 +153,18 @@ export default function EditRoutineModal({
       console.log("Datos a enviar:", updateData);
       await updateRoutine(routineId, updateData);
       
+      // Mostrar mensaje de éxito
+      setSuccessMessage("¡Rutina actualizada exitosamente!");
+      
       // Notificar que se actualizó la rutina
       if (onRoutineUpdated) {
         onRoutineUpdated();
       }
       
-      onClose();
+      // Cerrar el modal después de un breve delay para mostrar el mensaje de éxito
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -291,16 +304,47 @@ export default function EditRoutineModal({
   };
 
   const openImageModal = (weekIndex, dayIndex, exerciseIndex) => {
-    setImageModalOpen({
-      isOpen: true,
-      exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
-    });
+    const exercise = routine.weeks[weekIndex].days[dayIndex].exercises[exerciseIndex];
+    
+    if (exercise.exerciseId) {
+      // Si el ejercicio ya tiene imagen, abrir modal de visualización
+      setImageViewModalOpen({
+        isOpen: true,
+        exerciseId: exercise.exerciseId,
+        exerciseName: exercise.name,
+        exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
+      });
+    } else {
+      // Si no tiene imagen, abrir modal de selección
+      setImageModalOpen({
+        isOpen: true,
+        exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
+      });
+    }
   };
 
   const closeImageModal = () => {
     setImageModalOpen({
       isOpen: false,
       exercisePath: null
+    });
+  };
+
+  const closeImageViewModal = () => {
+    setImageViewModalOpen({
+      isOpen: false,
+      exerciseId: null,
+      exerciseName: null,
+      exercisePath: null
+    });
+  };
+
+  const handleEditImageFromView = () => {
+    // Cerrar modal de visualización y abrir modal de selección
+    closeImageViewModal();
+    setImageModalOpen({
+      isOpen: true,
+      exercisePath: imageViewModalOpen.exercisePath
     });
   };
 
@@ -657,11 +701,16 @@ export default function EditRoutineModal({
                                 <div key={exerciseIndex} className="bg-white border border-gray-200 rounded-lg p-4">
                                   <div className="flex justify-between mb-3">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 flex-1">
-                                      <div>
-                                        {console.log("exercise", exercise)}
-                                        <label className="block text-xs font-semibold text-gray-700 mb-1  items-center gap-2">
-                                          Nombre del Ejercicio *
-                                        </label>
+                                        <div>
+                                          <label className="flex text-xs font-semibold text-gray-700 mb-1 items-center gap-2">
+                                            Nombre del Ejercicio *
+                                            {exercise.exerciseId && (
+                                              <span className="text-green-600 text-xs flex items-center gap-1">
+                                                <Image className="h-3 w-3" />
+                                                Imagen
+                                              </span>
+                                            )}
+                                          </label>
                                         <input
                                           type="text"
                                           value={exercise.name}
@@ -812,6 +861,15 @@ export default function EditRoutineModal({
         onClose={closeImageModal}
         exercisePath={imageModalOpen.exercisePath}
         onExerciseSelect={handleExerciseSelect}
+      />
+
+      {/* Modal de Visualización de Imagen del Ejercicio */}
+      <ExerciseImageViewModal
+        isOpen={imageViewModalOpen.isOpen}
+        onClose={closeImageViewModal}
+        exerciseId={imageViewModalOpen.exerciseId}
+        exerciseName={imageViewModalOpen.exerciseName}
+        onEditImage={handleEditImageFromView}
       />
     </div>
   );
