@@ -59,8 +59,8 @@ export default function ExerciseImageContent({
   if (isLoadingExercises) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-        <p className="text-gray-600 mt-4">Cargando ejercicios...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto"></div>
+        <p className="text-gray-600 mt-4 text-sm">Cargando ejercicios...</p>
       </div>
     );
   }
@@ -70,26 +70,26 @@ export default function ExerciseImageContent({
       {/* Buscador */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <input
             type="text"
             placeholder="Buscar ejercicios por nombre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
           />
         </div>
       </div>
 
-      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <Dumbbell className="h-5 w-5 text-purple-600" />
+      <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Dumbbell className="h-4 w-4 text-gray-600" />
         Ejercicios ({filteredExercises.length})
       </h4>
       
       {filteredExercises.length === 0 ? (
         <div className="text-center py-8">
-          <Dumbbell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 text-lg">
+          <Dumbbell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 text-base">
             {searchTerm ? 'No se encontraron ejercicios' : 'No hay ejercicios disponibles'}
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function ExerciseImageContent({
             <div
               key={exercise.id}
               onClick={() => onExerciseSelect(exercise)}
-              className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-all duration-200 cursor-pointer group"
             >
               <div className="flex items-start gap-4">
                 {/* Imagen del ejercicio */}
@@ -108,28 +108,28 @@ export default function ExerciseImageContent({
                     <img
                       src={exercise.image.url}
                       alt={exercise.name}
-                      className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                      className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg border border-gray-200 flex items-center justify-center">
-                      <Dumbbell className="h-8 w-8 text-gray-400" />
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg border border-gray-200 flex items-center justify-center">
+                      <Dumbbell className="h-6 w-6 text-gray-400" />
                     </div>
                   )}
                 </div>
                 
                 {/* Información del ejercicio */}
                 <div className="flex-1 min-w-0">
-                  <h5 className="font-semibold text-gray-800 text-lg mb-1 truncate">
+                  <h5 className="font-semibold text-gray-900 text-base mb-1 truncate">
                     {exercise.name}
                   </h5>
                   <p className="text-gray-600 text-sm mb-2 line-clamp-2">
                     {exercise.description}
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
                       {exercise.muscleGroupName}
                     </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
                       exercise.isActive 
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-gray-100 text-gray-700'
@@ -138,14 +138,6 @@ export default function ExerciseImageContent({
                     </span>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end mt-3">
-                <Button
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 px-3 py-1 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
-                >
-                  Seleccionar
-                </Button>
               </div>
             </div>
           ))}

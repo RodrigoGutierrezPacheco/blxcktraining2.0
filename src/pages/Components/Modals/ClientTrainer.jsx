@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "../Button";
 import {
   Plus,
@@ -8,6 +9,7 @@ import {
   Activity,
   Ruler,
   Scale,
+  X,
 } from "lucide-react";
 
 export default function ClientTrainer({
@@ -16,42 +18,48 @@ export default function ClientTrainer({
   formatUserDate,
 }) {
   console.log("selectedUser", selectedUser);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
-        <div className="p-8">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-2xl font-bold text-black mb-2">
-                Información Completa del Cliente
+              <h3 className="text-lg font-semibold text-gray-900">
+                Información del Cliente
               </h3>
-              <p className="text-gray-600">
-                Perfil detallado de {selectedUser.fullName}
-              </p>
             </div>
             <Button
               onClick={handleCloseModal}
-              className="text-gray-500 hover:text-gray-700 bg-transparent hover:bg-gray-100 p-2 rounded-full"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
             >
-              ✕
+              <X className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+
+        <div className="p-6">
 
           {/* User Avatar and Basic Info */}
-          <div className="flex items-center gap-6 mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+          <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 text-lg font-semibold">
               {selectedUser.fullName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">
                 {selectedUser.fullName}
               </h2>
-              <div className="flex items-center gap-4 text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  <span>{selectedUser.email}</span>
-                </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <Mail className="h-4 w-4" />
+                <span className="text-sm">{selectedUser.email}</span>
               </div>
             </div>
           </div>
@@ -59,31 +67,31 @@ export default function ClientTrainer({
           {/* Main Information Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Personal Information */}
-            <div className="space-y-6">
-              <h4 className="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-2">
+            <div className="space-y-4">
+              <h4 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">
                 Información Personal
               </h4>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="h-5 w-5 text-blue-600" />
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <Calendar className="h-4 w-4 text-gray-600" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-500">
                       Fecha de Registro
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm">
                       {formatUserDate(selectedUser.createdAt)}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="h-5 w-5 text-green-600" />
+                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <Calendar className="h-4 w-4 text-gray-600" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-500">
                       Fecha de Nacimiento
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm">
                       {selectedUser.dateOfBirth
                         ? formatUserDate(selectedUser.dateOfBirth)
                         : "Sin información"}
@@ -91,13 +99,13 @@ export default function ClientTrainer({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <User className="h-5 w-5 text-purple-600" />
+                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <User className="h-4 w-4 text-gray-600" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-500">
                       Edad
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm">
                       {selectedUser.age
                         ? `${selectedUser.age} años`
                         : "Sin información"}
@@ -108,19 +116,19 @@ export default function ClientTrainer({
             </div>
 
             {/* Physical Measurements */}
-            <div className="space-y-6">
-              <h4 className="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-2">
+            <div className="space-y-4">
+              <h4 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">
                 Medidas Físicas
               </h4>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Scale className="h-5 w-5 text-orange-600" />
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <Scale className="h-4 w-4 text-gray-600" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-500">
                       Peso
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm">
                       {selectedUser.weight
                         ? `${selectedUser.weight} kg`
                         : "Sin información"}
@@ -128,13 +136,13 @@ export default function ClientTrainer({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Ruler className="h-5 w-5 text-teal-600" />
+                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <Ruler className="h-4 w-4 text-gray-600" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-500">
                       Altura
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm">
                       {selectedUser.height
                         ? `${selectedUser.height} cm`
                         : "Sin información"}
@@ -146,37 +154,35 @@ export default function ClientTrainer({
           </div>
 
           {/* Health Information */}
-          <div className="mb-8">
-            <h4 className="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-2 mb-4">
+          <div className="mb-6">
+            <h4 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2 mb-4">
               Información de Salud
             </h4>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                <div className="flex items-center gap-3 mb-3">
-                  <Activity className="h-5 w-5 text-gray-600" />
-                  <h5 className="font-semibold text-gray-800">
-                    Problemas de Salud
-                  </h5>
-                </div>
-                <p className="text-gray-700 leading-relaxed">
-                  {selectedUser.healthIssues || "Sin información"}
-                </p>
+            <div className="p-4 bg-white border border-gray-200 rounded-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <Activity className="h-4 w-4 text-gray-600" />
+                <h5 className="font-medium text-gray-800 text-sm">
+                  Problemas de Salud
+                </h5>
               </div>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                {selectedUser.healthIssues || "Sin información"}
+              </p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <Button
               onClick={handleCloseModal}
-              className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3"
+              className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-all duration-200"
             >
               Cerrar
             </Button>
-            <Button className="bg-green-600 text-white hover:bg-green-700 px-6 py-3">
-              <Plus className="mr-2 h-5 w-5" />
-              Asignar Rutina Personalizada
+            <Button className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200">
+              <Plus className="mr-2 h-4 w-4" />
+              Asignar Rutina
             </Button>
           </div>
         </div>

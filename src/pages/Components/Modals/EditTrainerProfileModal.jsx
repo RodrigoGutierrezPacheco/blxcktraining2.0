@@ -30,6 +30,18 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
     }
   }, [trainerData]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -82,43 +94,40 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
   if (!isOpen || !trainerData) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Fondo con overlay */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
       {/* Contenido del modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-300">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <User className="h-6 w-6" />
-            Editar Perfil del Entrenador
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Cerrar"
-          >
-            <X className="h-6 w-6" />
-          </button>
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Editar Perfil del Entrenador
+              </h3>
+            </div>
+            <Button
+              onClick={onClose}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
-          {/* Información Personal */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              Información Personal
-            </h3>
+            {/* Información Personal */}
+            <div className="space-y-4">
+              <h4 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                Información Personal
+              </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -131,7 +140,7 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -145,7 +154,7 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -158,7 +167,7 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -173,7 +182,7 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   onChange={handleInputChange}
                   min="18"
                   max="100"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -186,17 +195,17 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Información Profesional */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              Información Profesional
-            </h3>
+            {/* Información Profesional */}
+            <div className="space-y-4">
+              <h4 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                Información Profesional
+              </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -209,7 +218,7 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   value={formData.curp}
                   onChange={handleInputChange}
                   maxLength="18"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
 
@@ -223,41 +232,41 @@ export default function EditTrainerProfileModal({ isOpen, onClose, trainerData, 
                   value={formData.rfc}
                   onChange={handleInputChange}
                   maxLength="13"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Botones */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Guardando...
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Save className="h-4 w-4" />
-                  Guardar Cambios
-                </div>
-              )}
-            </Button>
-          </div>
-        </form>
+            {/* Botones */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Guardando...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    Guardar Cambios
+                  </div>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

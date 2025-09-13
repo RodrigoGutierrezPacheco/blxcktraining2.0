@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "../Button";
 import { X, Image, ArrowLeft } from "lucide-react";
 import { exercisesService } from "../../../services/exercises";
@@ -6,40 +6,18 @@ import { useAuth } from "../../../context/useAuth";
 import ExerciseFolderContent from "./ExerciseFolderContent";
 import ExerciseImageContent from "./ExerciseImageContent";
 
-export default function ExerciseImageModal({ 
-  isOpen, 
-  onClose, 
-  exercisePath,
-  onExerciseSelect
+export default function ExerciseImageModal({
+  isOpen,
+  onClose,
+  onExerciseSelect,
 }) {
   const { token } = useAuth();
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('folders'); // 'folders' o 'exercises'
+  const [currentView, setCurrentView] = useState("folders"); // 'folders' o 'exercises'
   const [selectedFolder, setSelectedFolder] = useState(null);
-
-  useEffect(() => {
-    if (isOpen && token) {
-      fetchFolders();
-    }
-  }, [isOpen, token]);
-
-  // Effect to block body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup function to restore scroll when component unmounts
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -47,19 +25,41 @@ export default function ExerciseImageModal({
       setFolders(data);
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching folders:', err);
+      console.error("Error fetching folders:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+  useEffect(() => {
+    if (isOpen && token) {
+      // Resetear siempre a la vista de carpetas cuando se abre el modal
+      setCurrentView("folders");
+      setSelectedFolder(null);
+      fetchFolders();
+    }
+  }, [isOpen, token, fetchFolders]);
+
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const handleFolderClick = (folder) => {
     setSelectedFolder(folder);
-    setCurrentView('exercises');
+    setCurrentView("exercises");
   };
 
   const handleBackToFolders = () => {
-    setCurrentView('folders');
+    setCurrentView("folders");
     setSelectedFolder(null);
   };
 
@@ -67,7 +67,7 @@ export default function ExerciseImageModal({
     if (onExerciseSelect) {
       onExerciseSelect(exercise);
     } else {
-      console.log('Ejercicio seleccionado:', exercise);
+      console.log("Ejercicio seleccionado:", exercise);
     }
   };
 
@@ -78,37 +78,38 @@ export default function ExerciseImageModal({
       <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl border border-gray-200">
         <div className="p-6">
           {/* Header del Modal de Imagen */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 mb-6 text-white shadow-lg">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                {currentView === 'exercises' && (
+                {currentView === "exercises" && (
                   <Button
                     onClick={handleBackToFolders}
-                    className="bg-white/20 text-white hover:bg-white/30 p-2 rounded-full transition-all duration-200 hover:scale-105"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
                   >
-                    <ArrowLeft className="h-5 w-5" />
+                    <ArrowLeft className="h-4 w-4" />
                   </Button>
                 )}
-                <div className="bg-white/20 p-3 rounded-full">
-                  <Image className="h-8 w-8 text-white" />
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <Image className="h-6 w-6 text-gray-600" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold">
-                    {currentView === 'folders' ? 'Seleccionar Carpeta' : selectedFolder?.title}
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {currentView === "folders"
+                      ? "Seleccionar Carpeta"
+                      : selectedFolder?.title}
                   </h3>
-                  <p className="text-purple-100 text-lg">
-                    {currentView === 'folders' 
-                      ? 'Selecciona una carpeta de ejercicios' 
-                      : 'Selecciona un ejercicio'
-                    }
+                  <p className="text-gray-600 text-sm">
+                    {currentView === "folders"
+                      ? "Selecciona una carpeta de ejercicios"
+                      : "Selecciona un ejercicio"}
                   </p>
                 </div>
               </div>
               <Button
                 onClick={onClose}
-                className="bg-white/20 text-white hover:bg-white/30 p-3 rounded-full transition-all duration-200 hover:scale-105"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-3 rounded-lg transition-all duration-200"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -117,9 +118,11 @@ export default function ExerciseImageModal({
           <div className="py-6">
             {loading && (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">
-                  {currentView === 'folders' ? 'Cargando carpetas...' : 'Cargando ejercicios...'}
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto"></div>
+                <p className="text-gray-600 mt-4 text-sm">
+                  {currentView === "folders"
+                    ? "Cargando carpetas..."
+                    : "Cargando ejercicios..."}
                 </p>
               </div>
             )}
@@ -130,27 +133,19 @@ export default function ExerciseImageModal({
               </div>
             )}
 
-            {!loading && !error && currentView === 'folders' && (
+            {!loading && !error && currentView === "folders" && (
               <ExerciseFolderContent
                 folders={folders}
                 onFolderClick={handleFolderClick}
               />
             )}
 
-            {!loading && !error && currentView === 'exercises' && (
+            {!loading && !error && currentView === "exercises" && (
               <ExerciseImageContent
                 folder={selectedFolder}
                 onExerciseSelect={handleExerciseSelect}
                 setError={setError}
               />
-            )}
-
-            {exercisePath && (
-              <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-                <p className="text-gray-500 text-xs font-mono">
-                  Ejercicio: {exercisePath}
-                </p>
-              </div>
             )}
           </div>
 
@@ -158,7 +153,7 @@ export default function ExerciseImageModal({
           <div className="flex justify-end gap-4 mt-6">
             <Button
               onClick={onClose}
-              className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-md"
+              className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-medium transition-all duration-200"
             >
               Cerrar
             </Button>

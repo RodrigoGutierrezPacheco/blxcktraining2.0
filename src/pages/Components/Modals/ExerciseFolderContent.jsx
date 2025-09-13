@@ -7,8 +7,8 @@ export default function ExerciseFolderContent({
 }) {
   return (
     <div>
-      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <Folder className="h-5 w-5 text-purple-600" />
+      <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Folder className="h-4 w-4 text-gray-600" />
         Carpetas de Ejercicios
       </h4>
       
@@ -23,33 +23,30 @@ export default function ExerciseFolderContent({
             <div
               key={folder.id}
               onClick={() => onFolderClick(folder)}
-              className="bg-gradient-to-br from-gray-50 to-purple-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-all duration-200 cursor-pointer group"
             >
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-purple-100 p-2 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
-                    <Folder className="h-5 w-5 text-purple-600" />
+                  <div className="bg-gray-100 p-2 rounded-lg group-hover:bg-gray-200 transition-colors duration-200">
+                    <Folder className="h-4 w-4 text-gray-600" />
                   </div>
                   <div>
-                    <h5 className="font-semibold text-gray-800 text-lg">
+                    <h5 className="font-semibold text-gray-900 text-base">
                       {folder.title}
                     </h5>
+                    {folder.description && (
+                      <p className="text-gray-600 text-sm mt-1">
+                        {folder.description}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Dumbbell className="h-4 w-4 text-gray-500" />
-                  <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-medium">
+                  <Dumbbell className="h-3 w-3 text-gray-500" />
+                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
                     {folder.exerciseCount}
                   </span>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-center">
-                <Button
-                  className="bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 px-3 py-1 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
-                >
-                  Seleccionar
-                </Button>
               </div>
             </div>
           ))}

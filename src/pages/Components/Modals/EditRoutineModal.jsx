@@ -859,7 +859,6 @@ export default function EditRoutineModal({
       <ExerciseImageModal
         isOpen={imageModalOpen.isOpen}
         onClose={closeImageModal}
-        exercisePath={imageModalOpen.exercisePath}
         onExerciseSelect={handleExerciseSelect}
       />
 
