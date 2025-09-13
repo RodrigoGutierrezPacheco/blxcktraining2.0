@@ -94,6 +94,7 @@ export default function ClientsSection({
                       <Eye className="mr-1 h-4 w-4" />
                       Ver Detalles
                     </Button>
+                    {console.log(user)}
                     {user.hasRoutine ? (
                       <Button
                         onClick={() => handleViewRoutine(user)}

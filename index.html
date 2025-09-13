@@ -1,10 +1,148 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- Favicons de diferentes tamaños -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>BlxckTraining - Entrenamientos Online, Rutinas de Gimnasio y Ejercicios en Casa</title>
+    <meta name="description" content="BlxckTraining es la plataforma líder en entrenamientos online. Rutinas personalizadas de gimnasio, ejercicios en casa, entrenamientos funcionales y planes de fitness adaptados a tus objetivos. ¡Transforma tu cuerpo con nuestros entrenadores certificados!" />
+    <meta name="keywords" content="entrenamientos online, rutinas de gimnasio, ejercicios en casa, entrenamientos en casa, entrenamientos en gimnasio, rutinas personalizadas, fitness online, entrenador personal online, ejercicios funcionales, plan de entrenamiento, rutina de gimnasio, ejercicios sin equipo, entrenamientos para casa, gimnasio virtual, fitness virtual, entrenamientos personalizados, rutinas de ejercicio, ejercicios de fuerza, cardio en casa, entrenamientos HIIT, crossfit en casa, musculación, definición muscular, pérdida de peso, ganancia de masa muscular" />
+    <meta name="author" content="BlxckTraining" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="Spanish" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Open Graph Meta Tags para redes sociales -->
+    <meta property="og:title" content="BlxckTraining - Entrenamientos Online y Rutinas de Gimnasio" />
+    <meta property="og:description" content="Plataforma líder en entrenamientos online. Rutinas personalizadas de gimnasio, ejercicios en casa y planes de fitness. ¡Transforma tu cuerpo con entrenadores certificados!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://blxcktraining.com" />
+    <meta property="og:site_name" content="BlxckTraining" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:image" content="https://blxcktraining.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="BlxckTraining - Entrenamientos Online y Fitness" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BlxckTraining - Entrenamientos Online y Rutinas de Gimnasio" />
+    <meta name="twitter:description" content="Plataforma líder en entrenamientos online. Rutinas personalizadas de gimnasio, ejercicios en casa y planes de fitness." />
+    <meta name="twitter:image" content="https://blxcktraining.com/twitter-card.jpg" />
+    <meta name="twitter:image:alt" content="BlxckTraining - Entrenamientos Online" />
+    
+    <!-- Schema.org JSON-LD para SEO estructurado -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "BlxckTraining",
+      "description": "Plataforma líder en entrenamientos online, rutinas de gimnasio y ejercicios en casa",
+      "url": "https://blxcktraining.com",
+      "logo": "https://blxcktraining.com/logo.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+52-XXX-XXX-XXXX",
+        "contactType": "customer service",
+        "areaServed": "MX",
+        "availableLanguage": "Spanish"
+      },
+      "sameAs": [
+        "https://www.facebook.com/blxcktraining",
+        "https://www.instagram.com/blxcktraining",
+        "https://www.youtube.com/blxcktraining"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "name": "Entrenamientos Online Personalizados",
+        "description": "Rutinas de gimnasio y ejercicios en casa personalizados",
+        "category": "Fitness y Entrenamiento"
+      },
+      "serviceType": [
+        "Entrenamientos Online",
+        "Rutinas de Gimnasio",
+        "Ejercicios en Casa",
+        "Entrenamientos Personalizados",
+        "Fitness Virtual"
+      ]
+    }
+    </script>
+    
+    <!-- Schema.org para LocalBusiness (si tienes ubicación física) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "@id": "https://blxcktraining.com",
+      "name": "BlxckTraining",
+      "description": "Centro de entrenamiento online especializado en rutinas de gimnasio y ejercicios en casa",
+      "url": "https://blxcktraining.com",
+      "telephone": "+52-XXX-XXX-XXXX",
+      "priceRange": "$$",
+      "serviceArea": {
+        "@type": "Country",
+        "name": "México"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Servicios de Entrenamiento",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Entrenamientos Online",
+              "description": "Sesiones de entrenamiento virtual personalizadas"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Rutinas de Gimnasio",
+              "description": "Planes de entrenamiento para gimnasio personalizados"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Ejercicios en Casa",
+              "description": "Rutinas de ejercicios para realizar en casa sin equipo"
+            }
+          }
+        ]
+      }
+    }
+    </script>
+    
+    <!-- Meta tags adicionales para SEO -->
+    <meta name="theme-color" content="#000000" />
+    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="apple-mobile-web-app-title" content="BlxckTraining" />
+    <meta name="application-name" content="BlxckTraining" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://blxcktraining.com" />
+    
+    <!-- Preconnect para mejorar performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    
+    <!-- Robots.txt -->
+    <link rel="robots" href="/robots.txt" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
     <div id="root"></div>
