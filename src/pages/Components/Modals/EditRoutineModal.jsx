@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "../Button";
-import { X, Plus, Trash2, Save, Loader2, ChevronDown, ChevronRight, Calendar, Clock, Dumbbell } from "lucide-react";
+import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image, ChevronDown, ChevronUp } from "lucide-react";
 import { getRoutineById, updateRoutine } from "../../../services/routines";
+import ExerciseImageModal from "./ExerciseImageModal";
 
 export default function EditRoutineModal({ 
   isOpen, 
@@ -9,12 +10,24 @@ export default function EditRoutineModal({
   routineId,
   onRoutineUpdated 
 }) {
-  const [routine, setRoutine] = useState(null);
+  const [routine, setRoutine] = useState({
+    name: "",
+    description: "",
+    comments: "",
+    totalWeeks: 1,
+    isActive: true,
+    weeks: []
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [collapsedWeeks, setCollapsedWeeks] = useState(new Set());
-  const [collapsedDays, setCollapsedDays] = useState(new Set());
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState({
+    isOpen: false,
+    exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
+  });
+  const [expandedWeeks, setExpandedWeeks] = useState(new Set([0])); // Primera semana expandida por defecto
+  const [expandedDays, setExpandedDays] = useState(new Set());
 
   useEffect(() => {
     if (isOpen && routineId) {
@@ -22,12 +35,31 @@ export default function EditRoutineModal({
     }
   }, [isOpen, routineId]);
 
+  // Effect to block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const fetchRoutine = async () => {
     try {
       setIsLoading(true);
       setError(null);
       const routineData = await getRoutineById(routineId);
       setRoutine(routineData);
+      
+      // Expandir automáticamente la primera semana
+      if (routineData.weeks && routineData.weeks.length > 0) {
+        setExpandedWeeks(new Set([0]));
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -104,7 +136,8 @@ export default function EditRoutineModal({
               restBetweenSets: parseInt(exercise.restBetweenSets),
               restBetweenExercises: parseInt(exercise.restBetweenExercises),
               comments: exercise.comments ? exercise.comments.trim() : "",
-              order: exerciseIndex + 1
+              order: exerciseIndex + 1,
+              exerciseId: exercise.exerciseId || null
             }))
           }))
         }))
@@ -134,18 +167,39 @@ export default function EditRoutineModal({
   };
 
   const addWeek = () => {
+    const newWeekIndex = routine.weeks.length;
     const newWeek = {
-      id: `temp-${Date.now()}`,
       weekNumber: routine.weeks.length + 1,
       name: `Semana ${routine.weeks.length + 1}`,
       comments: "",
-      days: []
+      days: [
+        {
+          dayNumber: 1,
+          name: `Día 1`,
+          comments: "",
+          exercises: [
+            {
+              name: "",
+              sets: 3,
+              repetitions: 10,
+              restBetweenSets: 60,
+              restBetweenExercises: 120,
+              comments: "",
+              order: 1,
+              exerciseId: null
+            }
+          ]
+        }
+      ]
     };
     
     setRoutine(prev => ({
       ...prev,
       weeks: [...prev.weeks, newWeek]
     }));
+
+    // Expandir automáticamente la nueva semana
+    setExpandedWeeks(prev => new Set([...prev, newWeekIndex]));
   };
 
   const removeWeek = (weekIndex) => {
@@ -167,11 +221,21 @@ export default function EditRoutineModal({
   const addDay = (weekIndex) => {
     const week = routine.weeks[weekIndex];
     const newDay = {
-      id: `temp-${Date.now()}`,
       dayNumber: week.days.length + 1,
       name: `Día ${week.days.length + 1}`,
       comments: "",
-      exercises: []
+      exercises: [
+        {
+          name: "",
+          sets: 3,
+          repetitions: 10,
+          restBetweenSets: 60,
+          restBetweenExercises: 120,
+          comments: "",
+          order: 1,
+          exerciseId: null
+        }
+      ]
     };
     
     updateWeek(weekIndex, 'days', [...week.days, newDay]);
@@ -195,14 +259,14 @@ export default function EditRoutineModal({
     const week = routine.weeks[weekIndex];
     const day = week.days[dayIndex];
     const newExercise = {
-      id: `temp-${Date.now()}`,
       name: "",
       sets: 3,
       repetitions: 10,
       restBetweenSets: 60,
       restBetweenExercises: 120,
       comments: "",
-      order: day.exercises.length + 1
+      order: day.exercises.length + 1,
+      exerciseId: null
     };
     
     const updatedExercises = [...day.exercises, newExercise];
@@ -217,6 +281,7 @@ export default function EditRoutineModal({
   };
 
   const updateExercise = (weekIndex, dayIndex, exerciseIndex, field, value) => {
+    console.log(`Actualizando ejercicio [${weekIndex}][${dayIndex}][${exerciseIndex}].${field} =`, value);
     const week = routine.weeks[weekIndex];
     const day = week.days[dayIndex];
     const updatedExercises = day.exercises.map((exercise, index) => 
@@ -225,33 +290,74 @@ export default function EditRoutineModal({
     updateDay(weekIndex, dayIndex, 'exercises', updatedExercises);
   };
 
-  const toggleWeekCollapse = (weekIndex) => {
-    setCollapsedWeeks(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(weekIndex)) {
-        newSet.delete(weekIndex);
-      } else {
-        newSet.add(weekIndex);
-      }
-      return newSet;
+  const openImageModal = (weekIndex, dayIndex, exerciseIndex) => {
+    setImageModalOpen({
+      isOpen: true,
+      exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
     });
   };
 
-  const toggleDayCollapse = (weekIndex, dayIndex) => {
-    const key = `${weekIndex}-${dayIndex}`;
-    setCollapsedDays(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(key)) {
-        newSet.delete(key);
-      } else {
-        newSet.add(key);
-      }
-      return newSet;
+  const closeImageModal = () => {
+    setImageModalOpen({
+      isOpen: false,
+      exercisePath: null
     });
   };
 
-  const isWeekCollapsed = (weekIndex) => collapsedWeeks.has(weekIndex);
-  const isDayCollapsed = (weekIndex, dayIndex) => collapsedDays.has(`${weekIndex}-${dayIndex}`);
+  const toggleWeek = (weekIndex) => {
+    const newExpandedWeeks = new Set(expandedWeeks);
+    if (newExpandedWeeks.has(weekIndex)) {
+      newExpandedWeeks.delete(weekIndex);
+    } else {
+      newExpandedWeeks.add(weekIndex);
+    }
+    setExpandedWeeks(newExpandedWeeks);
+  };
+
+  const toggleDay = (weekIndex, dayIndex) => {
+    const dayKey = `${weekIndex}-${dayIndex}`;
+    const newExpandedDays = new Set(expandedDays);
+    if (newExpandedDays.has(dayKey)) {
+      newExpandedDays.delete(dayKey);
+    } else {
+      newExpandedDays.add(dayKey);
+    }
+    setExpandedDays(newExpandedDays);
+  };
+
+  const handleExerciseSelect = (exercise) => {
+    console.log("exercise recibido:", exercise);
+    if (!imageModalOpen.exercisePath) {
+      console.log("No hay exercisePath");
+      return;
+    }
+    
+    // Parsear la ruta del ejercicio (formato: "weekIndex-dayIndex-exerciseIndex")
+    const [weekIndex, dayIndex, exerciseIndex] = imageModalOpen.exercisePath.split('-').map(Number);
+    console.log("Índices parseados:", { weekIndex, dayIndex, exerciseIndex });
+    
+    // Actualizar el ejercicio seleccionado con la información del ejercicio
+    const week = routine.weeks[weekIndex];
+    const day = week.days[dayIndex];
+    const updatedExercises = day.exercises.map((ex, index) => 
+      index === exerciseIndex 
+        ? { ...ex, exerciseId: exercise.id, name: exercise.name }
+        : ex
+    );
+    updateDay(weekIndex, dayIndex, 'exercises', updatedExercises);
+    
+    console.log('Ejercicio actualizado en rutina:', {
+      weekIndex,
+      dayIndex, 
+      exerciseIndex,
+      exerciseId: exercise.id,
+      name: exercise.name,
+      updatedExercise: updatedExercises[exerciseIndex]
+    });
+    
+    // Cerrar el modal
+    closeImageModal();
+  };
 
   if (!isOpen) return null;
 
@@ -282,26 +388,26 @@ export default function EditRoutineModal({
       <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-7xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-200">
         <div className="p-6">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-8 text-white shadow-lg">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-3 rounded-full">
-                  <Dumbbell className="h-8 w-8 text-white" />
+                <div className="bg-gray-100 p-3 rounded-lg">
+                  <Dumbbell className="h-6 w-6 text-gray-600" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold">
+                  <h3 className="text-2xl font-semibold text-gray-900">
                     Editar Rutina
                   </h3>
-                  <p className="text-blue-100 text-lg">
-                    {routine.name}
+                  <p className="text-gray-600">
+                    Modifica los detalles de tu rutina de entrenamiento
                   </p>
                 </div>
               </div>
               <Button
                 onClick={onClose}
-                className="bg-white/20 text-white hover:bg-white/30 p-3 rounded-full transition-all duration-200 hover:scale-105"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-3 rounded-lg transition-all duration-200"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -312,22 +418,28 @@ export default function EditRoutineModal({
             </div>
           )}
 
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+              <p className="text-green-700">{successMessage}</p>
+            </div>
+          )}
+
           {/* Información básica de la rutina */}
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 mb-8 border border-gray-200 shadow-sm">
-            <h4 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-600" />
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-gray-600" />
               Información de la Rutina
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Nombre de la Rutina
+                  Nombre de la Rutina *
                 </label>
                 <input
                   type="text"
                   value={routine.name}
                   onChange={(e) => updateRoutineField('name', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
                   placeholder="Ej: Rutina de Fuerza"
                 />
               </div>
@@ -338,7 +450,7 @@ export default function EditRoutineModal({
                 <select
                   value={routine.isActive ? 'true' : 'false'}
                   onChange={(e) => updateRoutineField('isActive', e.target.value === 'true')}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
                 >
                   <option value="true">✅ Activa</option>
                   <option value="false">⏸️ Inactiva</option>
@@ -346,13 +458,13 @@ export default function EditRoutineModal({
               </div>
               <div className="md:col-span-2 space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Descripción
+                  Descripción *
                 </label>
                 <textarea
                   value={routine.description}
                   onChange={(e) => updateRoutineField('description', e.target.value)}
                   rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
                   placeholder="Describe el objetivo y enfoque de esta rutina..."
                 />
               </div>
@@ -364,7 +476,7 @@ export default function EditRoutineModal({
                   value={routine.comments || ""}
                   onChange={(e) => updateRoutineField('comments', e.target.value)}
                   rows={2}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
                   placeholder="Notas especiales, consideraciones o instrucciones..."
                 />
               </div>
@@ -372,316 +484,286 @@ export default function EditRoutineModal({
           </div>
 
           {/* Semanas */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-full">
-                  <Calendar className="h-6 w-6 text-white" />
+                <div className="bg-gray-100 p-2 rounded-lg">
+                  <Calendar className="h-5 w-5 text-gray-600" />
                 </div>
                 <div>
-                  <h4 className="text-2xl font-bold text-gray-800">Semanas</h4>
-                  <p className="text-gray-600">Organiza tu rutina por semanas</p>
+                  <h4 className="text-lg font-semibold text-gray-900">Semanas</h4>
+                  <p className="text-gray-600 text-sm">Organiza tu rutina por semanas</p>
                 </div>
               </div>
               <Button
                 onClick={addWeek}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
               >
-                <Plus className="h-5 w-5 mr-2" />
+                <Plus className="h-4 w-4 mr-2" />
                 Agregar Semana
               </Button>
             </div>
 
             {routine.weeks.map((week, weekIndex) => (
-              <div key={week.id || weekIndex} className="bg-white rounded-xl border border-gray-200 shadow-lg mb-6 overflow-hidden">
+              <div key={weekIndex} className="bg-white border border-gray-200 rounded-lg mb-4 overflow-hidden">
                 {/* Header de la Semana */}
-                <div 
-                  className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 cursor-pointer hover:from-blue-100 hover:to-indigo-100 transition-all duration-200"
-                  onClick={() => toggleWeekCollapse(weekIndex)}
-                >
+                <div className="bg-gray-50 p-4 border-b border-gray-200">
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <button className="p-2 rounded-full bg-white shadow-sm hover:bg-blue-100 transition-colors">
-                        {isWeekCollapsed(weekIndex) ? (
-                          <ChevronRight className="h-5 w-5 text-blue-600" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-blue-600" />
-                        )}
-                      </button>
-                      <div className="flex items-center gap-4">
-                        <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                          Semana {week.weekNumber}
-                        </div>
-                        <h5 className="text-lg font-semibold text-gray-800">{week.name}</h5>
-                        {week.comments && (
-                          <span className="text-gray-600 text-sm italic">"{week.comments}"</span>
-                        )}
+                    <div className="flex items-center gap-4">
+                      <div className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-semibold">
+                        Semana {week.weekNumber}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
-                        {week.days.length} día{week.days.length !== 1 ? 's' : ''}
-                      </span>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeWeek(weekIndex);
-                        }}
-                        className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-full transition-all duration-200 hover:scale-110"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contenido de la Semana */}
-                {!isWeekCollapsed(weekIndex) && (
-                  <div className="p-6 space-y-6">
-                    {/* Campos de la Semana */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Número de Semana
-                        </label>
-                        <input
-                          type="number"
-                          value={week.weekNumber}
-                          onChange={(e) => updateWeek(weekIndex, 'weekNumber', parseInt(e.target.value))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Nombre de la Semana
-                        </label>
+                      <div className="flex-1">
                         <input
                           type="text"
                           value={week.name}
                           onChange={(e) => updateWeek(weekIndex, 'name', e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                          placeholder="Ej: Semana de Adaptación"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Comentarios
-                        </label>
-                        <input
-                          type="text"
-                          value={week.comments || ""}
-                          onChange={(e) => updateWeek(weekIndex, 'comments', e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                          placeholder="Notas sobre la semana..."
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                          placeholder="Nombre de la semana"
                         />
                       </div>
                     </div>
-
-                    {/* Días */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <h6 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
-                          <Clock className="h-5 w-5 text-indigo-600" />
-                          Días de Entrenamiento ({week.days.length})
-                        </h6>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-500">
+                        {week.days.length} día{week.days.length !== 1 ? 's' : ''}
+                      </span>
+                      <Button
+                        onClick={() => toggleWeek(weekIndex)}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
+                      >
+                        {expandedWeeks.has(weekIndex) ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                      {routine.weeks.length > 1 && (
                         <Button
-                          onClick={() => addDay(weekIndex)}
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                          onClick={() => removeWeek(weekIndex)}
+                          className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-lg transition-all duration-200"
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Agregar Día
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {expandedWeeks.has(weekIndex) && (
+                    <div className="mt-3">
+                      <input
+                        type="text"
+                        value={week.comments || ""}
+                        onChange={(e) => updateWeek(weekIndex, 'comments', e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Comentarios sobre la semana..."
+                      />
+                    </div>
+                  )}
+                </div>
 
-                      {week.days.map((day, dayIndex) => (
-                        <div key={day.id || dayIndex} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                          {/* Header del Día */}
-                          <div 
-                            className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 cursor-pointer hover:from-indigo-100 hover:to-purple-100 transition-all duration-200"
-                            onClick={() => toggleDayCollapse(weekIndex, dayIndex)}
-                          >
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-3">
-                                <button className="p-2 rounded-full bg-white shadow-sm hover:bg-indigo-100 transition-colors">
-                                  {isDayCollapsed(weekIndex, dayIndex) ? (
-                                    <ChevronRight className="h-4 w-4 text-indigo-600" />
-                                  ) : (
-                                    <ChevronDown className="h-4 w-4 text-indigo-600" />
-                                  )}
-                                </button>
-                                <div className="flex items-center gap-3">
-                                  <div className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                                    Día {day.dayNumber}
-                                  </div>
-                                  <h6 className="text-md font-semibold text-gray-800">{day.name}</h6>
-                                  {day.comments && (
-                                    <span className="text-gray-600 text-sm italic">"{day.comments}"</span>
-                                  )}
-                                </div>
+                {/* Días */}
+                {expandedWeeks.has(weekIndex) && (
+                  <div className="p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h6 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-600" />
+                        Días de Entrenamiento ({week.days.length})
+                      </h6>
+                      <Button
+                        onClick={() => addDay(weekIndex)}
+                        className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+                      >
+                        <Plus className="h-3 w-3 mr-2" />
+                        Agregar Día
+                      </Button>
+                    </div>
+
+                    {week.days.map((day, dayIndex) => (
+                      <div key={dayIndex} className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                        {/* Header del Día */}
+                        <div className="bg-white p-4 border-b border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-gray-900 text-white px-2 py-1 rounded text-xs font-semibold">
+                                Día {day.dayNumber}
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
-                                  {day.exercises.length} ejercicio{day.exercises.length !== 1 ? 's' : ''}
-                                </span>
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={day.name}
+                                  onChange={(e) => updateDay(weekIndex, dayIndex, 'name', e.target.value)}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                                  placeholder="Nombre del día"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-gray-500">
+                                {day.exercises.length} ejercicio{day.exercises.length !== 1 ? 's' : ''}
+                              </span>
+                              <Button
+                                onClick={() => toggleDay(weekIndex, dayIndex)}
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1 rounded transition-all duration-200"
+                              >
+                                {expandedDays.has(`${weekIndex}-${dayIndex}`) ? (
+                                  <ChevronUp className="h-3 w-3" />
+                                ) : (
+                                  <ChevronDown className="h-3 w-3" />
+                                )}
+                              </Button>
+                              {week.days.length > 1 && (
                                 <Button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeDay(weekIndex, dayIndex);
-                                  }}
-                                  className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-full transition-all duration-200 hover:scale-110"
+                                  onClick={() => removeDay(weekIndex, dayIndex)}
+                                  className="bg-red-500 text-white hover:bg-red-600 p-1 rounded transition-all duration-200"
                                 >
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
-                              </div>
+                              )}
                             </div>
                           </div>
-
-                          {/* Contenido del Día */}
-                          {!isDayCollapsed(weekIndex, dayIndex) && (
-                            <div className="p-4 space-y-4">
-                              {/* Campos del Día */}
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Número de Día
-                                  </label>
-                                  <input
-                                    type="number"
-                                    value={day.dayNumber}
-                                    onChange={(e) => updateDay(weekIndex, dayIndex, 'dayNumber', parseInt(e.target.value))}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Nombre del Día
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={day.name}
-                                    onChange={(e) => updateDay(weekIndex, dayIndex, 'name', e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                                    placeholder="Ej: Pecho y Tríceps"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Comentarios
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={day.comments || ""}
-                                    onChange={(e) => updateDay(weekIndex, dayIndex, 'comments', e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                                    placeholder="Notas sobre el día..."
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Ejercicios */}
-                              <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                  <h7 className="text-md font-semibold text-gray-700 flex items-center gap-2">
-                                    <Dumbbell className="h-4 w-4 text-purple-600" />
-                                    Ejercicios ({day.exercises.length})
-                                  </h7>
-                                  <Button
-                                    onClick={() => addExercise(weekIndex, dayIndex)}
-                                    className="bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 px-3 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-                                  >
-                                    <Plus className="h-3 w-3 mr-1" />
-                                    Agregar Ejercicio
-                                  </Button>
-                                </div>
-
-                                {day.exercises.map((exercise, exerciseIndex) => (
-                                  <div key={exercise.id || exerciseIndex} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                                    <div className="flex justify-between items-start mb-4">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
-                                        <div>
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Nombre del Ejercicio
-                                          </label>
-                                          <input
-                                            type="text"
-                                            value={exercise.name}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'name', e.target.value)}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                            placeholder="Ej: Press de Banca"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Series
-                                          </label>
-                                          <input
-                                            type="number"
-                                            value={exercise.sets}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'sets', parseInt(e.target.value))}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Repeticiones
-                                          </label>
-                                          <input
-                                            type="number"
-                                            value={exercise.repetitions}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'repetitions', parseInt(e.target.value))}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Descanso entre series (seg)
-                                          </label>
-                                          <input
-                                            type="number"
-                                            value={exercise.restBetweenSets}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'restBetweenSets', parseInt(e.target.value))}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                          />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Descanso entre ejercicios (seg)
-                                          </label>
-                                          <input
-                                            type="number"
-                                            value={exercise.restBetweenExercises}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'restBetweenExercises', parseInt(e.target.value))}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                          />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                          <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                            Comentarios
-                                          </label>
-                                          <input
-                                            type="text"
-                                            value={exercise.comments || ""}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'comments', e.target.value)}
-                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200"
-                                            placeholder="Notas sobre el ejercicio..."
-                                          />
-                                        </div>
-                                      </div>
-                                      <Button
-                                        onClick={() => removeExercise(weekIndex, dayIndex, exerciseIndex)}
-                                        className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-full ml-3 transition-all duration-200 hover:scale-110"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                          
+                          {expandedDays.has(`${weekIndex}-${dayIndex}`) && (
+                            <div className="mt-3">
+                              <input
+                                type="text"
+                                value={day.comments || ""}
+                                onChange={(e) => updateDay(weekIndex, dayIndex, 'comments', e.target.value)}
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Comentarios sobre el día..."
+                              />
                             </div>
                           )}
                         </div>
-                      ))}
-                    </div>
+
+                        {/* Ejercicios */}
+                        {expandedDays.has(`${weekIndex}-${dayIndex}`) && (
+                          <div className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <h7 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                  <Dumbbell className="h-4 w-4 text-gray-600" />
+                                  Ejercicios ({day.exercises.length})
+                                </h7>
+                                <Button
+                                  onClick={() => addExercise(weekIndex, dayIndex)}
+                                  className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                                >
+                                  <Plus className="h-3 w-3 mr-1" />
+                                  Agregar Ejercicio
+                                </Button>
+                              </div>
+
+                              {day.exercises.map((exercise, exerciseIndex) => (
+                                <div key={exerciseIndex} className="bg-white border border-gray-200 rounded-lg p-4">
+                                  <div className="flex justify-between mb-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 flex-1">
+                                      <div>
+                                        {console.log("exercise", exercise)}
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1  items-center gap-2">
+                                          Nombre del Ejercicio *
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={exercise.name}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'name', e.target.value)}
+                                          className={`w-full p-2 border rounded-lg focus:ring-2 focus:border-transparent text-sm transition-all duration-200 ${
+                                            exercise.exerciseId 
+                                              ? 'border-green-300 focus:ring-green-500 bg-green-50' 
+                                              : 'border-gray-300 focus:ring-gray-500'
+                                          }`}
+                                          placeholder="Ej: Press de Banca"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                          Series *
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={exercise.sets}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'sets', parseInt(e.target.value))}
+                                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm transition-all duration-200"
+                                          min="1"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                          Repeticiones *
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={exercise.repetitions}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'repetitions', parseInt(e.target.value))}
+                                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm transition-all duration-200"
+                                          min="1"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                          Descanso entre series (seg)
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={exercise.restBetweenSets}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'restBetweenSets', parseInt(e.target.value))}
+                                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm transition-all duration-200"
+                                          min="0"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                          Descanso entre ejercicios (seg)
+                                        </label>
+                                        <input
+                                          type="number"
+                                          value={exercise.restBetweenExercises}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'restBetweenExercises', parseInt(e.target.value))}
+                                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm transition-all duration-200"
+                                          min="0"
+                                        />
+                                      </div>
+                                      <div className="md:col-span-2">
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                          Comentarios
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={exercise.comments || ""}
+                                          onChange={(e) => updateExercise(weekIndex, dayIndex, exerciseIndex, 'comments', e.target.value)}
+                                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm transition-all duration-200"
+                                          placeholder="Notas sobre el ejercicio..."
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2 ml-3 items-center justify-center">
+                                      <Button
+                                        onClick={() => openImageModal(weekIndex, dayIndex, exerciseIndex)}
+                                        className={`p-2 rounded-lg transition-all duration-200 ${
+                                          exercise.exerciseId 
+                                            ? 'bg-green-500 text-white hover:bg-green-600' 
+                                            : 'bg-gray-900 text-white hover:bg-gray-800'
+                                        }`}
+                                        title={exercise.exerciseId ? "Cambiar imagen del ejercicio" : "Agregar imagen al ejercicio"}
+                                      >
+                                        <Image className="h-3 w-3" />
+                                      </Button>
+                                      {day.exercises.length > 1 && (
+                                        <Button
+                                          onClick={() => removeExercise(weekIndex, dayIndex, exerciseIndex)}
+                                          className="bg-red-500 text-white hover:bg-red-600 p-2 rounded-lg transition-all duration-200"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -689,23 +771,28 @@ export default function EditRoutineModal({
           </div>
 
           {/* Botones de acción */}
-          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="flex justify-end gap-4">
               <Button
                 onClick={onClose}
-                className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-md"
+                className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-medium transition-all duration-200"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={isSaving}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSaving || successMessage}
+                className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
                     Guardando Cambios...
+                  </>
+                ) : successMessage ? (
+                  <>
+                    <Save className="h-5 w-5 mr-2" />
+                    ¡Guardado!
                   </>
                 ) : (
                   <>
@@ -718,6 +805,14 @@ export default function EditRoutineModal({
           </div>
         </div>
       </div>
+
+      {/* Modal de Imagen para Ejercicios */}
+      <ExerciseImageModal
+        isOpen={imageModalOpen.isOpen}
+        onClose={closeImageModal}
+        exercisePath={imageModalOpen.exercisePath}
+        onExerciseSelect={handleExerciseSelect}
+      />
     </div>
   );
 }

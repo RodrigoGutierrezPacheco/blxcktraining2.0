@@ -43,7 +43,6 @@ export default function CreateRoutineModal({
       }
     ]
   });
-console.log("routine", routine);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -146,7 +145,6 @@ console.log("routine", routine);
         }))
       };
 
-      console.log("Datos a enviar para crear rutina:", createData);
 
       const createdRoutine = await createRoutine(createData);
       console.log("Rutina creada exitosamente:", createdRoutine);
@@ -292,7 +290,6 @@ console.log("routine", routine);
   };
 
   const updateExercise = (weekIndex, dayIndex, exerciseIndex, field, value) => {
-    console.log(`Actualizando ejercicio [${weekIndex}][${dayIndex}][${exerciseIndex}].${field} =`, value);
     const week = routine.weeks[weekIndex];
     const day = week.days[dayIndex];
     const updatedExercises = day.exercises.map((exercise, index) => 
@@ -337,15 +334,12 @@ console.log("routine", routine);
   };
 
   const handleExerciseSelect = (exercise) => {
-    console.log("exercise recibido:", exercise);
     if (!imageModalOpen.exercisePath) {
-      console.log("No hay exercisePath");
       return;
     }
     
     // Parsear la ruta del ejercicio (formato: "weekIndex-dayIndex-exerciseIndex")
     const [weekIndex, dayIndex, exerciseIndex] = imageModalOpen.exercisePath.split('-').map(Number);
-    console.log("Índices parseados:", { weekIndex, dayIndex, exerciseIndex });
     
     // Actualizar el ejercicio seleccionado con la información del ejercicio
     const week = routine.weeks[weekIndex];
@@ -356,16 +350,6 @@ console.log("routine", routine);
         : ex
     );
     updateDay(weekIndex, dayIndex, 'exercises', updatedExercises);
-    
-    console.log('Ejercicio actualizado en rutina:', {
-      weekIndex,
-      dayIndex, 
-      exerciseIndex,
-      exerciseId: exercise.id,
-      name: exercise.name,
-      updatedExercise: updatedExercises[exerciseIndex]
-    });
-    
     // Cerrar el modal
     closeImageModal();
   };
