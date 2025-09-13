@@ -3,6 +3,7 @@ import { Button } from "../Button";
 import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image, ChevronDown, ChevronUp } from "lucide-react";
 import { createRoutine } from "../../../services/routines";
 import ExerciseImageModal from "./ExerciseImageModal";
+import ExerciseImageViewModal from "./ExerciseImageViewModal";
 
 export default function CreateRoutineModal({ 
   isOpen, 
@@ -48,6 +49,12 @@ export default function CreateRoutineModal({
   const [successMessage, setSuccessMessage] = useState(null);
   const [imageModalOpen, setImageModalOpen] = useState({
     isOpen: false,
+    exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
+  });
+  const [imageViewModalOpen, setImageViewModalOpen] = useState({
+    isOpen: false,
+    exerciseId: null,
+    exerciseName: null,
     exercisePath: null // Formato: "weekIndex-dayIndex-exerciseIndex"
   });
   const [expandedWeeks, setExpandedWeeks] = useState(new Set([0])); // Primera semana expandida por defecto
@@ -299,16 +306,47 @@ export default function CreateRoutineModal({
   };
 
   const openImageModal = (weekIndex, dayIndex, exerciseIndex) => {
-    setImageModalOpen({
-      isOpen: true,
-      exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
-    });
+    const exercise = routine.weeks[weekIndex].days[dayIndex].exercises[exerciseIndex];
+    
+    if (exercise.exerciseId) {
+      // Si el ejercicio ya tiene imagen, abrir modal de visualización
+      setImageViewModalOpen({
+        isOpen: true,
+        exerciseId: exercise.exerciseId,
+        exerciseName: exercise.name,
+        exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
+      });
+    } else {
+      // Si no tiene imagen, abrir modal de selección
+      setImageModalOpen({
+        isOpen: true,
+        exercisePath: `${weekIndex}-${dayIndex}-${exerciseIndex}`
+      });
+    }
   };
 
   const closeImageModal = () => {
     setImageModalOpen({
       isOpen: false,
       exercisePath: null
+    });
+  };
+
+  const closeImageViewModal = () => {
+    setImageViewModalOpen({
+      isOpen: false,
+      exerciseId: null,
+      exerciseName: null,
+      exercisePath: null
+    });
+  };
+
+  const handleEditImageFromView = () => {
+    // Cerrar modal de visualización y abrir modal de selección
+    closeImageViewModal();
+    setImageModalOpen({
+      isOpen: true,
+      exercisePath: imageViewModalOpen.exercisePath
     });
   };
 
@@ -631,7 +669,7 @@ export default function CreateRoutineModal({
                                   <div className="flex justify-between mb-3">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 flex-1">
                                       <div>
-                                        <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                        <label className="flex text-xs font-semibold text-gray-700 mb-1 items-center gap-2">
                                           Nombre del Ejercicio *
                                           {exercise.exerciseId && (
                                             <span className="text-green-600 text-xs flex items-center gap-1">
@@ -790,6 +828,15 @@ export default function CreateRoutineModal({
         onClose={closeImageModal}
         exercisePath={imageModalOpen.exercisePath}
         onExerciseSelect={handleExerciseSelect}
+      />
+
+      {/* Modal de Visualización de Imagen del Ejercicio */}
+      <ExerciseImageViewModal
+        isOpen={imageViewModalOpen.isOpen}
+        onClose={closeImageViewModal}
+        exerciseId={imageViewModalOpen.exerciseId}
+        exerciseName={imageViewModalOpen.exerciseName}
+        onEditImage={handleEditImageFromView}
       />
     </div>
   );
