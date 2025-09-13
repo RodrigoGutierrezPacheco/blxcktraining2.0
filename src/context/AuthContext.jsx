@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -16,6 +17,13 @@ export function AuthProvider({ children }) {
     
     if (storedUser && storedToken && storedUserType) {
       try {
+        // Verificar si el token ha expirado
+        if (isTokenExpired(storedToken)) {
+          console.warn('Token expired, logging out user');
+          logout();
+          return;
+        }
+        
         setUser(JSON.parse(storedUser));
         setToken(storedToken);
         setUserType(storedUserType);
@@ -26,6 +34,23 @@ export function AuthProvider({ children }) {
     }
     setIsLoading(false);
   }, []);
+
+  // Verificar periódicamente si el token ha expirado
+  useEffect(() => {
+    if (!token) return;
+
+    const checkTokenExpiration = () => {
+      if (isTokenExpired(token)) {
+        console.warn('Token expired during session, logging out user');
+        logout();
+      }
+    };
+
+    // Verificar cada 5 minutos
+    const interval = setInterval(checkTokenExpiration, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [token]);
 
   const login = (userData, authToken, type = "user") => {
     localStorage.setItem("userBlck", JSON.stringify(userData));

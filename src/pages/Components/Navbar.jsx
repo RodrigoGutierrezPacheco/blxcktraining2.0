@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Menu, X, Play, User, Dumbbell } from "lucide-react";
 import { Button } from "./Button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import { isTokenExpired } from "../../utils/tokenUtils";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,7 +12,16 @@ export default function Navbar() {
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
   const timeoutRef = useRef(null);
-  const { user, logout, isTrainer } = useAuth();
+  const { user, logout, isTrainer, token } = useAuth();
+
+  // Verificar si el token ha expirado
+  useEffect(() => {
+    if (token && isTokenExpired(token)) {
+      console.warn('Token expired, logging out user');
+      logout();
+      navigate('/login');
+    }
+  }, [token, logout, navigate]);
 
   const handleMouseEnter = () => {
     clearTimeout(timeoutRef.current);

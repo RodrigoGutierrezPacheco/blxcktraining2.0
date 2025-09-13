@@ -1,20 +1,12 @@
-const API_BASE_URL = 'http://localhost:8000';
+import { apiCallWithTokenCheck } from '../utils/tokenUtils';
 
 export const exercisesService = {
   // Obtener todos los ejercicios
   async getAllExercises(token) {
     try {
-      const response = await fetch(`${API_BASE_URL}/exercises`, {
+      const response = await apiCallWithTokenCheck('/exercises', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      }, token);
 
       const data = await response.json();
       return data;
@@ -27,23 +19,15 @@ export const exercisesService = {
   // Crear un nuevo ejercicio
   async createExercise(token, exerciseData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/exercises`, {
+      const response = await apiCallWithTokenCheck('/exercises', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           name: exerciseData.name,
           description: exerciseData.description,
           imageId: exerciseData.imageId,
           muscleGroupId: exerciseData.muscleGroupId,
         }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      }, token);
 
       const data = await response.json();
       return data;
@@ -211,17 +195,9 @@ export const exercisesService = {
   // Obtener carpetas de ejercicios
   async getExerciseFolders(token) {
     try {
-      const response = await fetch(`${API_BASE_URL}/exercises/folders`, {
+      const response = await apiCallWithTokenCheck('/exercises/folders', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      }, token);
 
       const data = await response.json();
       return data;
@@ -231,49 +207,33 @@ export const exercisesService = {
     }
   },
 
-      // Obtener ejercicios de una carpeta específica
-      async getExercisesByFolder(token, folderId) {
-        try {
-          const response = await fetch(`${API_BASE_URL}/exercises/folders/${folderId}/exercises`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
+  // Obtener ejercicios de una carpeta específica
+  async getExercisesByFolder(token, folderId) {
+    try {
+      const response = await apiCallWithTokenCheck(`/exercises/folders/${folderId}/exercises`, {
+        method: 'GET',
+      }, token);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching exercises by folder:', error);
+      throw error;
+    }
+  },
 
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error('Error fetching exercises by folder:', error);
-          throw error;
-        }
-      },
+  // Obtener imagen de un ejercicio específico
+  async getExerciseImage(token, exerciseId) {
+    try {
+      const response = await apiCallWithTokenCheck(`/exercises/${exerciseId}/image`, {
+        method: 'GET',
+      }, token);
 
-      // Obtener imagen de un ejercicio específico
-      async getExerciseImage(token, exerciseId) {
-        try {
-          const response = await fetch(`${API_BASE_URL}/exercises/${exerciseId}/image`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error('Error fetching exercise image:', error);
-          throw error;
-        }
-      },
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching exercise image:', error);
+      throw error;
+    }
+  },
 };
