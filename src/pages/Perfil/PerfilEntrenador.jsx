@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "../Components/Card";
 import { Button } from "../Components/Button";
-import {
-  Award,
-} from "lucide-react";
+import { Award } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
-import { getUserRoutineByEmail, getTrainerRoutines } from "../../services/routines";
+import {
+  getUserRoutineByEmail,
+  getTrainerRoutines,
+} from "../../services/routines";
 import ClientTrainer from "../Components/Modals/ClientTrainer";
 import UserRoutineModal from "../Components/Modals/UserRoutineModal";
 import AssignRoutineModal from "../Components/Modals/AssignRoutineModal";
@@ -32,7 +33,8 @@ export default function PerfilEntrenador() {
   const [loadingRoutine, setLoadingRoutine] = useState(false);
   const [routinesData, setRoutinesData] = useState([]);
   const [isLoadingRoutines, setIsLoadingRoutines] = useState(false);
-  const [showTrainerRoutinesModal, setShowTrainerRoutinesModal] = useState(false);
+  const [showTrainerRoutinesModal, setShowTrainerRoutinesModal] =
+    useState(false);
   const [showEditRoutineModal, setShowEditRoutineModal] = useState(false);
   const [editingRoutineId, setEditingRoutineId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
@@ -49,7 +51,17 @@ export default function PerfilEntrenador() {
 
     return date.toLocaleDateString("es-ES", options);
   };
-
+  const fetchTrainerRoutines = useCallback(async () => {
+    try {
+      setIsLoadingRoutines(true);
+      const routines = await getTrainerRoutines(user.id);
+      setRoutinesData(routines);
+    } catch (err) {
+      console.error("Error fetching trainer routines:", err);
+    } finally {
+      setIsLoadingRoutines(false);
+    }
+  }, [user?.id]);
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.id) {
@@ -65,7 +77,7 @@ export default function PerfilEntrenador() {
         setTrainerData(trainerInfo);
         const users = await getUsersByTrainer(user.id);
         setUsersData(users);
-        
+
         // Obtener rutinas del entrenador
         await fetchTrainerRoutines();
       } catch (err) {
@@ -77,7 +89,7 @@ export default function PerfilEntrenador() {
     };
 
     fetchData();
-  }, [user?.id]);
+  }, [user?.id, fetchTrainerRoutines]);
 
   const formatUserDate = (dateString) => {
     if (!dateString) return "No disponible";
@@ -116,9 +128,9 @@ export default function PerfilEntrenador() {
     try {
       setLoadingRoutine(true);
       setSelectedUser(user);
-      
+
       const routine = await getUserRoutineByEmail(user.email);
-      
+
       if (routine) {
         setSelectedUserRoutine(routine);
         setShowRoutineModal(true);
@@ -171,38 +183,29 @@ export default function PerfilEntrenador() {
     }
   };
 
-  const fetchTrainerRoutines = async () => {
-    try {
-      setIsLoadingRoutines(true);
-      const routines = await getTrainerRoutines(user.id);
-      setRoutinesData(routines);
-    } catch (err) {
-      console.error("Error fetching trainer routines:", err);
-    } finally {
-      setIsLoadingRoutines(false);
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-xl text-gray-700">
-          Cargando información del perfil...
-        </p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-4"></div>
+          <p className="text-sm text-gray-600">
+            Cargando información del perfil...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-600 mb-4">
+          <p className="text-sm text-red-600 mb-4">
             Error al cargar el perfil: {error}
           </p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-black text-white hover:bg-gray-800"
+            className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
           >
             Reintentar
           </Button>
@@ -213,8 +216,8 @@ export default function PerfilEntrenador() {
 
   if (!trainerData) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-xl text-gray-700">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-sm text-gray-600">
           No se pudo cargar la información del entrenador.
         </p>
       </div>
@@ -222,10 +225,10 @@ export default function PerfilEntrenador() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {/* Profile Header */}
-      <section className="bg-black text-white rounded-lg shadow-lg p-6 sm:p-8 lg:p-10 mb-8 max-w-6xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+      <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative">
             <img
               src={
@@ -233,23 +236,23 @@ export default function PerfilEntrenador() {
                 "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150"
               }
               alt="Imagen de perfil del entrenador"
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
             />
             {trainerData.verified && (
-              <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white rounded-full p-2">
-                <Award className="h-4 w-4" />
+              <div className="absolute -bottom-1 -right-1 bg-gray-600 text-white rounded-full p-1">
+                <Award className="h-3 w-3" />
               </div>
             )}
           </div>
           <div className="text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-              ¡Hola, {trainerData.fullName}!
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
+              {trainerData.fullName}
             </h1>
-            <p className="text-gray-300 text-lg">
-              Bienvenido a tu espacio de entrenador en BLXCK Training.
+            <p className="text-gray-600 text-sm">
+              Entrenador en BLXCK Training
             </p>
             {trainerData.specialty && (
-              <p className="text-blue-300 text-lg mt-2">
+              <p className="text-gray-500 text-sm mt-1">
                 {trainerData.specialty}
               </p>
             )}
@@ -257,7 +260,7 @@ export default function PerfilEntrenador() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-6">
         {/* Trainer Information Section */}
         <div className="lg:col-span-1">
           <TrainerInfo trainerData={trainerData} formatDate={formatDate} />
@@ -270,7 +273,7 @@ export default function PerfilEntrenador() {
       </div>
 
       {/* Clients Section */}
-      <div className="max-w-6xl mx-auto mt-8">
+      <div className="max-w-6xl mx-auto mt-6">
         <ClientsSection
           usersData={usersData}
           formatUserDate={formatUserDate}
@@ -282,7 +285,7 @@ export default function PerfilEntrenador() {
       </div>
 
       {/* Trainer Routines Section */}
-      <div className="max-w-6xl mx-auto mt-8">
+      <div className="max-w-6xl mx-auto mt-6">
         <TrainerRoutinesSection
           routinesData={routinesData}
           isLoadingRoutines={isLoadingRoutines}
@@ -292,7 +295,7 @@ export default function PerfilEntrenador() {
       </div>
 
       {/* Trainer Documents Section */}
-      <div className="max-w-6xl mx-auto mt-8">
+      <div className="max-w-6xl mx-auto mt-6">
         <TrainerDocumentsSection trainerId={user?.id} />
       </div>
 
