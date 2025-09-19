@@ -113,101 +113,121 @@ export default function Perfil() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {/* Profile Header */}
-      <section className="bg-black text-white rounded-lg shadow-lg p-6 sm:p-8 lg:p-10 mb-8 max-w-6xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+      <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <img
             src={userData.profileImage || "/placeholder.svg"}
             alt="Imagen de perfil"
-            className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white shadow-md"
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
           />
           <div className="text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
               ¡Hola, {userData.fullName}!
             </h1>
-            <p className="text-gray-300 text-lg">
-              Bienvenido a tu espacio personal en BLXCK Training.
+            <p className="text-gray-600 text-sm">
+              Miembro de BLXCK Training
             </p>
           </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6">
         {/* Account Information Section */}
         <div className="lg:col-span-1">
-          <Card className="border-2 border-black h-full">
+          <Card className="border border-gray-200 h-fit">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
-                <User className="h-6 w-6" />
+              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <User className="h-5 w-5 text-gray-600" />
                 Información de la Cuenta
               </h2>
-              <div className="space-y-4 text-gray-700">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
-                  <span>
-                    Miembro desde:{" "}
-                    <span className="font-semibold">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-gray-600" />
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">
+                      Miembro desde
+                    </label>
+                    <span className="text-sm font-medium text-gray-900">
                       {userData.memberSince}
                     </span>
-                  </span>
+                  </div>
                 </div>
                 
                 {userData.email && (
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Correo electrónico:{" "}
-                      <span className="font-semibold">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Email
+                      </label>
+                      <span className="text-sm font-medium text-gray-900">
                         {userData.email}
                       </span>
-                    </span>
+                    </div>
                   </div>
                 )}
                 
                 {userData.fullName && userData.fullName !== userData.username && (
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Nombre completo:{" "}
-                      <span className="font-semibold">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Nombre completo
+                      </label>
+                      <span className="text-sm font-medium text-gray-900">
                         {userData.fullName}
                       </span>
-                    </span>
+                    </div>
                   </div>
                 )}
                 
                 {userData.age && (
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-gray-600" />
-                    <span>
-                      Edad:{" "}
-                      <span className="font-semibold">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Edad
+                      </label>
+                      <span className="text-sm font-medium text-gray-900">
                         {userData.age} años
                       </span>
-                    </span>
+                    </div>
                   </div>
                 )}
                 
-                {(userData.weight || userData.height) && (
-                  <div className="flex items-center gap-3">
-                    <Scale className="h-5 w-5 text-gray-600" />
-                    <span>
-                      {userData.weight && (
-                        <span>Peso: <span className="font-semibold">{userData.weight} kg</span></span>
-                      )}
-                      {userData.weight && userData.height && " | "}
-                      {userData.height && (
-                        <span>Altura: <span className="font-semibold">{userData.height} cm</span></span>
-                      )}
-                    </span>
+                {userData.weight && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Scale className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Peso
+                      </label>
+                      <span className="text-sm font-medium text-gray-900">
+                        {userData.weight} kg
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {userData.height && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Scale className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Altura
+                      </label>
+                      <span className="text-sm font-medium text-gray-900">
+                        {userData.height} cm
+                      </span>
+                    </div>
                   </div>
                 )}
                 
                 <div className="pt-4">
                   <Button
-                    variant="outline"
-                    className="w-full border-black text-black hover:bg-gray-100 bg-transparent"
+                    className="w-full bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
                     onClick={handleEditProfile}
                   >
                     Editar Perfil
@@ -219,96 +239,72 @@ export default function Perfil() {
         </div>
 
         {/* My Routine Section */}
-        <div className="lg:col-span-2">
-          <Card className="border-2 border-black h-full">
+        <div className="lg:col-span-3">
+          <Card className="border border-gray-200 h-full">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
-                <Dumbbell className="h-6 w-6" />
-                Mi Estado de Entrenamiento
+              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <Dumbbell className="h-5 w-5 text-gray-600" />
+                Entrenamiento
               </h2>
               
-              {/* Si no tiene entrenador asignado */}
-              {!userData.trainerId ? (
-                <div className="text-center py-8">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-8 border border-blue-200 mb-6">
-                    <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <Dumbbell className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                      ¡Comienza tu viaje fitness!
-                    </h3>
-                    <p className="text-gray-600 text-lg mb-6">
-                      Para acceder a rutinas personalizadas y entrenamiento profesional, 
-                      necesitas elegir un plan de entrenamiento.
-                    </p>
-                    <Button 
-                      onClick={() => navigate("/planes")}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 text-lg py-3 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
-                    >
-                      <ArrowRight className="mr-2 h-5 w-5" />
-                      Ver Planes Disponibles
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                /* Si tiene entrenador pero no tiene rutina */
-                !userData.hasRoutine ? (
-                  <div className="text-center py-8">
-                    <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-xl p-8 border border-yellow-200 mb-6">
-                      <div className="bg-yellow-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <Clock className="h-8 w-8" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                        Entrenador Asignado
-                      </h3>
-                      <p className="text-gray-600 text-lg mb-6">
-                        Tu entrenador está preparando tu rutina personalizada. 
-                        Pronto tendrás acceso a tu plan de entrenamiento.
-                      </p>
-                      <div className="bg-white rounded-lg p-4 border border-yellow-200">
-                        <p className="text-sm text-gray-600">
-                          <span className="font-semibold">Estado:</span> Esperando asignación de rutina
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Si tiene entrenador y tiene rutina */
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border border-green-200">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-green-600 text-white rounded-full p-2">
-                          <CheckCircle className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-800">
-                            Rutina Activa
-                          </h3>
-                          <p className="text-green-600 font-medium">
-                            ¡Tu rutina está lista!
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {/* Trainer Information */}
-                      {userData.trainerId && <TrainerInfo trainerId={userData.trainerId} />}
-                    </div>
+               {/* Si no tiene entrenador asignado */}
+               {!userData.trainerId ? (
+                 <div className="text-center py-8">
+                   <Dumbbell className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                   <h3 className="text-base font-medium text-gray-900 mb-2">
+                     Sin plan de entrenamiento
+                   </h3>
+                   <p className="text-sm text-gray-500 mb-4">
+                     Elige un plan para acceder a rutinas personalizadas.
+                   </p>
+                   <button 
+                     onClick={() => navigate("/planes")}
+                     className="text-sm text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                   >
+                     Ver planes disponibles →
+                   </button>
+                 </div>
+               ) : (
+                 /* Si tiene entrenador pero no tiene rutina */
+                 !userData.hasRoutine ? (
+                   <div className="text-center py-8">
+                     <Clock className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                     <h3 className="text-base font-medium text-gray-900 mb-2">
+                       Entrenador asignado
+                     </h3>
+                     <p className="text-sm text-gray-500">
+                       Tu entrenador está preparando tu rutina.
+                     </p>
+                   </div>
+                 ) : (
+                   /* Si tiene entrenador y tiene rutina */
+                   <div className="space-y-4">
+                     <div className="flex items-center gap-3 py-3">
+                       <CheckCircle className="h-5 w-5 text-green-600" />
+                       <div>
+                         <h3 className="text-sm font-medium text-gray-900">
+                           Rutina activa
+                         </h3>
+                         <p className="text-xs text-gray-500">
+                           Tu rutina está lista para entrenar
+                         </p>
+                       </div>
+                     </div>
+                     
+                     {/* Trainer Information */}
+                     {userData.trainerId && <TrainerInfo trainerId={userData.trainerId} />}
 
-                    <div className="text-center pt-4">
-                      <p className="text-gray-600 text-lg mb-4">
-                        Accede a los detalles completos de tu rutina personalizada.
-                      </p>
-                      <Button
-                        onClick={handleViewRoutine}
-                        className="bg-black text-white hover:bg-gray-800 text-lg py-3 px-8"
-                      >
-                        <ArrowRight className="mr-2 h-5 w-5" />
-                        Ver Mi Rutina
-                      </Button>
-                    </div>
-                  </div>
-                )
-              )}
+                     <div className="pt-2">
+                       <button
+                         onClick={handleViewRoutine}
+                         className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                       >
+                         Ver rutina completa →
+                       </button>
+                     </div>
+                   </div>
+                 )
+               )}
             </CardContent>
           </Card>
         </div>

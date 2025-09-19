@@ -1,4 +1,5 @@
 import { apiCallWithTokenCheck } from '../utils/tokenUtils';
+const API_BASE_URL = 'http://localhost:8000';
 
 export const exercisesService = {
   // Obtener todos los ejercicios

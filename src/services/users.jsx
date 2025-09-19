@@ -106,12 +106,31 @@ export const updateUserProfile = async (userId, profileData) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Error al actualizar el perfil");
+      // Si hay errores de validación específicos, los incluimos en el error
+      if (data.errors && Array.isArray(data.errors)) {
+        throw new Error(JSON.stringify({
+          message: data.message || "Error de validación",
+          errors: data.errors,
+          statusCode: data.statusCode
+        }));
+      }
+      
+      // Si es un error de validación u otro tipo
+      throw new Error(JSON.stringify({
+        message: data.message || "Error al actualizar el perfil",
+        statusCode: data.statusCode || response.status
+      }));
     }
 
     return data;
   } catch (error) {
     console.log("error backend", error);
+    
+    // Si el error ya es un JSON stringificado, lo re-lanzamos
+    if (error.message && error.message.startsWith('{')) {
+      throw error;
+    }
+    
     throw new Error(error.message || "Error de conexión");
   }
 };
@@ -173,6 +192,33 @@ export const getTrainerById = async (trainerId) => {
 
     if (!response.ok) {
       throw new Error(data.message || "Error al obtener información del entrenador");
+    }
+
+    return data;
+  } catch (error) {
+    console.log("error backend", error);
+    throw new Error(error.message || "Error de conexión");
+  }
+};
+
+export const unassignUserFromTrainer = async (userId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    const response = await fetch(`${APP_URL}users/${userId}/trainer`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al desasignar usuario del entrenador");
     }
 
     return data;

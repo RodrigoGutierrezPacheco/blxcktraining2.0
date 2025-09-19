@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "../Button";
 import { X, Plus, Trash2, Save, Loader2, Calendar, Clock, Dumbbell, Image, ChevronDown, ChevronUp } from "lucide-react";
-import { createRoutine } from "../../../services/routines";
+import { createRoutine, createRoutineForUser } from "../../../services/routines";
 import ExerciseImageModal from "./ExerciseImageModal";
 import ExerciseImageViewModal from "./ExerciseImageViewModal";
 
@@ -9,7 +9,12 @@ export default function CreateRoutineModal({
   isOpen, 
   onClose, 
   onRoutineCreated,
-  trainerId
+  trainerId,
+  userId,
+  startDate,
+  endDate,
+  notes,
+  isDirectAssignment = false
 }) {
   const [routine, setRoutine] = useState({
     name: "",
@@ -153,15 +158,31 @@ export default function CreateRoutineModal({
       };
 
 
-      const createdRoutine = await createRoutine(createData);
-      console.log("Rutina creada exitosamente:", createdRoutine);
+      let createdRoutine;
       
-      // Mostrar mensaje de éxito
-      setSuccessMessage("¡Rutina creada exitosamente!");
+      if (isDirectAssignment && userId && startDate && endDate) {
+        // Crear rutina directamente asignada al usuario
+        const createForUserData = {
+          ...createData,
+          user_id: userId,
+          startDate: new Date(startDate).toISOString(),
+          endDate: new Date(endDate).toISOString(),
+          notes: notes || "Rutina creada y asignada automáticamente"
+        };
+        
+        createdRoutine = await createRoutineForUser(createForUserData);
+        console.log("Rutina creada y asignada exitosamente:", createdRoutine);
+        setSuccessMessage("¡Rutina creada y asignada exitosamente!");
+      } else {
+        // Crear rutina normal
+        createdRoutine = await createRoutine(createData);
+        console.log("Rutina creada exitosamente:", createdRoutine);
+        setSuccessMessage("¡Rutina creada exitosamente!");
+      }
       
       // Notificar que se creó la rutina
       if (onRoutineCreated) {
-        onRoutineCreated();
+        onRoutineCreated(createdRoutine);
       }
       
       // Cerrar el modal después de un breve delay para mostrar el mensaje de éxito

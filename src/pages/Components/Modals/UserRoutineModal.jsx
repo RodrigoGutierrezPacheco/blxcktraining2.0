@@ -11,7 +11,11 @@ import {
   Dumbbell,
   Clock,
   Target,
+  Image,
+  Loader2,
 } from "lucide-react";
+import { exercisesService } from "../../../services/exercises";
+import { useAuth } from "../../../context/useAuth";
 
 export default function UserRoutineModal({
   isOpen,
@@ -19,7 +23,13 @@ export default function UserRoutineModal({
   userRoutine,
   userName,
 }) {
+  const { token } = useAuth();
   const [expandedWeeks, setExpandedWeeks] = useState(new Set());
+  
+  // Estados para el modal de imagen del ejercicio
+  const [showExerciseImageModal, setShowExerciseImageModal] = useState(false);
+  const [exerciseImageData, setExerciseImageData] = useState(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   const toggleWeek = (weekNumber) => {
     const newExpanded = new Set(expandedWeeks);
@@ -29,6 +39,28 @@ export default function UserRoutineModal({
       newExpanded.add(weekNumber);
     }
     setExpandedWeeks(newExpanded);
+  };
+
+  // Función para manejar la visualización de imagen del ejercicio
+  const handleViewExerciseImage = async (exerciseId) => {
+    if (!exerciseId || !token) return;
+    
+    try {
+      setIsLoadingImage(true);
+      const response = await exercisesService.getExerciseImage(token, exerciseId);
+      setExerciseImageData(response);
+      setShowExerciseImageModal(true);
+    } catch (error) {
+      console.error("Error al cargar la imagen del ejercicio:", error);
+    } finally {
+      setIsLoadingImage(false);
+    }
+  };
+
+  // Función para cerrar el modal de imagen
+  const closeExerciseImageModal = () => {
+    setShowExerciseImageModal(false);
+    setExerciseImageData(null);
   };
 
   if (!isOpen || !userRoutine) return null;
@@ -83,7 +115,7 @@ export default function UserRoutineModal({
             {routine.comments && (
               <div className="mt-4 p-3 bg-white/50 rounded-lg border border-blue-200">
                 <p className="text-sm text-gray-700 text-center">
-                  <span className="font-medium">Comentarios:</span>{" "}
+                  <span className="font-medium">Imagen:</span>{" "}
                   {routine.comments}
                 </p>
               </div>
@@ -171,7 +203,7 @@ export default function UserRoutineModal({
                                         Descanso
                                       </th>
                                       <th className="p-2 text-center font-medium text-gray-700">
-                                        Comentarios
+                                        Imagen
                                       </th>
                                     </tr>
                                   </thead>
@@ -194,7 +226,16 @@ export default function UserRoutineModal({
                                           {exercise.restBetweenSets}s
                                         </td>
                                         <td className="p-2 text-center text-gray-700">
-                                          {exercise.comments || "-"}
+                                          {exercise.exerciseId ? (
+                                            <Button
+                                              className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1 text-xs rounded"
+                                              onClick={() => handleViewExerciseImage(exercise.exerciseId)}
+                                            >
+                                              Ver
+                                            </Button>
+                                          ) : (
+                                            "-"
+                                          )}
                                         </td>
                                       </tr>
                                     ))}
@@ -223,6 +264,64 @@ export default function UserRoutineModal({
           </div>
         </div>
       </div>
+
+      {/* Modal para mostrar imagen del ejercicio */}
+      {showExerciseImageModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-70 flex items-center justify-center p-4 overflow-y-hidden">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200">
+            {/* Header del modal */}
+            <div className="bg-white border-b border-gray-200 p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {exerciseImageData?.exerciseName || 'Imagen del Ejercicio'}
+                  </h3>
+                </div>
+                <Button
+                  onClick={closeExerciseImageModal}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all duration-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Contenido del modal - Solo la imagen */}
+            <div className="p-6 flex items-center justify-center min-h-[500px]">
+              {isLoadingImage ? (
+                <div className="text-center">
+                  <Loader2 className="h-16 w-16 text-blue-600 animate-spin mx-auto mb-4" />
+                  <p className="text-gray-600 mt-4">Cargando imagen del ejercicio...</p>
+                </div>
+              ) : exerciseImageData?.image?.url ? (
+                <div className="text-center">
+                  <img
+                    src={exerciseImageData.image.url}
+                    alt={exerciseImageData.exerciseName}
+                    className="max-w-full h-auto max-h-[70vh] rounded-lg shadow-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div 
+                    className="hidden bg-gray-100 rounded-lg p-12 text-center"
+                    style={{ minHeight: '300px', display: 'none' }}
+                  >
+                    <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No se pudo cargar la imagen</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No hay imagen disponible para este ejercicio</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

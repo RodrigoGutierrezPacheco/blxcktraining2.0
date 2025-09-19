@@ -183,6 +183,19 @@ export default function PerfilEntrenador() {
     }
   };
 
+  const handleUserUnassigned = async (userId) => {
+    // Actualizar la lista de usuarios removiendo el usuario desasignado
+    setUsersData(prevUsers => prevUsers.filter(user => user.id !== userId));
+    
+    // Opcional: recargar todos los datos para asegurar consistencia
+    try {
+      const users = await getUsersByTrainer(user.id);
+      setUsersData(users);
+    } catch (error) {
+      console.error("Error al recargar usuarios:", error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -276,6 +289,7 @@ export default function PerfilEntrenador() {
             handleViewRoutine={handleViewRoutine}
             handleAssignRoutine={handleAssignRoutine}
             loadingRoutine={loadingRoutine}
+            onUserUnassigned={handleUserUnassigned}
           />
 
           {/* Trainer Routines Section */}

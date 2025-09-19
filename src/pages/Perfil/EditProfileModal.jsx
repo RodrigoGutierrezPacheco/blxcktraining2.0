@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "../Components/Card";
 import { Button } from "../Components/Button";
 import {
@@ -33,6 +33,7 @@ export default function EditProfileModal({
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
+  const messageRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && userData) {
@@ -71,6 +72,19 @@ export default function EditProfileModal({
       });
     }
   }, [isOpen, userData]);
+
+  // Efecto para hacer scroll hasta el mensaje de error cuando aparece
+  useEffect(() => {
+    if (message.text && message.type === "error" && messageRef.current) {
+      // Pequeño delay para asegurar que el DOM se haya actualizado
+      setTimeout(() => {
+        messageRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
+  }, [message]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -163,10 +177,10 @@ export default function EditProfileModal({
         const errorData = JSON.parse(error.message);
 
         if (errorData.errors && Array.isArray(errorData.errors)) {
-          // Mostrar todos los errores de validación
-          const errorMessages = errorData.errors.join(", ");
+          // Mostrar todos los errores de validación en una lista
+          const errorList = errorData.errors.map((err) => `• ${err}`).join('\n');
           setMessage({
-            text: `Errores de validación: ${errorMessages}`,
+            text: `Errores de validación:\n${errorList}`,
             type: "error",
           });
         } else if (errorData.message) {
@@ -213,13 +227,16 @@ export default function EditProfileModal({
 
           {message.text && (
             <div
-              className={`mb-6 p-3 rounded-md text-center ${
+              ref={messageRef}
+              className={`mb-6 p-4 rounded-md text-left ${
                 message.type === "success"
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
               }`}
             >
-              {message.text}
+              <div className="whitespace-pre-line">
+                {message.text}
+              </div>
             </div>
           )}
 

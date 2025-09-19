@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "../Button";
 import { X, Dumbbell, Calendar, Clock, Target, Users, CheckCircle, XCircle, Plus, Search, Filter } from "lucide-react";
 import { getTrainerRoutines, assignRoutineToUser } from "../../../services/routines";
+import CreateRoutineModal from "./CreateRoutineModal";
 
 export default function AssignRoutineModal({ 
   isOpen, 
@@ -18,19 +19,15 @@ export default function AssignRoutineModal({
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [isAssigning, setIsAssigning] = useState(false);
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
+  const [showCreateRoutineModal, setShowCreateRoutineModal] = useState(false);
+  const [isDirectAssignment, setIsDirectAssignment] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     notes: ""
   });
 
-  useEffect(() => {
-    if (isOpen && trainerId) {
-      fetchTrainerRoutines();
-    }
-  }, [isOpen, trainerId]);
-
-  const fetchTrainerRoutines = async () => {
+  const fetchTrainerRoutines = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -41,7 +38,13 @@ export default function AssignRoutineModal({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [trainerId]);
+
+  useEffect(() => {
+    if (isOpen && trainerId) {
+      fetchTrainerRoutines();
+    }
+  }, [isOpen, trainerId, fetchTrainerRoutines]);
 
   const handleAssignRoutine = async () => {
     if (!selectedRoutine) return;
@@ -94,270 +97,294 @@ export default function AssignRoutineModal({
     });
   };
 
+  const handleRoutineCreated = async (createdRoutine) => {
+    try {
+      // Si se creó una rutina directamente asignada al usuario
+      if (createdRoutine && isDirectAssignment) {
+        // La rutina ya fue creada y asignada automáticamente por el endpoint
+        console.log("Rutina creada y asignada exitosamente:", createdRoutine);
+        
+        // Notificar que se asignó la rutina para hacer refetch de usuarios
+        if (onRoutineAssigned) {
+          onRoutineAssigned();
+        }
+
+        // Cerrar el modal principal
+        onClose();
+      } else if (createdRoutine && userId && trainerId) {
+        // Si se creó una rutina normal, asignarla manualmente
+        const startDate = new Date(assignmentData.startDate).toISOString();
+        const endDate = new Date(assignmentData.endDate).toISOString();
+
+        await assignRoutineToUser(
+          createdRoutine.id,
+          userId,
+          startDate,
+          endDate,
+          assignmentData.notes || "Rutina creada y asignada automáticamente"
+        );
+
+        // Notificar que se asignó la rutina
+        if (onRoutineAssigned) {
+          onRoutineAssigned();
+        }
+
+        // Cerrar el modal principal
+        onClose();
+      } else {
+        // Si no hay datos para asignar, solo refrescar la lista
+        fetchTrainerRoutines();
+      }
+      
+      setShowCreateRoutineModal(false);
+      setIsDirectAssignment(false);
+    } catch (error) {
+      console.error("Error al asignar rutina creada:", error);
+      setError("Error al asignar la rutina creada al usuario");
+      // Refrescar la lista de todas formas
+      fetchTrainerRoutines();
+      setShowCreateRoutineModal(false);
+      setIsDirectAssignment(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-lg border border-gray-200">
         <div className="p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {showAssignmentForm && (
-                <Button
+                <button
                   onClick={handleBackToRoutines}
-                  className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
+                  className="text-gray-500 hover:text-gray-700 p-1"
                 >
                   <X className="h-5 w-5" />
-                </Button>
+                </button>
               )}
-              <h3 className="text-2xl font-bold text-black flex items-center gap-2">
-                <Dumbbell className="h-6 w-6" />
+              <h3 className="text-lg font-semibold text-gray-900">
                 {showAssignmentForm ? 'Asignar Rutina' : `Asignar Rutina a ${userName}`}
               </h3>
             </div>
-            <Button
+            <button
               onClick={onClose}
-              className="bg-gray-500 text-white hover:bg-gray-600 p-2 rounded-full transition-all duration-200 hover:scale-105"
+              className="text-gray-500 hover:text-gray-700 p-1"
             >
               <X className="h-5 w-5" />
-            </Button>
+            </button>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-              <p className="text-red-700">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded p-3 mb-4">
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
           {!showAssignmentForm ? (
             // Vista de selección de rutina
             <>
-              {/* Barra de búsqueda */}
-              <div className="mb-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              {/* Barra de búsqueda y botón crear */}
+              <div className="mb-4 flex gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Buscar rutinas por nombre o descripción..."
+                    placeholder="Buscar rutinas..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                   />
                 </div>
+                <Button
+                  onClick={() => {
+                    setIsDirectAssignment(true);
+                    setShowCreateRoutineModal(true);
+                  }}
+                  className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 text-sm rounded flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Crear Rutina
+                </Button>
               </div>
+
+              {/* Instrucción */}
+              {!isLoading && filteredRoutines.length > 0 && (
+                <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-xs text-blue-700 text-center">
+                    💡 Selecciona una rutina haciendo clic en ella para asignarla a {userName}
+                  </p>
+                </div>
+              )}
 
               {/* Lista de rutinas */}
               {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600 text-lg">Cargando rutinas...</p>
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-3"></div>
+                  <p className="text-gray-600">Cargando rutinas...</p>
                 </div>
               ) : filteredRoutines.length > 0 ? (
-                <div className="grid gap-4">
+                <div className="space-y-3">
                   {filteredRoutines.map((routine) => (
                     <div
                       key={routine.id}
-                      className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                      className="bg-white p-4 border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-300 cursor-pointer transition-colors"
                       onClick={() => handleRoutineSelect(routine)}
                     >
-                      <div className="flex justify-between items-start mb-3">
+                      <div className="flex justify-between items-start mb-2">
                         <div>
-                          <h4 className="text-lg font-semibold text-black mb-2">
+                          <h4 className="text-base font-medium text-gray-900 mb-1">
                             {routine.name}
                           </h4>
-                          <p className="text-gray-600 mb-3">
+                          <p className="text-sm text-gray-600">
                             {routine.description}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
                           {routine.isActive ? (
-                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3" />
+                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
                               Activa
                             </span>
                           ) : (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
                               Inactiva
                             </span>
                           )}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-600" />
-                          <span>
-                            <span className="font-medium">Duración:</span>{" "}
-                            {routine.totalWeeks} semana{routine.totalWeeks !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-600" />
-                          <span>
-                            <span className="font-medium">Creada:</span>{" "}
-                            {new Date(routine.createdAt).toLocaleDateString("es-ES")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-600" />
-                          <span>
-                            <span className="font-medium">Ejercicios:</span>{" "}
-                            {routine.weeks?.reduce((total, week) => 
-                              total + week.days?.reduce((dayTotal, day) => 
-                                dayTotal + (day.exercises?.length || 0), 0
-                              ), 0
-                            ) || 0}
-                          </span>
-                        </div>
+                      <div className="flex gap-4 text-xs text-gray-500">
+                        <span>{routine.totalWeeks} semana{routine.totalWeeks !== 1 ? "s" : ""}</span>
+                        <span>{routine.weeks?.reduce((total, week) => 
+                          total + week.days?.reduce((dayTotal, day) => 
+                            dayTotal + (day.exercises?.length || 0), 0
+                          ), 0
+                        ) || 0} ejercicios</span>
                       </div>
 
                       {routine.comments && (
-                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                          <p className="text-sm text-blue-700">
-                            <span className="font-medium">Comentarios:</span>{" "}
+                        <div className="mt-2 p-2 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-600">
                             {routine.comments}
                           </p>
                         </div>
                       )}
-
-                      <div className="mt-4">
-                        <Button 
-                          className="w-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
-                        >
-                          <Dumbbell className="mr-2 h-4 w-4" />
-                          Seleccionar esta Rutina
-                        </Button>
+                      
+                      <div className="mt-3 pt-2 border-t border-gray-100">
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <span>👆</span>
+                          Haz clic para asignar esta rutina a {userName}
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Dumbbell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-lg mb-2">
-                    {searchTerm ? 'No se encontraron rutinas que coincidan con la búsqueda' : 'No tienes rutinas creadas aún'}
+                <div className="text-center py-6">
+                  <p className="text-gray-600 mb-1">
+                    {searchTerm ? 'No se encontraron rutinas' : 'No tienes rutinas creadas'}
                   </p>
-                  <p className="text-gray-500">
-                    {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Crea tu primera rutina para poder asignarla a usuarios'}
+                  <p className="text-sm text-gray-500">
+                    {searchTerm ? 'Intenta con otros términos' : 'Crea tu primera rutina'}
                   </p>
                 </div>
               )}
             </>
           ) : (
             // Vista de formulario de asignación
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Información de la rutina seleccionada */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                <h4 className="text-lg font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                  <Dumbbell className="h-5 w-5" />
-                  Rutina Seleccionada
+              <div className="bg-gray-50 p-4 rounded border">
+                <h4 className="text-base font-medium text-gray-900 mb-2">
+                  {selectedRoutine.name}
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-blue-600 font-medium">Nombre</p>
-                    <p className="text-lg font-bold text-blue-800">{selectedRoutine.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-600 font-medium">Duración</p>
-                    <p className="text-lg font-bold text-blue-800">
-                      {selectedRoutine.totalWeeks} semana{selectedRoutine.totalWeeks !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-600 font-medium">Descripción</p>
-                    <p className="text-blue-800">{selectedRoutine.description}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-600 font-medium">Total Ejercicios</p>
-                    <p className="text-lg font-bold text-blue-800">
-                      {selectedRoutine.weeks?.reduce((total, week) => 
-                        total + week.days?.reduce((dayTotal, day) => 
-                          dayTotal + (day.exercises?.length || 0), 0
-                        ), 0
-                      ) || 0}
-                    </p>
-                  </div>
+                <div className="flex gap-4 text-sm text-gray-600">
+                  <span>{selectedRoutine.totalWeeks} semana{selectedRoutine.totalWeeks !== 1 ? 's' : ''}</span>
+                  <span>{selectedRoutine.weeks?.reduce((total, week) => 
+                    total + week.days?.reduce((dayTotal, day) => 
+                      dayTotal + (day.exercises?.length || 0), 0
+                    ), 0
+                  ) || 0} ejercicios</span>
                 </div>
               </div>
 
               {/* Formulario de asignación */}
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  Configuración de la Asignación
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-4 border border-gray-200 rounded">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Fecha de Inicio
                     </label>
                     <input
                       type="date"
                       value={assignmentData.startDate}
                       onChange={(e) => setAssignmentData(prev => ({ ...prev, startDate: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Fecha de Fin
                     </label>
                     <input
                       type="date"
                       value={assignmentData.endDate}
                       onChange={(e) => setAssignmentData(prev => ({ ...prev, endDate: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                     />
                   </div>
                 </div>
 
-                <div className="mt-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Notas de Asignación
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Notas (opcional)
                   </label>
                   <textarea
                     value={assignmentData.notes}
                     onChange={(e) => setAssignmentData(prev => ({ ...prev, notes: e.target.value }))}
-                    rows={3}
-                    placeholder="Notas especiales, instrucciones o consideraciones para el usuario..."
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    rows={2}
+                    placeholder="Instrucciones o consideraciones especiales..."
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                   />
                 </div>
               </div>
 
               {/* Botones de acción */}
-              <div className="flex justify-end gap-4">
-                <Button
+              <div className="flex justify-end gap-3">
+                <button
                   onClick={handleBackToRoutines}
-                  className="bg-gray-500 text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
                 >
                   Cancelar
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={handleAssignRoutine}
                   disabled={isAssigning}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm text-white bg-gray-900 hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isAssigning ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Asignando...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="mr-2 h-5 w-5" />
-                      Asignar Rutina
-                    </>
-                  )}
-                </Button>
+                  {isAssigning ? "Asignando..." : "Asignar Rutina"}
+                </button>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Modal para crear nueva rutina */}
+      <CreateRoutineModal
+        isOpen={showCreateRoutineModal}
+        onClose={() => setShowCreateRoutineModal(false)}
+        onRoutineCreated={handleRoutineCreated}
+        trainerId={trainerId}
+        userId={userId}
+        startDate={assignmentData.startDate}
+        endDate={assignmentData.endDate}
+        notes={assignmentData.notes}
+        isDirectAssignment={true}
+      />
     </div>
   );
 }
