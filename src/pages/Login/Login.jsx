@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff, LogInIcon, User, Dumbbell } from "lucide-react";
 import { Button } from "../Components/Button";
 import { Card, CardContent } from "../Components/Card";
@@ -15,7 +15,19 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, userType } = useAuth();
+
+  // Redirigir automáticamente si el usuario ya está autenticado
+  useEffect(() => {
+    if (user && userType) {
+      // Redirigir según el tipo de usuario
+      if (userType === "user") {
+        navigate("/perfil");
+      } else if (userType === "trainer") {
+        navigate("/entrenadores/perfil");
+      }
+    }
+  }, [user, userType, navigate]);
 
   const handleLogin = async (e) => {
     setIsLoading(true);
@@ -93,7 +105,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => handleTabChange("user")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
                 activeTab === "user"
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"
@@ -105,7 +117,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => handleTabChange("trainer")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
                 activeTab === "trainer"
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"

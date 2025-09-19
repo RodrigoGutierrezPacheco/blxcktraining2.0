@@ -29,6 +29,7 @@ export default function EditProfileModal({
     age: "",
     weight: "",
     height: "",
+    phone: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +70,7 @@ export default function EditProfileModal({
         age: calculatedAge || userData.age || "",
         weight: userData.weight || "",
         height: userData.height || "",
+        phone: userData.phone || "",
       });
     }
   }, [isOpen, userData]);
@@ -335,6 +337,23 @@ export default function EditProfileModal({
                   placeholder="Tu altura en cm"
                   min="100"
                   max="300"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Número telefónico
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
+                  placeholder="+52 55 1234 5678"
                 />
               </div>
             </div>

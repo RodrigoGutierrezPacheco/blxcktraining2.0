@@ -57,7 +57,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route
-            path="/registro/entrenadores"
+            path="/registro-entrenadores"
             element={<RegistroEntrenadores />}
           />
           <Route path="/entrenamiento-funcional" element={<Funcional />} />

@@ -83,6 +83,10 @@ export default function ClientsSection({
                         <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</span>
                         <span className="text-sm text-gray-900 mt-1">{user.email}</span>
                       </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Número telefónico</span>
+                        <span className="text-sm text-gray-900 mt-1">{user.phone ?? "Sin información"}</span>
+                      </div>
                       {user.age && (
                         <div className="flex flex-col">
                           <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Edad</span>
@@ -109,18 +113,9 @@ export default function ClientsSection({
 
                     {(user.chronicDiseases || user.healthIssues) && (
                       <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                        <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                          Información de Salud
-                        </h4>
-                        {user.chronicDiseases && (
-                          <div className="mb-2">
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Enfermedades crónicas</span>
-                            <p className="text-sm text-gray-900 mt-1">{user.chronicDiseases}</p>
-                          </div>
-                        )}
                         {user.healthIssues && (
                           <div>
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud</span>
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud/Enfermedades crónicas/Limitaciones</span>
                             <p className="text-sm text-gray-900 mt-1">{user.healthIssues}</p>
                           </div>
                         )}

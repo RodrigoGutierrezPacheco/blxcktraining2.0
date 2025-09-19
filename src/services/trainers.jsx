@@ -169,7 +169,8 @@ export const getUsersByTrainer = async (trainerId) => {
       dateOfBirth: user.dateOfBirth,
       healthIssues: user.healthIssues,
       createdAt: user.createdAt,
-      hasRoutine: user.hasRoutine
+      hasRoutine: user.hasRoutine,
+      phone: user.phone
     }));
 
     return filteredUsers;
