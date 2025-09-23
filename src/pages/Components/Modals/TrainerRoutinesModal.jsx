@@ -47,6 +47,7 @@ export default function TrainerRoutinesModal({
   const [showExerciseImageModal, setShowExerciseImageModal] = useState(false);
   const [expandedWeeks, setExpandedWeeks] = useState(new Set());
   const [expandedDays, setExpandedDays] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Effect to open create modal when openCreateModal prop is true
   useEffect(() => {
@@ -181,6 +182,13 @@ export default function TrainerRoutinesModal({
     }
   };
 
+  // Filtrar rutinas basado en el término de búsqueda
+  const filteredRoutines = routinesData?.filter(routine => 
+    routine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    routine.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (routine.comments && routine.comments.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) || [];
+
   if (!isOpen) return null;
 
   return (
@@ -239,9 +247,49 @@ export default function TrainerRoutinesModal({
           {viewMode === "list" ? (
             // Vista de lista de rutinas
             <>
-              {routinesData && routinesData.length > 0 ? (
+              {/* Buscador de rutinas */}
+              {routinesData && routinesData.length > 0 && (
+                <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        placeholder="Buscar rutinas por nombre, descripción o comentarios..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      />
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm("")}
+                        className="text-gray-400 hover:text-gray-600 p-2"
+                        title="Limpiar búsqueda"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  {searchTerm && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      {filteredRoutines.length > 0 ? (
+                        <span>Mostrando {filteredRoutines.length} de {routinesData.length} rutinas</span>
+                      ) : (
+                        <span>No se encontraron rutinas que coincidan con "{searchTerm}"</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {filteredRoutines.length > 0 ? (
                 <div className="grid gap-4">
-                  {routinesData.map((routine) => (
+                  {filteredRoutines.map((routine) => (
                     <div
                       key={routine.id}
                       className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200"
@@ -287,14 +335,6 @@ export default function TrainerRoutinesModal({
                             )}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-600" />
-                          <span>
-                            <span className="font-medium">Asignada a:</span>{" "}
-                            {routine.assignedUsers || 0} usuario
-                            {routine.assignedUsers !== 1 ? "s" : ""}
-                          </span>
-                        </div>
                       </div>
 
                       {routine.comments && (
@@ -330,6 +370,26 @@ export default function TrainerRoutinesModal({
                       </div>
                     </div>
                   ))}
+                </div>
+              ) : searchTerm ? (
+                <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+                  <div className="bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No se encontraron rutinas
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    No hay rutinas que coincidan con "{searchTerm}"
+                  </p>
+                  <Button
+                    onClick={() => setSearchTerm("")}
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Limpiar Búsqueda
+                  </Button>
                 </div>
               ) : (
                 <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
@@ -382,7 +442,7 @@ export default function TrainerRoutinesModal({
                   </div>
 
                   {/* Información de la Rutina */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center gap-3">
                         <div className="bg-white p-2 rounded-lg border border-gray-200">
@@ -472,6 +532,42 @@ export default function TrainerRoutinesModal({
                         </div>
                       </div>
                     </div>
+
+                    {selectedRoutine.suggestedStartDate && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-blue-100 p-2 rounded-lg border border-blue-200">
+                            <Calendar className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-blue-600 font-medium">
+                              Inicio Sugerido
+                            </p>
+                            <p className="text-lg font-semibold text-blue-900">
+                              {new Date(selectedRoutine.suggestedStartDate).toLocaleDateString("es-ES")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedRoutine.suggestedEndDate && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-green-100 p-2 rounded-lg border border-green-200">
+                            <Calendar className="h-4 w-4 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-green-600 font-medium">
+                              Fin Sugerido
+                            </p>
+                            <p className="text-lg font-semibold text-green-900">
+                              {new Date(selectedRoutine.suggestedEndDate).toLocaleDateString("es-ES")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Comentarios */}

@@ -22,6 +22,8 @@ export default function CreateRoutineModal({
     comments: "",
     totalWeeks: 1,
     isActive: true,
+    suggestedStartDate: "",
+    suggestedEndDate: "",
     weeks: [
       {
         weekNumber: 1,
@@ -135,6 +137,8 @@ export default function CreateRoutineModal({
         totalWeeks: routine.weeks.length,
         isActive: routine.isActive,
         trainer_id: trainerId,
+        suggestedStartDate: routine.suggestedStartDate ? new Date(routine.suggestedStartDate).toISOString() : null,
+        suggestedEndDate: routine.suggestedEndDate ? new Date(routine.suggestedEndDate).toISOString() : null,
         weeks: routine.weeks.map((week, weekIndex) => ({
           weekNumber: weekIndex + 1,
           name: week.name.trim(),
@@ -487,6 +491,28 @@ export default function CreateRoutineModal({
                   <option value="true">✅ Activa</option>
                   <option value="false">⏸️ Inactiva</option>
                 </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Fecha de Inicio Sugerida
+                </label>
+                <input
+                  type="date"
+                  value={routine.suggestedStartDate}
+                  onChange={(e) => updateRoutineField('suggestedStartDate', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Fecha de Fin Sugerida
+                </label>
+                <input
+                  type="date"
+                  value={routine.suggestedEndDate}
+                  onChange={(e) => updateRoutineField('suggestedEndDate', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 bg-white"
+                />
               </div>
               <div className="md:col-span-2 space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
