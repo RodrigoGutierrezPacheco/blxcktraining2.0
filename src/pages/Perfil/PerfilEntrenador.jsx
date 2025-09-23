@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "../Components/Card";
 import { Button } from "../Components/Button";
-import { Award } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
 import {
@@ -18,6 +17,8 @@ import TrainerStatsBio from "../Components/TrainerStatsBio";
 import ClientsSection from "../Components/ClientsSection";
 import TrainerRoutinesSection from "../Components/TrainerRoutinesSection";
 import TrainerDocumentsSection from "../../components/TrainerDocumentsSection";
+import TrainerProfileHeader from "../Components/TrainerProfileHeader";
+import RoutineExpirationSection from "../Components/RoutineExpirationSection";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
@@ -240,38 +241,7 @@ export default function PerfilEntrenador() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {/* Profile Header */}
-      <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <div className="relative">
-            <img
-              src={
-                trainerData.profileImage ||
-                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150"
-              }
-              alt="Imagen de perfil del entrenador"
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
-            />
-            {trainerData.verified && (
-              <div className="absolute -bottom-1 -right-1 bg-gray-600 text-white rounded-full p-1">
-                <Award className="h-3 w-3" />
-              </div>
-            )}
-          </div>
-          <div className="text-center sm:text-left">
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
-              {trainerData.fullName}
-            </h1>
-            <p className="text-gray-600 text-sm">
-              Entrenador en BLXCK Training
-            </p>
-            {trainerData.specialty && (
-              <p className="text-gray-500 text-sm mt-1">
-                {trainerData.specialty}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      <TrainerProfileHeader trainerData={trainerData} />
 
       <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6">
         {/* Left Column - Trainer Information */}
@@ -281,6 +251,16 @@ export default function PerfilEntrenador() {
 
         {/* Right Column - All Sections */}
         <div className="lg:col-span-3 space-y-6">
+          {/* Routine Expiration Section */}
+          <RoutineExpirationSection
+            usersData={usersData}
+            formatUserDate={formatUserDate}
+            handleViewUser={handleViewUser}
+            handleViewRoutine={handleViewRoutine}
+            handleAssignRoutine={handleAssignRoutine}
+            loadingRoutine={loadingRoutine}
+          />
+
           {/* Clients Section */}
           <ClientsSection
             usersData={usersData}

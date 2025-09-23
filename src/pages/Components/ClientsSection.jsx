@@ -1,8 +1,6 @@
 import { Card, CardContent } from "./Card";
 import { Button } from "./Button";
-import { Users, Eye, BookOpen, Plus, UserMinus } from "lucide-react";
-import { useState } from "react";
-import { unassignUserFromTrainer } from "../../services/users";
+import { Users, Eye, BookOpen, Plus } from "lucide-react";
 
 export default function ClientsSection({ 
   usersData, 
@@ -10,46 +8,17 @@ export default function ClientsSection({
   handleViewUser, 
   handleViewRoutine, 
   handleAssignRoutine, 
-  loadingRoutine,
-  onUserUnassigned // Callback para actualizar la lista después de desasignar
+  loadingRoutine
 }) {
-  const [unassigningUserId, setUnassigningUserId] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [userToUnassign, setUserToUnassign] = useState(null);
-
-  const handleUnassignClick = (user) => {
-    setUserToUnassign(user);
-    setShowConfirmModal(true);
-  };
-
-  const handleConfirmUnassign = async () => {
-    if (!userToUnassign) return;
-
-    try {
-      setUnassigningUserId(userToUnassign.id);
-      
-      await unassignUserFromTrainer(userToUnassign.id);
-      
-      alert(`Usuario ${userToUnassign.fullName} desasignado exitosamente.`);
-      
-      // Llamar al callback para actualizar la lista
-      if (onUserUnassigned) {
-        onUserUnassigned(userToUnassign.id);
-      }
-      
-    } catch (error) {
-      console.error("Error al desasignar usuario:", error);
-      alert(`Error al desasignar usuario: ${error.message}`);
-    } finally {
-      setUnassigningUserId(null);
-      setShowConfirmModal(false);
-      setUserToUnassign(null);
+  // Función para determinar el color según los días restantes
+  const getDaysRemainingColor = (daysRemaining) => {
+    if (daysRemaining < 10) {
+      return "text-red-600"; // Menos de 10 días - rojo
+    } else if (daysRemaining <= 20) {
+      return "text-yellow-600"; // 10-20 días - amarillo
+    } else {
+      return "text-green-600"; // Más de 20 días - verde
     }
-  };
-
-  const handleCancelUnassign = () => {
-    setShowConfirmModal(false);
-    setUserToUnassign(null);
   };
 
   return (
@@ -109,6 +78,21 @@ export default function ClientsSection({
                         <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Registrado</span>
                         <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.createdAt)}</span>
                       </div>
+                      
+                      {user.hasRoutine && user.routineInfo && (
+                        <>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rutina termina</span>
+                            <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.routineInfo.routineEndDate)}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Días restantes</span>
+                            <span className={`text-sm font-medium mt-1 ${getDaysRemainingColor(user.routineInfo.daysRemaining)}`}>
+                              {user.routineInfo.daysRemaining} días
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {(user.chronicDiseases || user.healthIssues) && (
@@ -131,7 +115,6 @@ export default function ClientsSection({
                       <Eye className="mr-1 h-4 w-4" />
                       Ver Detalles
                     </Button>
-                    {console.log(user)}
                     {user.hasRoutine ? (
                       <Button
                         onClick={() => handleViewRoutine(user)}
@@ -150,14 +133,14 @@ export default function ClientsSection({
                         Asignar Rutina
                       </Button>
                     )}
-                    <Button
+                    {/* <Button
                       onClick={() => handleUnassignClick(user)}
                       disabled={unassigningUserId === user.id}
                       className="bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400 text-sm px-3 py-2"
                     >
                       <UserMinus className="mr-1 h-4 w-4" />
                       {unassigningUserId === user.id ? "Desasignando..." : "Desasignar"}
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>
@@ -175,37 +158,6 @@ export default function ClientsSection({
           </div>
         )}
       </CardContent>
-      
-      {/* Modal de confirmación */}
-      {showConfirmModal && userToUnassign && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Confirmar desasignación
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              ¿Estás seguro de que quieres desasignar a <strong>{userToUnassign.fullName}</strong>? 
-              Esta acción no se puede deshacer y el usuario perderá acceso a su rutina actual.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleCancelUnassign}
-                disabled={unassigningUserId === userToUnassign.id}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmUnassign}
-                disabled={unassigningUserId === userToUnassign.id}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50"
-              >
-                {unassigningUserId === userToUnassign.id ? "Desasignando..." : "Desasignar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </Card>
   );
 }

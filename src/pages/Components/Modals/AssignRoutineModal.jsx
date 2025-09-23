@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "../Button";
 import { X, Dumbbell, Calendar, Clock, Target, Users, CheckCircle, XCircle, Plus, Search, Filter } from "lucide-react";
-import { getTrainerRoutines, assignRoutineToUser } from "../../../services/routines";
+import { getTrainerUnassignedRoutines, assignRoutineToUser } from "../../../services/routines";
 import CreateRoutineModal from "./CreateRoutineModal";
 
 export default function AssignRoutineModal({ 
@@ -31,7 +31,7 @@ export default function AssignRoutineModal({
     try {
       setIsLoading(true);
       setError(null);
-      const routinesData = await getTrainerRoutines(trainerId);
+      const routinesData = await getTrainerUnassignedRoutines(trainerId);
       setRoutines(routinesData);
     } catch (err) {
       setError(err.message);
@@ -214,7 +214,7 @@ export default function AssignRoutineModal({
               {!isLoading && filteredRoutines.length > 0 && (
                 <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
                   <p className="text-xs text-blue-700 text-center">
-                    💡 Selecciona una rutina haciendo clic en ella para asignarla a {userName}
+                    💡 Selecciona una rutina sin asignar haciendo clic en ella para asignarla a {userName}
                   </p>
                 </div>
               )}
@@ -275,7 +275,7 @@ export default function AssignRoutineModal({
                       <div className="mt-3 pt-2 border-t border-gray-100">
                         <p className="text-xs text-gray-500 flex items-center gap-1">
                           <span>👆</span>
-                          Haz clic para asignar esta rutina a {userName}
+                          Rutina disponible - Haz clic para asignar a {userName}
                         </p>
                       </div>
                     </div>
@@ -284,10 +284,10 @@ export default function AssignRoutineModal({
               ) : (
                 <div className="text-center py-6">
                   <p className="text-gray-600 mb-1">
-                    {searchTerm ? 'No se encontraron rutinas' : 'No tienes rutinas creadas'}
+                    {searchTerm ? 'No se encontraron rutinas sin asignar' : 'No tienes rutinas sin asignar'}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {searchTerm ? 'Intenta con otros términos' : 'Crea tu primera rutina'}
+                    {searchTerm ? 'Intenta con otros términos' : 'Todas tus rutinas ya están asignadas a usuarios'}
                   </p>
                 </div>
               )}

@@ -80,6 +80,47 @@ export const getTrainerRoutines = async (trainerId) => {
   }
 };
 
+export const getTrainerUnassignedRoutines = async (trainerId) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!trainerId) {
+      throw new Error("ID del entrenador no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/trainer/${trainerId}/unassigned`;
+    
+    console.log("Getting unassigned routines for trainer:", trainerId);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json"
+      }
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Unassigned routines:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error getting trainer unassigned routines:", error);
+    throw new Error(error.message || "Error al obtener las rutinas sin asignar del entrenador");
+  }
+};
+
 export const assignRoutineToUser = async (routineId, userId, startDate, endDate, notes) => {
   try {
     const token = localStorage.getItem("tokenBlck");
