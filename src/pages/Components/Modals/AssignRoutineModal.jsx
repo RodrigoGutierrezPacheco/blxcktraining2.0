@@ -1,16 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "../Button";
-import { X, Dumbbell, Calendar, Clock, Target, Users, CheckCircle, XCircle, Plus, Search, Filter } from "lucide-react";
-import { getTrainerUnassignedRoutines, assignRoutineToUser } from "../../../services/routines";
+import {
+  X,
+  Dumbbell,
+  Calendar,
+  Clock,
+  Target,
+  Users,
+  CheckCircle,
+  XCircle,
+  Plus,
+  Search,
+  Filter,
+} from "lucide-react";
+import {
+  getTrainerUnassignedRoutines,
+  assignRoutineToUser,
+} from "../../../services/routines";
 import CreateRoutineModal from "./CreateRoutineModal";
 
-export default function AssignRoutineModal({ 
-  isOpen, 
-  onClose, 
+export default function AssignRoutineModal({
+  isOpen,
+  onClose,
   userName,
   userId,
   trainerId,
-  onRoutineAssigned 
+  onRoutineAssigned,
 }) {
   const [routines, setRoutines] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +37,11 @@ export default function AssignRoutineModal({
   const [showCreateRoutineModal, setShowCreateRoutineModal] = useState(false);
   const [isDirectAssignment, setIsDirectAssignment] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    notes: ""
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
+    notes: "",
   });
 
   const fetchTrainerRoutines = useCallback(async () => {
@@ -77,9 +94,10 @@ export default function AssignRoutineModal({
     }
   };
 
-  const filteredRoutines = routines.filter(routine =>
-    routine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    routine.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRoutines = routines.filter(
+    (routine) =>
+      routine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      routine.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRoutineSelect = (routine) => {
@@ -91,9 +109,11 @@ export default function AssignRoutineModal({
     setShowAssignmentForm(false);
     setSelectedRoutine(null);
     setAssignmentData({
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      notes: ""
+      startDate: new Date().toISOString().split("T")[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      notes: "",
     });
   };
 
@@ -103,7 +123,7 @@ export default function AssignRoutineModal({
       if (createdRoutine && isDirectAssignment) {
         // La rutina ya fue creada y asignada automáticamente por el endpoint
         console.log("Rutina creada y asignada exitosamente:", createdRoutine);
-        
+
         // Notificar que se asignó la rutina para hacer refetch de usuarios
         if (onRoutineAssigned) {
           onRoutineAssigned();
@@ -135,7 +155,7 @@ export default function AssignRoutineModal({
         // Si no hay datos para asignar, solo refrescar la lista
         fetchTrainerRoutines();
       }
-      
+
       setShowCreateRoutineModal(false);
       setIsDirectAssignment(false);
     } catch (error) {
@@ -166,7 +186,9 @@ export default function AssignRoutineModal({
                 </button>
               )}
               <h3 className="text-lg font-semibold text-gray-900">
-                {showAssignmentForm ? 'Asignar Rutina' : `Asignar Rutina a ${userName}`}
+                {showAssignmentForm
+                  ? "Asignar Rutina"
+                  : `Asignar Rutina a ${userName}`}
               </h3>
             </div>
             <button
@@ -198,7 +220,7 @@ export default function AssignRoutineModal({
                     className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                   />
                 </div>
-                <Button
+                {/* <Button
                   onClick={() => {
                     setIsDirectAssignment(true);
                     setShowCreateRoutineModal(true);
@@ -207,17 +229,33 @@ export default function AssignRoutineModal({
                 >
                   <Plus className="h-4 w-4" />
                   Crear Rutina
-                </Button>
+                </Button> */}
               </div>
 
               {/* Instrucción */}
               {!isLoading && filteredRoutines.length > 0 && (
                 <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
                   <p className="text-xs text-blue-700 text-center">
-                    💡 Selecciona una rutina sin asignar haciendo clic en ella para asignarla a {userName}
+                    💡 Selecciona una rutina sin asignar haciendo clic en ella
+                    para asignarla a {userName}
                   </p>
                 </div>
               )}
+
+              {/* Mensaje informativo */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <Dumbbell className="h-5 w-5 text-blue-600" />
+                  <p className="text-sm text-blue-800 font-medium">
+                    💡 ¿Necesitas crear una nueva rutina para {userName}?
+                  </p>
+                </div>
+                <p className="text-sm text-blue-600">
+                  Ve a la sección <strong>"Mis Rutinas"</strong> en tu perfil
+                  para crear una rutina personalizada y luego regresa aquí para
+                  asignarla.
+                </p>
+              </div>
 
               {/* Lista de rutinas */}
               {isLoading ? (
@@ -256,12 +294,23 @@ export default function AssignRoutineModal({
                       </div>
 
                       <div className="flex gap-4 text-xs text-gray-500">
-                        <span>{routine.totalWeeks} semana{routine.totalWeeks !== 1 ? "s" : ""}</span>
-                        <span>{routine.weeks?.reduce((total, week) => 
-                          total + week.days?.reduce((dayTotal, day) => 
-                            dayTotal + (day.exercises?.length || 0), 0
-                          ), 0
-                        ) || 0} ejercicios</span>
+                        <span>
+                          {routine.totalWeeks} semana
+                          {routine.totalWeeks !== 1 ? "s" : ""}
+                        </span>
+                        <span>
+                          {routine.weeks?.reduce(
+                            (total, week) =>
+                              total +
+                              week.days?.reduce(
+                                (dayTotal, day) =>
+                                  dayTotal + (day.exercises?.length || 0),
+                                0
+                              ),
+                            0
+                          ) || 0}{" "}
+                          ejercicios
+                        </span>
                       </div>
 
                       {routine.comments && (
@@ -271,7 +320,7 @@ export default function AssignRoutineModal({
                           </p>
                         </div>
                       )}
-                      
+
                       <div className="mt-3 pt-2 border-t border-gray-100">
                         <p className="text-xs text-gray-500 flex items-center gap-1">
                           <span>👆</span>
@@ -283,12 +332,31 @@ export default function AssignRoutineModal({
                 </div>
               ) : (
                 <div className="text-center py-6">
-                  <p className="text-gray-600 mb-1">
-                    {searchTerm ? 'No se encontraron rutinas sin asignar' : 'No tienes rutinas sin asignar'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {searchTerm ? 'Intenta con otros términos' : 'Todas tus rutinas ya están asignadas a usuarios'}
-                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
+                    <div className="flex items-center justify-center mb-3">
+                      <Dumbbell className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <h4 className="text-lg font-medium text-blue-900 mb-2">
+                      {searchTerm
+                        ? "No se encontraron rutinas sin asignar"
+                        : "No tienes rutinas sin asignar"}
+                    </h4>
+                    <p className="text-blue-700 mb-3">
+                      {searchTerm
+                        ? "Intenta con otros términos de búsqueda"
+                        : "Todas tus rutinas ya están asignadas a usuarios"}
+                    </p>
+                    <div className="bg-white border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm text-blue-800 font-medium mb-1">
+                        💡 ¿Necesitas crear una nueva rutina para {userName}?
+                      </p>
+                      <p className="text-sm text-blue-600">
+                        Ve a la sección <strong>"Mis Rutinas"</strong> en tu
+                        perfil para crear una rutina personalizada y luego
+                        regresa aquí para asignarla.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </>
@@ -301,12 +369,23 @@ export default function AssignRoutineModal({
                   {selectedRoutine.name}
                 </h4>
                 <div className="flex gap-4 text-sm text-gray-600">
-                  <span>{selectedRoutine.totalWeeks} semana{selectedRoutine.totalWeeks !== 1 ? 's' : ''}</span>
-                  <span>{selectedRoutine.weeks?.reduce((total, week) => 
-                    total + week.days?.reduce((dayTotal, day) => 
-                      dayTotal + (day.exercises?.length || 0), 0
-                    ), 0
-                  ) || 0} ejercicios</span>
+                  <span>
+                    {selectedRoutine.totalWeeks} semana
+                    {selectedRoutine.totalWeeks !== 1 ? "s" : ""}
+                  </span>
+                  <span>
+                    {selectedRoutine.weeks?.reduce(
+                      (total, week) =>
+                        total +
+                        week.days?.reduce(
+                          (dayTotal, day) =>
+                            dayTotal + (day.exercises?.length || 0),
+                          0
+                        ),
+                      0
+                    ) || 0}{" "}
+                    ejercicios
+                  </span>
                 </div>
               </div>
 
@@ -320,11 +399,16 @@ export default function AssignRoutineModal({
                     <input
                       type="date"
                       value={assignmentData.startDate}
-                      onChange={(e) => setAssignmentData(prev => ({ ...prev, startDate: e.target.value }))}
+                      onChange={(e) =>
+                        setAssignmentData((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
                       className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Fecha de Fin
@@ -332,7 +416,12 @@ export default function AssignRoutineModal({
                     <input
                       type="date"
                       value={assignmentData.endDate}
-                      onChange={(e) => setAssignmentData(prev => ({ ...prev, endDate: e.target.value }))}
+                      onChange={(e) =>
+                        setAssignmentData((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
                       className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                     />
                   </div>
@@ -344,7 +433,12 @@ export default function AssignRoutineModal({
                   </label>
                   <textarea
                     value={assignmentData.notes}
-                    onChange={(e) => setAssignmentData(prev => ({ ...prev, notes: e.target.value }))}
+                    onChange={(e) =>
+                      setAssignmentData((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
                     rows={2}
                     placeholder="Instrucciones o consideraciones especiales..."
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "./Card";
 import { Button } from "./Button";
-import { Users, Eye, BookOpen, Plus } from "lucide-react";
+import { Users, Eye, BookOpen, Plus, Clock, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
 
 export default function ClientsSection({ 
   usersData, 
@@ -10,16 +10,47 @@ export default function ClientsSection({
   handleAssignRoutine, 
   loadingRoutine
 }) {
-  // Función para determinar el color según los días restantes
-  const getDaysRemainingColor = (daysRemaining) => {
+
+  // Función para determinar el estado de la rutina
+  const getRoutineStatus = (daysRemaining) => {
     if (daysRemaining < 10) {
-      return "text-red-600"; // Menos de 10 días - rojo
+      return {
+        color: "text-red-600",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+        icon: AlertTriangle,
+        status: "Crítico",
+        description: "Rutina expira pronto"
+      };
     } else if (daysRemaining <= 20) {
-      return "text-yellow-600"; // 10-20 días - amarillo
+      return {
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200",
+        icon: Clock,
+        status: "Atención",
+        description: "Rutina expira en breve"
+      };
     } else {
-      return "text-green-600"; // Más de 20 días - verde
+      return {
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+        icon: CheckCircle,
+        status: "Estable",
+        description: "Rutina vigente"
+      };
     }
   };
+
+  // Separar usuarios con y sin rutina
+  const usersWithRoutine = usersData.filter(user => user.hasRoutine && user.routineInfo);
+  const usersWithoutRoutine = usersData.filter(user => !user.hasRoutine);
+  
+  // Ordenar usuarios con rutina por días restantes (más urgentes primero)
+  const sortedUsersWithRoutine = usersWithRoutine.sort((a, b) => 
+    a.routineInfo.daysRemaining - b.routineInfo.daysRemaining
+  );
 
   return (
     <Card className="bg-white border border-gray-200 shadow-sm">
@@ -30,121 +61,211 @@ export default function ClientsSection({
             Mis Clientes
           </h2>
           <div className="text-sm font-medium text-gray-600">
-            Total: {usersData.length} usuario
-            {usersData.length !== 1 ? "s" : ""}
+            Total: {usersData.length} usuario{usersData.length !== 1 ? "s" : ""}
+            {usersWithRoutine.length > 0 && (
+              <span className="ml-2 text-xs">
+                ({usersWithRoutine.length} con rutina)
+              </span>
+            )}
           </div>
         </div>
 
         {usersData.length > 0 ? (
-          <div className="space-y-4">
-            {usersData.map((user) => (
-              <div
-                key={user.id}
-                className="bg-white p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-base font-medium text-gray-900 mb-3">
-                      {user.fullName}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</span>
-                        <span className="text-sm text-gray-900 mt-1">{user.email}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Número telefónico</span>
-                        <span className="text-sm text-gray-900 mt-1">{user.phone ?? "Sin información"}</span>
-                      </div>
-                      {user.age && (
-                        <div className="flex flex-col">
-                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Edad</span>
-                          <span className="text-sm text-gray-900 mt-1">{user.age} años</span>
-                        </div>
-                      )}
-                      {user.weight && (
-                        <div className="flex flex-col">
-                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Peso</span>
-                          <span className="text-sm text-gray-900 mt-1">{user.weight} kg</span>
-                        </div>
-                      )}
-                      {user.height && (
-                        <div className="flex flex-col">
-                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Altura</span>
-                          <span className="text-sm text-gray-900 mt-1">{user.height} cm</span>
-                        </div>
-                      )}
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Registrado</span>
-                        <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.createdAt)}</span>
-                      </div>
-                      
-                      {user.hasRoutine && user.routineInfo && (
-                        <>
-                          <div className="flex flex-col">
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rutina termina</span>
-                            <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.routineInfo.routineEndDate)}</span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Días restantes</span>
-                            <span className={`text-sm font-medium mt-1 ${getDaysRemainingColor(user.routineInfo.daysRemaining)}`}>
-                              {user.routineInfo.daysRemaining} días
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
+          <div className="space-y-6">
+            {/* Usuarios con rutina - Prioridad por urgencia */}
+            {sortedUsersWithRoutine.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="h-4 w-4 text-gray-600" />
+                  <h3 className="text-base font-medium text-gray-900">
+                    Clientes con Rutina ({sortedUsersWithRoutine.length})
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {sortedUsersWithRoutine.map((user) => {
+                    const status = getRoutineStatus(user.routineInfo.daysRemaining);
+                    const StatusIcon = status.icon;
 
-                    {(user.chronicDiseases || user.healthIssues) && (
-                      <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                        {user.healthIssues && (
-                          <div>
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud/Enfermedades crónicas/Limitaciones</span>
-                            <p className="text-sm text-gray-900 mt-1">{user.healthIssues}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                    return (
+                      <div
+                        key={user.id}
+                        className={`p-4 rounded-lg border transition-colors ${status.bgColor} ${status.borderColor}`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className={`p-2 rounded-full ${status.bgColor}`}>
+                                <StatusIcon className={`h-4 w-4 ${status.color}`} />
+                              </div>
+                              <div>
+                                <h4 className="text-base font-medium text-gray-900">
+                                  {user.fullName}
+                                </h4>
+                                <p className={`text-xs font-medium ${status.color} uppercase tracking-wide`}>
+                                  {status.status} - {status.description}
+                                </p>
+                              </div>
+                            </div>
 
-                  <div className="flex flex-col gap-2 ml-4">
-                    <Button
-                      onClick={() => handleViewUser(user)}
-                      className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
-                    >
-                      <Eye className="mr-1 h-4 w-4" />
-                      Ver Detalles
-                    </Button>
-                    {user.hasRoutine ? (
-                      <Button
-                        onClick={() => handleViewRoutine(user)}
-                        disabled={loadingRoutine}
-                        className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2"
-                      >
-                        <BookOpen className="mr-1 h-4 w-4" />
-                        {loadingRoutine ? "Cargando..." : "Ver Rutina"}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => handleAssignRoutine(user)}
-                        className="bg-gray-700 text-white hover:bg-gray-600 text-sm px-3 py-2"
-                      >
-                        <Plus className="mr-1 h-4 w-4" />
-                        Asignar Rutina
-                      </Button>
-                    )}
-                    {/* <Button
-                      onClick={() => handleUnassignClick(user)}
-                      disabled={unassigningUserId === user.id}
-                      className="bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400 text-sm px-3 py-2"
-                    >
-                      <UserMinus className="mr-1 h-4 w-4" />
-                      {unassigningUserId === user.id ? "Desasignando..." : "Desasignar"}
-                    </Button> */}
-                  </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</span>
+                                <span className="text-sm text-gray-900 mt-1">{user.email}</span>
+                              </div>
+                              
+                              {user.phone && (
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Teléfono</span>
+                                  <span className="text-sm text-gray-900 mt-1">{user.phone}</span>
+                                </div>
+                              )}
+
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rutina termina</span>
+                                <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.routineInfo.routineEndDate)}</span>
+                              </div>
+
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Días restantes</span>
+                                <span className={`text-sm font-bold mt-1 ${status.color}`}>
+                                  {user.routineInfo.daysRemaining} día{user.routineInfo.daysRemaining !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                            </div>
+
+                            {user.healthIssues && (
+                              <div className="mt-3 p-2 bg-white/50 border border-gray-200 rounded-lg">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud</span>
+                                <p className="text-xs text-gray-700 mt-1">{user.healthIssues}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-2 ml-4">
+                            <Button
+                              onClick={() => handleViewUser(user)}
+                              className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
+                            >
+                              Ver Detalles
+                            </Button>
+                            
+                            <Button
+                              onClick={() => handleViewRoutine(user)}
+                              disabled={loadingRoutine}
+                              className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2"
+                            >
+                              {loadingRoutine ? "Cargando..." : "Ver Rutina"}
+                            </Button>
+
+                            {user.routineInfo.daysRemaining < 10 ? (
+                              <Button
+                                onClick={() => handleAssignRoutine(user)}
+                                className="bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-2"
+                              >
+                                Renovar Rutina
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => handleAssignRoutine(user)}
+                                className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
+                              >
+                                Cambiar Rutina
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Usuarios sin rutina */}
+            {usersWithoutRoutine.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Plus className="h-4 w-4 text-gray-600" />
+                  <h3 className="text-base font-medium text-gray-900">
+                    Clientes sin Rutina ({usersWithoutRoutine.length})
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {usersWithoutRoutine.map((user) => (
+                    <div
+                      key={user.id}
+                      className="bg-white p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h4 className="text-base font-medium text-gray-900 mb-3">
+                            {user.fullName}
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</span>
+                              <span className="text-sm text-gray-900 mt-1">{user.email}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Número telefónico</span>
+                              <span className="text-sm text-gray-900 mt-1">{user.phone ?? "Sin información"}</span>
+                            </div>
+                            {user.age && (
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Edad</span>
+                                <span className="text-sm text-gray-900 mt-1">{user.age} años</span>
+                              </div>
+                            )}
+                            {user.weight && (
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Peso</span>
+                                <span className="text-sm text-gray-900 mt-1">{user.weight} kg</span>
+                              </div>
+                            )}
+                            {user.height && (
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Altura</span>
+                                <span className="text-sm text-gray-900 mt-1">{user.height} cm</span>
+                              </div>
+                            )}
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Registrado</span>
+                              <span className="text-sm text-gray-900 mt-1">{formatUserDate(user.createdAt)}</span>
+                            </div>
+                          </div>
+
+                          {user.healthIssues && (
+                            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Problemas de salud/Enfermedades crónicas/Limitaciones</span>
+                                <p className="text-sm text-gray-900 mt-1">{user.healthIssues}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col gap-2 ml-4">
+                          <Button
+                            onClick={() => handleViewUser(user)}
+                            className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
+                          >
+                            <Eye className="mr-1 h-4 w-4" />
+                            Ver Detalles
+                          </Button>
+                          <Button
+                            onClick={() => handleAssignRoutine(user)}
+                            className="bg-gray-700 text-white hover:bg-gray-600 text-sm px-3 py-2"
+                          >
+                            <Plus className="mr-1 h-4 w-4" />
+                            Asignar Rutina
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">

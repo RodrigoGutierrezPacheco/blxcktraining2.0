@@ -18,7 +18,6 @@ import ClientsSection from "../Components/ClientsSection";
 import TrainerRoutinesSection from "../Components/TrainerRoutinesSection";
 import TrainerDocumentsSection from "../../components/TrainerDocumentsSection";
 import TrainerProfileHeader from "../Components/TrainerProfileHeader";
-import RoutineExpirationSection from "../Components/RoutineExpirationSection";
 
 export default function PerfilEntrenador() {
   const { user } = useAuth();
@@ -251,17 +250,7 @@ export default function PerfilEntrenador() {
 
         {/* Right Column - All Sections */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Routine Expiration Section */}
-          <RoutineExpirationSection
-            usersData={usersData}
-            formatUserDate={formatUserDate}
-            handleViewUser={handleViewUser}
-            handleViewRoutine={handleViewRoutine}
-            handleAssignRoutine={handleAssignRoutine}
-            loadingRoutine={loadingRoutine}
-          />
-
-          {/* Clients Section */}
+          {/* Clients Section - Unificada */}
           <ClientsSection
             usersData={usersData}
             formatUserDate={formatUserDate}

@@ -33,6 +33,7 @@ export default function TrainerRoutinesModal({
   openCreateModal = false,
   trainerId,
 }) {
+  console.log("routinesData", routinesData)
   const { token } = useAuth();
   const [viewMode, setViewMode] = useState("list"); // 'list' o 'details'
   const [selectedRoutine, setSelectedRoutine] = useState(null);

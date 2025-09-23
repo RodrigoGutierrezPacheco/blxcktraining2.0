@@ -171,6 +171,8 @@ export default function CreateRoutineModal({
           user_id: userId,
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
+          suggestedStartDate: routine.suggestedStartDate ? new Date(routine.suggestedStartDate).toISOString() : null,
+          suggestedEndDate: routine.suggestedEndDate ? new Date(routine.suggestedEndDate).toISOString() : null,
           notes: notes || "Rutina creada y asignada automáticamente"
         };
         
