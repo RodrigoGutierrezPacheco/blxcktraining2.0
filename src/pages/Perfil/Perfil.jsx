@@ -11,6 +11,7 @@ import {
   Scale,
   CheckCircle,
   Phone,
+  MessageCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
@@ -118,7 +119,7 @@ export default function Perfil() {
       <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <img
-            src={userData.profileImage || "/placeholder.svg"}
+            src="/public/images/BTNegro.png"
             alt="Imagen de perfil"
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
           />
@@ -255,10 +256,26 @@ export default function Perfil() {
         <div className="lg:col-span-3">
           <Card className="border border-gray-200 h-full">
             <CardContent className="p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <Dumbbell className="h-5 w-5 text-gray-600" />
-                Entrenamiento
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Dumbbell className="h-5 w-5 text-gray-600" />
+                  Entrenamiento
+                </h2>
+                {userData.trainerId && (
+                  <Button
+                    onClick={() => {
+                      const phoneNumber = userData.trainerPhone || '1234567890'; // Replace with actual trainer phone
+                      const message = `Hola! Soy ${userData.fullName} y tengo una consulta sobre mi entrenamiento.`;
+                      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Contactar Entrenador
+                  </Button>
+                )}
+              </div>
 
               {/* Si no tiene entrenador asignado */}
               {!userData.trainerId ? (
@@ -302,6 +319,43 @@ export default function Perfil() {
                       </p>
                     </div>
                   </div>
+                  {/* Routine Expiration Info */}
+                  {userData.routine && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-900">
+                            Vencimiento de la Rutina
+                          </h4>
+                          <p className="text-sm text-blue-700">
+                            {userData.routine.endDate 
+                              ? formatDate(userData.routine.endDate)
+                              : "Fecha no disponible"
+                            }
+                          </p>
+                          {userData.routine.endDate && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              {(() => {
+                                const endDate = new Date(userData.routine.endDate);
+                                const today = new Date();
+                                const diffTime = endDate - today;
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                
+                                if (diffDays > 0) {
+                                  return `${diffDays} día${diffDays !== 1 ? 's' : ''} restante${diffDays !== 1 ? 's' : ''}`;
+                                } else if (diffDays === 0) {
+                                  return "Rutina vence hoy";
+                                } else {
+                                  return "Rutina vencida";
+                                }
+                              })()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Trainer Information */}
                   {userData.trainerId && (
