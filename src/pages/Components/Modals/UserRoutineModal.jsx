@@ -81,6 +81,7 @@ export default function UserRoutineModal({
                 Plan de entrenamiento personalizado
               </p>
             </div>
+            
             <Button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 bg-transparent hover:bg-gray-100 p-2 rounded-full"
@@ -120,6 +121,23 @@ export default function UserRoutineModal({
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Update Routine Message */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                <span className="text-amber-600 font-bold text-sm">ℹ</span>
+              </div>
+              <div>
+                <p className="text-sm text-amber-800 font-medium">
+                  ¿Necesitas actualizar tu rutina?
+                </p>
+                <p className="text-sm text-amber-700">
+                  Dirígete a la sección de <span className="font-semibold">Mis Rutinas</span> para modificar tu plan de entrenamiento.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Weeks */}

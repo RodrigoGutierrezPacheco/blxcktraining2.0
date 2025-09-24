@@ -1,6 +1,6 @@
 import { Card, CardContent } from "./Card";
 import { Button } from "./Button";
-import { Users, Eye, BookOpen, Plus, Clock, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
+import { Users, Eye, BookOpen, Plus, Clock, AlertTriangle, CheckCircle, Calendar, Edit3 } from "lucide-react";
 
 export default function ClientsSection({ 
   usersData, 
@@ -8,7 +8,8 @@ export default function ClientsSection({
   handleViewUser, 
   handleViewRoutine, 
   handleAssignRoutine, 
-  loadingRoutine
+  loadingRoutine,
+  handleChangeDuration
 }) {
 
   // Función para determinar el estado de la rutina
@@ -141,37 +142,55 @@ export default function ClientsSection({
                             )}
                           </div>
 
-                          <div className="flex flex-col gap-2 ml-4">
-                            <Button
-                              onClick={() => handleViewUser(user)}
-                              className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
-                            >
-                              Ver Detalles
-                            </Button>
-                            
-                            <Button
-                              onClick={() => handleViewRoutine(user)}
-                              disabled={loadingRoutine}
-                              className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2"
-                            >
-                              {loadingRoutine ? "Cargando..." : "Ver Rutina"}
-                            </Button>
+                          <div className="flex flex-col gap-2 ml-4 min-w-[200px]">
+                            {/* Primary Actions Row */}
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                onClick={() => handleViewUser(user)}
+                                className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 w-full"
+                              >
+                                <Eye className="mr-1 h-4 w-4" />
+                                Ver Detalles
+                              </Button>
+                              
+                              <Button
+                                onClick={() => handleViewRoutine(user)}
+                                disabled={loadingRoutine}
+                                className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2 w-full"
+                              >
+                                <BookOpen className="mr-1 h-4 w-4" />
+                                {loadingRoutine ? "Cargando..." : "Ver Rutina"}
+                              </Button>
+                            </div>
 
-                            {user.routineInfo.daysRemaining < 10 ? (
+                            {/* Secondary Actions Row */}
+                            <div className="flex gap-2">
                               <Button
-                                onClick={() => handleAssignRoutine(user)}
-                                className="bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-2"
+                                onClick={() => handleChangeDuration(user)}
+                                className="bg-orange-600 text-white hover:bg-orange-700 text-xs px-2 py-2 flex-1"
                               >
-                                Renovar Rutina
+                                <Edit3 className="mr-1 h-3 w-3" />
+                                Cambiar Duración
                               </Button>
-                            ) : (
-                              <Button
-                                onClick={() => handleAssignRoutine(user)}
-                                className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2"
-                              >
-                                Cambiar Rutina
-                              </Button>
-                            )}
+
+                              {user.routineInfo.daysRemaining < 10 ? (
+                                <Button
+                                  onClick={() => handleAssignRoutine(user)}
+                                  className="bg-red-600 text-white hover:bg-red-700 text-xs px-2 py-2 flex-1"
+                                >
+                                  <Plus className="mr-1 h-3 w-3" />
+                                  Renovar
+                                </Button>
+                              ) : (
+                                <Button
+                                  onClick={() => handleAssignRoutine(user)}
+                                  className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-2 flex-1"
+                                >
+                                  <Plus className="mr-1 h-3 w-3" />
+                                  Cambiar
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -244,17 +263,17 @@ export default function ClientsSection({
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2 ml-4">
+                        <div className="flex flex-col gap-2 ml-4 min-w-[160px]">
                           <Button
                             onClick={() => handleViewUser(user)}
-                            className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2"
+                            className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 w-full"
                           >
                             <Eye className="mr-1 h-4 w-4" />
                             Ver Detalles
                           </Button>
                           <Button
                             onClick={() => handleAssignRoutine(user)}
-                            className="bg-gray-700 text-white hover:bg-gray-600 text-sm px-3 py-2"
+                            className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2 w-full"
                           >
                             <Plus className="mr-1 h-4 w-4" />
                             Asignar Rutina

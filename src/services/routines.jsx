@@ -372,3 +372,47 @@ export const createRoutineForUser = async (routineData) => {
     throw new Error(error.message || "Error al crear la rutina para el usuario");
   }
 };
+
+export const updateRoutineDuration = async (durationData) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!durationData || !durationData.userId || !durationData.startDate) {
+      throw new Error("Datos de duración no válidos");
+    }
+
+    const apiUrl = `${APP_URL}routines/user/update-duration`;
+    
+    console.log("Updating routine duration for user:", durationData.userId);
+    console.log("API URL:", apiUrl);
+    console.log("Duration data:", JSON.stringify(durationData, null, 2));
+
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(durationData)
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Routine duration update successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error updating routine duration:", error);
+    throw new Error(error.message || "Error al actualizar la duración de la rutina");
+  }
+};

@@ -6,12 +6,14 @@ import { getTrainerById, getUsersByTrainer } from "../../services/trainers";
 import {
   getUserRoutineByEmail,
   getTrainerRoutines,
+  updateRoutineDuration,
 } from "../../services/routines";
 import ClientTrainer from "../Components/Modals/ClientTrainer";
 import UserRoutineModal from "../Components/Modals/UserRoutineModal";
 import AssignRoutineModal from "../Components/Modals/AssignRoutineModal";
 import TrainerRoutinesModal from "../Components/Modals/TrainerRoutinesModal";
 import EditRoutineModal from "../Components/Modals/EditRoutineModal";
+import ChangeDurationModal from "../Components/Modals/ChangeDurationModal";
 import TrainerInfo from "../Components/TrainerInfo";
 import TrainerStatsBio from "../Components/TrainerStatsBio";
 import ClientsSection from "../Components/ClientsSection";
@@ -38,6 +40,8 @@ export default function PerfilEntrenador() {
   const [showEditRoutineModal, setShowEditRoutineModal] = useState(false);
   const [editingRoutineId, setEditingRoutineId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [showChangeDurationModal, setShowChangeDurationModal] = useState(false);
+  const [loadingDurationUpdate, setLoadingDurationUpdate] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -183,16 +187,39 @@ export default function PerfilEntrenador() {
     }
   };
 
-  const handleUserUnassigned = async (userId) => {
-    // Actualizar la lista de usuarios removiendo el usuario desasignado
-    setUsersData(prevUsers => prevUsers.filter(user => user.id !== userId));
-    
-    // Opcional: recargar todos los datos para asegurar consistencia
+  const handleChangeDuration = (user) => {
+    setSelectedUser(user);
+    setShowChangeDurationModal(true);
+  };
+
+  const handleCloseChangeDurationModal = () => {
+    setShowChangeDurationModal(false);
+    setSelectedUser(null);
+  };
+
+  const handleConfirmDurationChange = async (durationData) => {
     try {
-      const users = await getUsersByTrainer(user.id);
-      setUsersData(users);
+      setLoadingDurationUpdate(true);
+      
+      await updateRoutineDuration(durationData);
+      
+      // Mostrar mensaje de éxito
+      alert(`Duración de rutina actualizada exitosamente para ${selectedUser.fullName}`);
+      
+      // Recargar los datos del usuario para mostrar los cambios
+      if (user?.id) {
+        const users = await getUsersByTrainer(user.id);
+        setUsersData(users);
+      }
+      
+      // Cerrar el modal
+      handleCloseChangeDurationModal();
+      
     } catch (error) {
-      console.error("Error al recargar usuarios:", error);
+      console.error("Error updating routine duration:", error);
+      alert(`Error al actualizar la duración: ${error.message}`);
+    } finally {
+      setLoadingDurationUpdate(false);
     }
   };
 
@@ -258,7 +285,7 @@ export default function PerfilEntrenador() {
             handleViewRoutine={handleViewRoutine}
             handleAssignRoutine={handleAssignRoutine}
             loadingRoutine={loadingRoutine}
-            onUserUnassigned={handleUserUnassigned}
+            handleChangeDuration={handleChangeDuration}
           />
 
           {/* Trainer Routines Section */}
@@ -346,6 +373,17 @@ export default function PerfilEntrenador() {
           onClose={handleCloseEditRoutineModal}
           routineId={editingRoutineId}
           onRoutineUpdated={handleRoutineUpdated}
+        />
+      )}
+
+      {/* Change Duration Modal */}
+      {showChangeDurationModal && selectedUser && (
+        <ChangeDurationModal
+          isOpen={showChangeDurationModal}
+          onClose={handleCloseChangeDurationModal}
+          user={selectedUser}
+          onConfirm={handleConfirmDurationChange}
+          loading={loadingDurationUpdate}
         />
       )}
     </div>
