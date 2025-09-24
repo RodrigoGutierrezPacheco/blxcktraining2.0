@@ -6,10 +6,7 @@ export default function TrainerProfileHeader({ trainerData }) {
       <div className="flex flex-col sm:flex-row items-center gap-4">
         <div className="relative">
           <img
-            src={
-              trainerData.profileImage ||
-              "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150"
-            }
+            src="/public/images/BTNegro.png"
             alt="Imagen de perfil del entrenador"
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
           />

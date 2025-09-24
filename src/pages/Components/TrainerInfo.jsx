@@ -9,6 +9,13 @@ import {
   Star,
   Clock,
   Edit,
+  User,
+  Shield,
+  CheckCircle,
+  XCircle,
+  FileText,
+  Hash,
+  Activity,
 } from "lucide-react";
 import { useState } from "react";
 import EditTrainerProfileModal from "./Modals/EditTrainerProfileModal";
@@ -39,7 +46,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
         </h2>
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <Calendar className="h-4 w-4 text-gray-600" />
+            <Activity className="h-4 w-4 text-gray-600" />
             <div>
               <label className="block text-xs font-medium text-gray-500">
                 Entrenador desde
@@ -67,7 +74,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
           )}
 
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <Mail className="h-4 w-4 text-gray-600" />
+            <Shield className="h-4 w-4 text-gray-600" />
             <div>
               <label className="block text-xs font-medium text-gray-500">
                 Verificado
@@ -83,7 +90,11 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
           </div>
 
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <Clock className="h-4 w-4 text-gray-600" />
+            {trainerData.isActive ? (
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            ) : (
+              <XCircle className="h-4 w-4 text-gray-400" />
+            )}
             <div>
               <label className="block text-xs font-medium text-gray-500">
                 Estado
@@ -114,7 +125,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
 
           {trainerData.age && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <Calendar className="h-4 w-4 text-gray-600" />
+              <User className="h-4 w-4 text-gray-600" />
               <div>
                 <label className="block text-xs font-medium text-gray-500">
                   Edad
@@ -136,10 +147,19 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
                 <span className="text-sm font-medium text-gray-900">
                   {(() => {
                     try {
-                      const date = new Date(trainerData.dateOfBirth);
+                      const dateStr = trainerData.dateOfBirth;
+                      if (!dateStr) {
+                        return "Fecha no disponible";
+                      }
+                      
+                      // Parse the date string directly to avoid timezone issues
+                      const [year, month, day] = dateStr.split('-').map(num => parseInt(num, 10));
+                      const date = new Date(year, month - 1, day); // month is 0-indexed
+                      
                       if (isNaN(date.getTime())) {
                         return "Fecha inválida";
                       }
+                      
                       return date.toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
@@ -156,7 +176,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
 
           {trainerData.curp && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <Dumbbell className="h-4 w-4 text-gray-600" />
+              <FileText className="h-4 w-4 text-gray-600" />
               <div>
                 <label className="block text-xs font-medium text-gray-500">
                   CURP
@@ -170,7 +190,7 @@ export default function TrainerInfo({ trainerData, formatDate, onUpdate }) {
 
           {trainerData.rfc && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <Dumbbell className="h-4 w-4 text-gray-600" />
+              <Hash className="h-4 w-4 text-gray-600" />
               <div>
                 <label className="block text-xs font-medium text-gray-500">
                   RFC

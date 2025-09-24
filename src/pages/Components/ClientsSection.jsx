@@ -92,7 +92,7 @@ export default function ClientsSection({
                         key={user.id}
                         className={`p-4 rounded-lg border transition-colors ${status.bgColor} ${status.borderColor}`}
                       >
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-3">
                               <div className={`p-2 rounded-full ${status.bgColor}`}>
@@ -142,12 +142,13 @@ export default function ClientsSection({
                             )}
                           </div>
 
-                          <div className="flex flex-col gap-2 ml-4 min-w-[200px]">
+                          {/* Buttons - Responsive Layout */}
+                          <div className="flex flex-col gap-2 lg:min-w-[200px]">
                             {/* Primary Actions Row */}
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
                               <Button
                                 onClick={() => handleViewUser(user)}
-                                className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 w-full"
+                                className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 flex-1 lg:w-full"
                               >
                                 <Eye className="mr-1 h-4 w-4" />
                                 Ver Detalles
@@ -156,7 +157,7 @@ export default function ClientsSection({
                               <Button
                                 onClick={() => handleViewRoutine(user)}
                                 disabled={loadingRoutine}
-                                className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2 w-full"
+                                className="bg-gray-900 text-white hover:bg-gray-800 text-sm px-3 py-2 flex-1 lg:w-full"
                               >
                                 <BookOpen className="mr-1 h-4 w-4" />
                                 {loadingRoutine ? "Cargando..." : "Ver Rutina"}
@@ -170,7 +171,8 @@ export default function ClientsSection({
                                 className="bg-orange-600 text-white hover:bg-orange-700 text-xs px-2 py-2 flex-1"
                               >
                                 <Edit3 className="mr-1 h-3 w-3" />
-                                Cambiar Duración
+                                <span className="hidden sm:inline">Cambiar Duración</span>
+                                <span className="sm:hidden">Duración</span>
                               </Button>
 
                               {user.routineInfo.daysRemaining < 10 ? (
@@ -215,7 +217,7 @@ export default function ClientsSection({
                       key={user.id}
                       className="bg-white p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                         <div className="flex-1">
                           <h4 className="text-base font-medium text-gray-900 mb-3">
                             {user.fullName}
@@ -263,17 +265,18 @@ export default function ClientsSection({
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2 ml-4 min-w-[160px]">
+                        {/* Buttons - Responsive Layout */}
+                        <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:min-w-[160px]">
                           <Button
                             onClick={() => handleViewUser(user)}
-                            className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 w-full"
+                            className="bg-gray-600 text-white hover:bg-gray-700 text-sm px-3 py-2 flex-1 lg:w-full"
                           >
                             <Eye className="mr-1 h-4 w-4" />
                             Ver Detalles
                           </Button>
                           <Button
                             onClick={() => handleAssignRoutine(user)}
-                            className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2 w-full"
+                            className="bg-blue-600 text-white hover:bg-blue-700 text-sm px-3 py-2 flex-1 lg:w-full"
                           >
                             <Plus className="mr-1 h-4 w-4" />
                             Asignar Rutina

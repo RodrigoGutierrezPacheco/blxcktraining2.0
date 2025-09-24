@@ -10,6 +10,7 @@ import {
   Ruler,
   Scale,
   X,
+  Phone,
 } from "lucide-react";
 
 export default function ClientTrainer({
@@ -99,17 +100,33 @@ export default function ClientTrainer({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
-                  <User className="h-4 w-4 text-gray-600" />
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500">
-                      Edad
-                    </label>
-                    <p className="text-gray-900 font-medium text-sm">
-                      {selectedUser.age
-                        ? `${selectedUser.age} años`
-                        : "Sin información"}
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                    <User className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Edad
+                      </label>
+                      <p className="text-gray-900 font-medium text-sm">
+                        {selectedUser.age
+                          ? `${selectedUser.age} años`
+                          : "Sin información"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                    <Phone className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">
+                        Teléfono
+                      </label>
+                      <p className="text-gray-900 font-medium text-sm">
+                        {selectedUser.phone
+                          ? selectedUser.phone
+                          : "Sin información"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
