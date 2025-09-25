@@ -416,3 +416,147 @@ export const updateRoutineDuration = async (durationData) => {
     throw new Error(error.message || "Error al actualizar la duración de la rutina");
   }
 };
+
+// Mark/unmark exercise as completed
+export const toggleExerciseCompleted = async (exerciseId, currentStatus) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!exerciseId) {
+      throw new Error("ID del ejercicio no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/mark/exercise`;
+    const newStatus = !currentStatus; // Toggle the current status
+    
+    console.log("Toggling exercise completion:", exerciseId, `from ${currentStatus} to ${newStatus}`);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        exerciseId: exerciseId,
+        isCompleted: newStatus
+      })
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Exercise completion toggle successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error toggling exercise completion:", error);
+    throw new Error(error.message || "Error al cambiar el estado de completado del ejercicio");
+  }
+};
+
+// Mark/unmark day as completed
+export const toggleDayCompleted = async (dayId, currentStatus) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!dayId) {
+      throw new Error("ID del día no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/mark/day`;
+    const newStatus = !currentStatus; // Toggle the current status
+    
+    console.log("Toggling day completion:", dayId, `from ${currentStatus} to ${newStatus}`);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        dayId: dayId,
+        isCompleted: newStatus
+      })
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Day completion toggle successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error toggling day completion:", error);
+    throw new Error(error.message || "Error al cambiar el estado de completado del día");
+  }
+};
+
+// Mark/unmark week as completed
+export const toggleWeekCompleted = async (weekId, currentStatus) => {
+  try {
+    const token = localStorage.getItem("tokenBlck");
+    if (!token) {
+      throw new Error("No hay token de autenticación");
+    }
+
+    if (!weekId) {
+      throw new Error("ID de la semana no válido");
+    }
+
+    const apiUrl = `${APP_URL}routines/mark/week`;
+    const newStatus = !currentStatus; // Toggle the current status
+    
+    console.log("Toggling week completion:", weekId, `from ${currentStatus} to ${newStatus}`);
+    console.log("API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        weekId: weekId,
+        isCompleted: newStatus
+      })
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Week completion toggle successful:", data);
+    
+    return data;
+  } catch (error) {
+    console.log("Error toggling week completion:", error);
+    throw new Error(error.message || "Error al cambiar el estado de completado de la semana");
+  }
+};

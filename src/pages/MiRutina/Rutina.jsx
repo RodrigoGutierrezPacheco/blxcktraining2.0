@@ -17,9 +17,11 @@ import {
   Eye,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
-import { getUserRoutineByEmail } from "../../services/routines";
+import { getUserRoutineByEmail, toggleExerciseCompleted, toggleDayCompleted, toggleWeekCompleted } from "../../services/routines";
 import RutinaInfo from "./RutinaInfo";
 import ExerciseModal from "./ExerciseModal";
+import RoutineDatesInfo from "../../components/RoutineDatesInfo";
+import RoutineContent from "../../components/RoutineContent";
 
 export default function Rutina() {
   const { user } = useAuth();
@@ -45,6 +47,36 @@ export default function Rutina() {
   const closeExerciseModal = () => {
     setShowExerciseModal(false);
     setSelectedExercise(null);
+  };
+
+  const handleMarkCompleted = async (type, id, currentStatus) => {
+    try {
+      let result;
+      switch (type) {
+        case 'exercise':
+          result = await toggleExerciseCompleted(id, currentStatus);
+          break;
+        case 'day':
+          result = await toggleDayCompleted(id, currentStatus);
+          break;
+        case 'week':
+          result = await toggleWeekCompleted(id, currentStatus);
+          break;
+        default:
+          throw new Error('Tipo de elemento no válido');
+      }
+
+      // Refresh routine data to get updated completion status
+      const updatedRoutine = await getUserRoutineByEmail(user.email);
+      if (updatedRoutine) {
+        setRoutineData(updatedRoutine.routine);
+      }
+
+      console.log(`${type} completion toggled:`, result);
+    } catch (error) {
+      console.error(`Error toggling ${type} completion:`, error);
+      // You could add a toast notification here
+    }
   };
 
   useEffect(() => {
@@ -170,152 +202,19 @@ export default function Rutina() {
             </div>
             
             {/* Routine Dates Info */}
-            {(startDate || endDate) && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-blue-900 mb-2">
-                      Fechas de la Rutina
-                    </h4>
-                    
-                    {/* Start Date */}
-                    {startDate && (
-                      <div className="mb-2">
-                        <p className="text-xs text-blue-600 font-medium">Inicio:</p>
-                        <p className="text-sm text-blue-700">
-                          {(() => {
-                            try {
-                              const start = new Date(startDate);
-                              return start.toLocaleDateString('es-ES', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              });
-                            } catch {
-                              return "Fecha no disponible";
-                            }
-                          })()}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* End Date */}
-                    {endDate && (
-                      <div className="mb-2">
-                        <p className="text-xs text-blue-600 font-medium">Vencimiento:</p>
-                        <p className="text-sm text-blue-700">
-                          {(() => {
-                            try {
-                              const end = new Date(endDate);
-                              return end.toLocaleDateString('es-ES', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              });
-                            } catch {
-                              return "Fecha no disponible";
-                            }
-                          })()}
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1">
-                          {(() => {
-                            try {
-                              const end = new Date(endDate);
-                              const today = new Date();
-                              const diffTime = end - today;
-                              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                              
-                              if (diffDays > 0) {
-                                return `${diffDays} día${diffDays !== 1 ? 's' : ''} restante${diffDays !== 1 ? 's' : ''}`;
-                              } else if (diffDays === 0) {
-                                return "Rutina vence hoy";
-                              } else {
-                                return "Rutina vencida";
-                              }
-                            } catch {
-                              return "Fecha no válida";
-                            }
-                          })()}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            <RoutineDatesInfo startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>
 
       {/* Routine Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {routineData.weeks?.map((week) => (
-          <div key={week.id} className="mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {/* Week Header */}
-              <div 
-                className="p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => toggleWeek(week.weekNumber)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {week.name}
-                  </h3>
-                  {expandedWeek === week.weekNumber ? (
-                    <ChevronUp className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  )}
-                </div>
-              </div>
-
-              {/* Week Content */}
-              {expandedWeek === week.weekNumber && (
-                <div className="p-4">
-                  {week.days?.map((day) => (
-                    <div key={day.id} className="mb-6 last:mb-0">
-                      <h4 className="text-md font-medium text-gray-800 mb-3">
-                        {day.name}
-                      </h4>
-                      <div className="space-y-3">
-                        {day.exercises?.map((exercise) => (
-                          <div
-                            key={exercise.id}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                            onClick={() => handleExerciseClick(exercise)}
-                          >
-                            <div className="flex-1">
-                              <h5 className="font-medium text-gray-900">
-                                {exercise.name}
-                              </h5>
-                              <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                                <span className="flex items-center gap-1">
-                                  <Repeat className="h-3 w-3" />
-                                  {exercise.sets} series
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Dumbbell className="h-3 w-3" />
-                                  {exercise.repetitions} repeticiones
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {exercise.restBetweenSets}s descanso
-                                </span>
-                              </div>
-                            </div>
-                            <Eye className="h-4 w-4 text-gray-400" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+      <RoutineContent 
+        routineData={routineData}
+        expandedWeek={expandedWeek}
+        onToggleWeek={toggleWeek}
+        onExerciseClick={handleExerciseClick}
+        onMarkCompleted={handleMarkCompleted}
+      />
 
       {/* Exercise Modal */}
       <ExerciseModal
