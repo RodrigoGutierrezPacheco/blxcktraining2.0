@@ -294,10 +294,10 @@ export default function TrainerDocumentsSection({ trainerId }) {
   };
 
   return (
-    <Card className="w-full bg-white border border-gray-200 shadow-sm">
+    <Card className="border ml-auto mr-auto border-gray-200 w-[345px] sm:w-[360px] md:w-full h-fit">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
+          <div className="flex-1">
             <h3 className="text-lg font-medium text-gray-900">
               Documentos del Entrenador
             </h3>
@@ -305,20 +305,20 @@ export default function TrainerDocumentsSection({ trainerId }) {
               Gestiona tus certificaciones, diplomas y otros documentos
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => {
                 setError(null); // Limpiar errores previos
                 setShowVerificationForm(true);
               }}
-              className="bg-gray-600 text-white hover:bg-gray-700 flex items-center gap-2 px-4 py-2"
+              className="bg-gray-600 text-white hover:bg-gray-700 flex items-center justify-center gap-2 px-4 py-2"
             >
               <Upload className="h-4 w-4" />
               Verificación
             </Button>
             <Button
               onClick={() => setShowUploadForm(true)}
-              className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2 px-4 py-2"
+              className="bg-gray-900 text-white hover:bg-gray-800 flex items-center justify-center gap-2 px-4 py-2"
             >
               <Plus className="h-4 w-4" />
               Subir

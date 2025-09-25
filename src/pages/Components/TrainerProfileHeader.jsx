@@ -2,7 +2,7 @@ import { Award } from "lucide-react";
 
 export default function TrainerProfileHeader({ trainerData }) {
   return (
-    <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
+    <section className="bg-white border  border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto w-[345px] sm:w-[360px] md:w-full">
       <div className="flex flex-col sm:flex-row items-center gap-4">
         <div className="relative">
           <img

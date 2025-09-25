@@ -200,21 +200,22 @@ export default function PerfilEntrenador() {
   const handleConfirmDurationChange = async (durationData) => {
     try {
       setLoadingDurationUpdate(true);
-      
+
       await updateRoutineDuration(durationData);
-      
+
       // Mostrar mensaje de éxito
-      alert(`Duración de rutina actualizada exitosamente para ${selectedUser.fullName}`);
-      
+      alert(
+        `Duración de rutina actualizada exitosamente para ${selectedUser.fullName}`
+      );
+
       // Recargar los datos del usuario para mostrar los cambios
       if (user?.id) {
         const users = await getUsersByTrainer(user.id);
         setUsersData(users);
       }
-      
+
       // Cerrar el modal
       handleCloseChangeDurationModal();
-      
     } catch (error) {
       console.error("Error updating routine duration:", error);
       alert(`Error al actualizar la duración: ${error.message}`);
@@ -269,9 +270,9 @@ export default function PerfilEntrenador() {
       {/* Profile Header */}
       <TrainerProfileHeader trainerData={trainerData} />
 
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6 lg:justify-start justify-center">
         {/* Left Column - Trainer Information */}
-        <div className="lg:col-span-1">
+        <div className="flex justify-center lg:justify-start">
           <TrainerInfo trainerData={trainerData} formatDate={formatDate} />
         </div>
 
