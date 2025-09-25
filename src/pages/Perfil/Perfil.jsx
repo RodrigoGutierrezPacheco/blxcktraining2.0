@@ -362,13 +362,123 @@ export default function Perfil() {
                     <TrainerInfo trainerId={userData.trainerId} />
                   )}
 
-                  <div className="pt-2">
-                    <button
-                      onClick={handleViewRoutine}
-                      className="text-sm text-gray-600 hover:text-gray-900 font-medium"
-                    >
-                      Ver rutina completa →
-                    </button>
+                  {/* Routine Preview */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                        <Dumbbell className="h-4 w-4 text-gray-600" />
+                        Vista Previa de la Rutina
+                      </h4>
+                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                        Preview
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                      {/* Semana 1 */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-xs font-medium text-gray-700">Semana 1</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Lunes</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Miércoles</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Viernes</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Semana 2 */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-xs font-medium text-gray-700">Semana 2</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Lunes</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Miércoles</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Viernes</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Semana 3 */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                          <span className="text-xs font-medium text-gray-700">Semana 3</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Lunes</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Miércoles</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">Viernes</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ejemplo de ejercicio */}
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-700">Ejemplo de Ejercicio</span>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
+                          <Dumbbell className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Sentadillas</p>
+                          <p className="text-xs text-gray-500">3 series x 12 repeticiones</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Call to action */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h5 className="text-sm font-medium text-blue-900 mb-1">
+                            ¿Listo para entrenar?
+                          </h5>
+                          <p className="text-xs text-blue-700">
+                            Accede a tu rutina completa con todos los ejercicios, series y repeticiones
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleViewRoutine}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2"
+                        >
+                          Ver Rutina Completa
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

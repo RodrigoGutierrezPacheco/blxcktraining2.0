@@ -416,7 +416,7 @@ export default function Registro() {
                 disabled={isLoading}
               >
                 <UserPlus className="mr-2 h-5 w-5" />
-                {isLoading ? "Registrando..." : "Crear cuenta profesional"}
+                {isLoading ? "Registrando..." : "Crear cuenta"}
               </Button>
              
             </form>
