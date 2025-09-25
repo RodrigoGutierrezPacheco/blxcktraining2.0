@@ -225,81 +225,91 @@ const RoutineContent = ({ routineData, expandedWeek, autoOpenDayId, onToggleWeek
                                 {day.exercises?.map((exercise, exerciseIndex) => (
                                   <div
                                     key={exercise.id}
-                                    className={`group relative flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white border rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer ${
+                                    className={`group relative p-3 md:p-4 bg-gradient-to-r from-gray-50 to-white border rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer ${
                                       exercise.isCompleted 
                                         ? 'border-green-300 bg-green-50' 
                                         : 'border-gray-200 hover:border-gray-300'
                                     }`}
                                     onClick={() => onExerciseClick(exercise)}
                                   >
-                                    {/* Exercise number indicator */}
-                                    <div className={`absolute left-2 top-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                                      exercise.isCompleted 
-                                        ? 'bg-green-200 text-green-700' 
-                                        : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
-                                    }`}>
-                                      {exerciseIndex + 1}
+                                    {/* Header Row - Title and Actions */}
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        {/* Exercise number indicator */}
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors flex-shrink-0 ${
+                                          exercise.isCompleted 
+                                            ? 'bg-green-200 text-green-700' 
+                                            : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
+                                        }`}>
+                                          {exerciseIndex + 1}
+                                        </div>
+                                        
+                                        <div className="flex-1 min-w-0">
+                                          <h5 className={`font-semibold text-sm md:text-base transition-colors ${
+                                            exercise.isCompleted 
+                                              ? 'text-green-800 line-through' 
+                                              : 'text-gray-900 group-hover:text-gray-600'
+                                          }`}>
+                                            {exercise.name}
+                                          </h5>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Action buttons */}
+                                      <div className="flex items-center gap-2 flex-shrink-0">
+                                        {/* Exercise completion check */}
+                                        <button
+                                          onClick={(e) => handleMarkCompleted('exercise', exercise.id, exercise.isCompleted, e)}
+                                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                            exercise.isCompleted 
+                                              ? 'bg-green-500 border-green-500 text-white' 
+                                              : 'border-gray-300 hover:border-green-400 hover:bg-green-100'
+                                          }`}
+                                          title={exercise.isCompleted ? "Desmarcar ejercicio como completado" : "Marcar ejercicio como completado"}
+                                        >
+                                          {exercise.isCompleted && <Check className="h-4 w-4" />}
+                                        </button>
+                                        
+                                        <div className="flex items-center gap-1">
+                                          <div className={`w-1.5 h-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${
+                                            exercise.isCompleted ? 'bg-green-400' : 'bg-gray-400'
+                                          }`}></div>
+                                          <Eye className={`h-4 w-4 transition-colors ${
+                                            exercise.isCompleted 
+                                              ? 'text-green-400 group-hover:text-green-600' 
+                                              : 'text-gray-400 group-hover:text-gray-600'
+                                          }`} />
+                                        </div>
+                                      </div>
                                     </div>
                                     
-                                    <div className="flex-1 ml-8">
-                                      <div className="flex items-center gap-2">
-                                        <h5 className={`font-semibold transition-colors ${
-                                          exercise.isCompleted 
-                                            ? 'text-green-800 line-through' 
-                                            : 'text-gray-900 group-hover:text-gray-600'
-                                        }`}>
-                                          {exercise.name}
-                                        </h5>
-                                        {exercise.isCompleted && (
-                                          <CheckCircle className="h-4 w-4 text-green-600" />
-                                        )}
-                                      </div>
-                                      <div className="flex items-center gap-6 mt-2 text-sm text-gray-500">
-                                        <span className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-                                          exercise.isCompleted ? 'bg-green-100' : 'bg-gray-100'
+                                    {/* Stats Row - Compact badges */}
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
+                                          exercise.isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                                         }`}>
                                           <Repeat className="h-3 w-3" />
-                                          {exercise.sets} series
-                                        </span>
-                                        <span className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-                                          exercise.isCompleted ? 'bg-green-100' : 'bg-gray-100'
+                                          <span>{exercise.sets}</span>
+                                        </div>
+                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
+                                          exercise.isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                                         }`}>
                                           <Dumbbell className="h-3 w-3" />
-                                          {exercise.repetitions} reps
-                                        </span>
-                                        <span className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-                                          exercise.isCompleted ? 'bg-green-100' : 'bg-gray-100'
+                                          <span>{exercise.repetitions}</span>
+                                        </div>
+                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
+                                          exercise.isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                                         }`}>
                                           <Clock className="h-3 w-3" />
-                                          {exercise.restBetweenSets}s
-                                        </span>
+                                          <span>{exercise.restBetweenSets}s</span>
+                                        </div>
                                       </div>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3">
-                                      {/* Exercise completion check */}
-                                      <button
-                                        onClick={(e) => handleMarkCompleted('exercise', exercise.id, exercise.isCompleted, e)}
-                                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                          exercise.isCompleted 
-                                            ? 'bg-green-500 border-green-500 text-white' 
-                                            : 'border-gray-300 hover:border-green-400 hover:bg-green-100'
-                                        }`}
-                                        title={exercise.isCompleted ? "Desmarcar ejercicio como completado" : "Marcar ejercicio como completado"}
-                                      >
-                                        {exercise.isCompleted && <Check className="h-4 w-4" />}
-                                      </button>
                                       
-                                      <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${
-                                          exercise.isCompleted ? 'bg-green-400' : 'bg-gray-400'
-                                        }`}></div>
-                                        <Eye className={`h-5 w-5 transition-colors ${
-                                          exercise.isCompleted 
-                                            ? 'text-green-400 group-hover:text-green-600' 
-                                            : 'text-gray-400 group-hover:text-gray-600'
-                                        }`} />
-                                      </div>
+                                      {/* Completion indicator */}
+                                      {exercise.isCompleted && (
+                                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                      )}
                                     </div>
                                   </div>
                                 ))}

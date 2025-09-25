@@ -16,13 +16,15 @@ import {
 import { useNavigate } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal";
 import TrainerInfo from "./TrainerInfo";
-import { getUserByEmail } from "../../services/users";
+import { getUserByEmail, getTrainerById } from "../../services/users";
+import FloatingTrainerContactButton from "../../components/FloatingTrainerContactButton";
 
 export default function Perfil() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [trainerData, setTrainerData] = useState(null);
 
   // Función para formatear la fecha del backend
   const formatDate = (dateString) => {
@@ -52,6 +54,16 @@ export default function Perfil() {
           profileImage:
             "https://images.unsplash.com/photo-1535713875002-d1d0cfd975fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150",
         });
+
+        // Fetch trainer data if user has a trainer
+        if (userInfo.trainerId) {
+          try {
+            const trainerInfo = await getTrainerById(userInfo.trainerId);
+            setTrainerData(trainerInfo);
+          } catch (error) {
+            console.error("Error fetching trainer data:", error);
+          }
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         // Fallback a datos del localStorage si falla la API
@@ -261,20 +273,6 @@ export default function Perfil() {
                   <Dumbbell className="h-5 w-5 text-gray-600" />
                   Entrenamiento
                 </h2>
-                {userData.trainerId && (
-                  <Button
-                    onClick={() => {
-                      const phoneNumber = userData.trainerPhone || '1234567890'; // Replace with actual trainer phone
-                      const message = `Hola! Soy ${userData.fullName} y tengo una consulta sobre mi entrenamiento.`;
-                      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                      window.open(whatsappUrl, '_blank');
-                    }}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    Contactar Entrenador
-                  </Button>
-                )}
               </div>
 
               {/* Si no tiene entrenador asignado */}
@@ -363,79 +361,79 @@ export default function Perfil() {
                   )}
 
                   {/* Routine Preview */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
-                    <div className="flex items-center justify-between mb-3">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 mt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                       <h4 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                        <Dumbbell className="h-4 w-4 text-gray-600" />
-                        Vista Previa de la Rutina
+                        <Dumbbell className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                        <span className="truncate">Vista Previa de la Rutina</span>
                       </h4>
-                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full self-start sm:self-auto">
                         Preview
                       </span>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
                       {/* Semana 1 */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
                           <span className="text-xs font-medium text-gray-700">Semana 1</span>
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Lunes</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Miércoles</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Viernes</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Semana 2 */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                           <span className="text-xs font-medium text-gray-700">Semana 2</span>
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Lunes</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Miércoles</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Viernes</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Semana 3 */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3 sm:col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
                           <span className="text-xs font-medium text-gray-700">Semana 3</span>
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Lunes</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Miércoles</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-gray-400" />
+                            <Clock className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span className="text-xs text-gray-600">Viernes</span>
                           </div>
                         </div>
@@ -443,26 +441,26 @@ export default function Perfil() {
                     </div>
 
                     {/* Ejemplo de ejercicio */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 mb-4">
+                    <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-gray-700">Ejemplo de Ejercicio</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <Dumbbell className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">Sentadillas</p>
-                          <p className="text-xs text-gray-500">3 series x 12 repeticiones</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">Sentadillas</p>
+                          <p className="text-xs text-gray-500 truncate">3 series x 12 repeticiones</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Call to action */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
                           <h5 className="text-sm font-medium text-blue-900 mb-1">
                             ¿Listo para entrenar?
                           </h5>
@@ -470,13 +468,14 @@ export default function Perfil() {
                             Accede a tu rutina completa con todos los ejercicios, series y repeticiones
                           </p>
                         </div>
-                        <button
-                          onClick={handleViewRoutine}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2"
-                        >
-                          Ver Rutina Completa
-                          <ArrowRight className="h-4 w-4" />
-                        </button>
+                    <button
+                      onClick={handleViewRoutine}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 flex-shrink-0"
+                    >
+                          <span className="hidden sm:inline">Ver Rutina Completa</span>
+                          <span className="sm:hidden">Ver Rutina</span>
+                          <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
                       </div>
                     </div>
                   </div>
@@ -492,6 +491,11 @@ export default function Perfil() {
         userData={userData}
         setUserData={setUserData}
       />
+      
+      {/* Floating Trainer Contact Button */}
+      {userData?.trainerId && (
+        <FloatingTrainerContactButton trainerData={trainerData} />
+      )}
     </div>
   );
 }
