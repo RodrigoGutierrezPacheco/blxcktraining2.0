@@ -69,7 +69,7 @@ const FloatingContactButton = ({ trainerData }) => {
             </div>
             <button
               onClick={toggleContactPanel}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
             >
               <X className="h-4 w-4 text-gray-400" />
             </button>
@@ -83,7 +83,7 @@ const FloatingContactButton = ({ trainerData }) => {
             {trainerData?.email ? (
               <button
                 onClick={handleEmailClick}
-                className="w-full flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
+                className="w-full cursor-pointer flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
               >
                 <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="h-4 w-4 text-white" />
@@ -98,7 +98,7 @@ const FloatingContactButton = ({ trainerData }) => {
             {trainerData?.phone ? (
               <button
                 onClick={handleWhatsAppClick}
-                className="w-full flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
+                className="w-full cursor-pointer flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
               >
                 <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
                   <MessageCircle className="h-4 w-4 text-white" />
@@ -111,14 +111,14 @@ const FloatingContactButton = ({ trainerData }) => {
             ) : null}
 
             {!trainerData && (
-              <div className="text-center py-3">
+              <div className="text-center cursor-pointer py-3">
                 <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse mx-auto mb-2"></div>
                 <p className="text-gray-500 text-xs">Cargando...</p>
               </div>
             )}
 
             {trainerData && !trainerData.email && !trainerData.phone && (
-              <div className="text-center py-3">
+              <div className="text-center cursor-pointer py-3">
                 <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <User className="h-3 w-3 text-gray-400" />
                 </div>
@@ -132,7 +132,7 @@ const FloatingContactButton = ({ trainerData }) => {
       {/* Floating Button */}
       <button
         onClick={toggleContactPanel}
-        className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group ${
+        className={`w-14 cursor-pointer h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group ${
           isOpen ? 'rotate-45' : 'rotate-0'
         }`}
         title="Contactar entrenador"

@@ -54,7 +54,7 @@ export default function ExerciseModal({
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-gray-500/30 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -84,7 +84,7 @@ export default function ExerciseModal({
               <img
                 src={exerciseImage.image.url}
                 alt={exerciseImage.exerciseName || exercise.name}
-                className="w-full h-64 object-cover rounded-lg"
+                className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
               />
             ) : (
               <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
