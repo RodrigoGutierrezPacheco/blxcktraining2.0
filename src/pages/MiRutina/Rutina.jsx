@@ -18,14 +18,17 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { getUserRoutineByEmail, toggleExerciseCompleted, toggleDayCompleted, toggleWeekCompleted } from "../../services/routines";
+import { getTrainerById } from "../../services/users";
 import RutinaInfo from "./RutinaInfo";
 import ExerciseModal from "./ExerciseModal";
 import RoutineDatesInfo from "../../components/RoutineDatesInfo";
 import RoutineContent from "../../components/RoutineContent";
+import FloatingContactButton from "../../components/FloatingContactButton";
 
 export default function Rutina() {
   const { user } = useAuth();
-  const [expandedWeek, setExpandedWeek] = useState(1);
+  const [expandedWeek, setExpandedWeek] = useState(null);
+  const [autoOpenDayId, setAutoOpenDayId] = useState(null);
   const [routineData, setRoutineData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,10 +36,35 @@ export default function Rutina() {
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [trainerData, setTrainerData] = useState(null);
   const weekRefs = useRef({});
 
   const toggleWeek = (weekNumber) => {
     setExpandedWeek(expandedWeek === weekNumber ? null : weekNumber);
+  };
+
+  // Function to find the first incomplete week and day
+  const findFirstIncompleteWeekAndDay = (routineData) => {
+    if (!routineData?.weeks) return { weekNumber: null, dayId: null };
+
+    for (const week of routineData.weeks) {
+      // If week is not completed, open it
+      if (!week.isCompleted) {
+        // Look for first incomplete day in this week
+        if (week.days) {
+          for (const day of week.days) {
+            if (!day.isCompleted) {
+              return { weekNumber: week.weekNumber, dayId: day.id };
+            }
+          }
+        }
+        // If no incomplete day found, just open the week
+        return { weekNumber: week.weekNumber, dayId: null };
+      }
+    }
+    
+    // If all weeks are completed, don't open any week
+    return { weekNumber: null, dayId: null };
   };
 
   const handleExerciseClick = (exercise) => {
@@ -106,6 +134,29 @@ export default function Rutina() {
           setRoutineData(routine.routine);
           setStartDate(routine.startDate);
           setEndDate(routine.endDate);
+          
+          // Auto-open first incomplete week and day
+          const { weekNumber, dayId } = findFirstIncompleteWeekAndDay(routine.routine);
+          if (weekNumber) {
+            setExpandedWeek(weekNumber);
+            setAutoOpenDayId(dayId);
+            console.log(`Auto-opening week ${weekNumber}${dayId ? ` and day ${dayId}` : ''}`);
+          }
+          
+          // Fetch trainer data if trainerId is available
+          console.log("trainerId from routine:", routine.routine);
+          if (routine.routine.trainer_id) {
+            try {
+              const trainerInfo = await getTrainerById(routine.routine.trainer_id);
+              console.log("trainer info:", trainerInfo);
+              setTrainerData(trainerInfo);
+            } catch (trainerError) {
+              console.error("Error fetching trainer data:", trainerError);
+              // Don't set error state for trainer data, just log it
+            }
+          } else {
+            console.log("No trainer_id found in routine data");
+          }
         } else {
           setRoutineData(null);
         }
@@ -211,6 +262,7 @@ export default function Rutina() {
       <RoutineContent 
         routineData={routineData}
         expandedWeek={expandedWeek}
+        autoOpenDayId={autoOpenDayId}
         onToggleWeek={toggleWeek}
         onExerciseClick={handleExerciseClick}
         onMarkCompleted={handleMarkCompleted}
@@ -222,6 +274,9 @@ export default function Rutina() {
         onClose={closeExerciseModal}
         exercise={selectedExercise}
       />
+
+      {/* Floating Contact Button */}
+      <FloatingContactButton trainerData={trainerData} />
     </div>
   );
 }

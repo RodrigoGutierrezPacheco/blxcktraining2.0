@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dumbbell,
   ChevronDown,
@@ -10,8 +10,15 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const RoutineContent = ({ routineData, expandedWeek, onToggleWeek, onExerciseClick, onMarkCompleted }) => {
+const RoutineContent = ({ routineData, expandedWeek, autoOpenDayId, onToggleWeek, onExerciseClick, onMarkCompleted }) => {
   const [expandedDay, setExpandedDay] = useState(null);
+
+  // Auto-open the specified day when autoOpenDayId changes
+  useEffect(() => {
+    if (autoOpenDayId) {
+      setExpandedDay(autoOpenDayId);
+    }
+  }, [autoOpenDayId]);
 
   if (!routineData?.weeks || routineData.weeks.length === 0) {
     return (

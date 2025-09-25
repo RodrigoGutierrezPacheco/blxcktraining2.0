@@ -38,7 +38,7 @@ export default function AssignRoutineModal({
   const [isDirectAssignment, setIsDirectAssignment] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
     startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    endDate: new Date(Date.now() + 5 * 7 * 24 * 60 * 60 * 1000)
       .toISOString()
       .split("T")[0],
     notes: "",
@@ -110,7 +110,7 @@ export default function AssignRoutineModal({
     setSelectedRoutine(null);
     setAssignmentData({
       startDate: new Date().toISOString().split("T")[0],
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      endDate: new Date(Date.now() + 5 * 7 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
       notes: "",
