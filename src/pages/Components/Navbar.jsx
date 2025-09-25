@@ -97,7 +97,7 @@ export default function Navbar() {
                 onMouseLeave={handleMouseLeave}
               >
                 <button
-                  className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                  className="flex cursor-pointer items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
                   {isTrainer ? (
@@ -117,7 +117,7 @@ export default function Navbar() {
                     {!isActive("/perfil") && !isTrainer && (
                       <a
                         href="/perfil"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Ver Perfil
@@ -126,7 +126,7 @@ export default function Navbar() {
                     {!isActive("/entrenadores/perfil") && isTrainer && (
                       <a
                         href="/entrenadores/perfil"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         Ver Perfil
@@ -134,7 +134,7 @@ export default function Navbar() {
                     )}
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="block w-full cursor-pointer text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Cerrar Sesión
                     </button>

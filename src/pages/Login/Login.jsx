@@ -35,7 +35,7 @@ export default function Login() {
 
     if (!email || !password) {
       setIsLoading(false);
-      setMessage("Por favor, ingresa tu usuario y contraseña.");
+      setMessage("Por favor, ingresa tu email y contraseña.");
       return;
     }
 
@@ -88,62 +88,62 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2 border-black">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-black mb-2">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4">
+      <Card className="w-full max-w-md border-2 border-black relative">
+        <CardContent className="p-4 sm:p-6 lg:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-black mb-2">
               Iniciar Sesión
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               Accede a tu cuenta de BLXCK Training
             </p>
           </div>
 
           {/* Tabs para seleccionar tipo de usuario */}
-          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+          <div className="flex mb-4 sm:mb-6 bg-gray-100 rounded-lg p-0.5 sm:p-1">
             <button
               type="button"
               onClick={() => handleTabChange("user")}
-              className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`flex-1 cursor-pointer flex items-center justify-center gap-1 sm:gap-2 py-2 px-2 sm:px-4 rounded-md font-medium transition-colors text-sm sm:text-base ${
                 activeTab === "user"
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"
               }`}
             >
-              <User className="h-4 w-4" />
-              Usuario
+              <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="truncate">Usuario</span>
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("trainer")}
-              className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`flex-1 cursor-pointer flex items-center justify-center gap-1 sm:gap-2 py-2 px-2 sm:px-4 rounded-md font-medium transition-colors text-sm sm:text-base ${
                 activeTab === "trainer"
                   ? "bg-white text-black shadow-sm"
                   : "text-gray-600 hover:text-gray-800"
               }`}
             >
-              <Dumbbell className="h-4 w-4" />
-              Entrenador
+              <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="truncate">Entrenador</span>
             </button>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
             <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                {activeTab === "user" ? "Usuario" : "Email"}
+                Email
               </label>
               <input
-                type={activeTab === "user" ? "text" : "email"}
+                type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
-                placeholder={activeTab === "user" ? "Tu nombre de usuario" : "Tu email"}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors text-sm sm:text-base"
+                placeholder="Tu correo electrónico"
                 required
               />
             </div>
@@ -162,7 +162,7 @@ export default function Login() {
                   name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors pr-10 text-sm sm:text-base"
                   placeholder="Tu contraseña"
                   required
                 />
@@ -175,9 +175,9 @@ export default function Login() {
                   }
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
+                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
                   ) : (
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
                   )}
                 </button>
               </div>
@@ -197,13 +197,15 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full bg-black text-white hover:bg-gray-800 text-lg py-3"
+              className="w-full bg-black text-white hover:bg-gray-800 text-base sm:text-lg py-2.5 sm:py-3"
               disabled={isLoading}
             >
               {!isLoading ? (
                 <div className="flex items-center gap-1 justify-center">
-                  <LogInIcon className="mr-2 h-5 w-5" />
-                  Iniciar Sesión como {activeTab === "user" ? "Usuario" : "Entrenador"}
+                  <LogInIcon className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-sm sm:text-base">
+                    Iniciar Sesión
+                  </span>
                 </div>
               ) : (
                 <Spinner className="h-1 w-1" size="sm" />
@@ -211,7 +213,7 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm">
+          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
             <a href="#" className="text-black hover:underline">
               ¿Olvidaste tu contraseña?
             </a>
