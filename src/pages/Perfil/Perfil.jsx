@@ -131,7 +131,7 @@ export default function Perfil() {
       <section className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <img
-            src="/public/images/BTNegro.png"
+            src="/images/BTNegro.png"
             alt="Imagen de perfil"
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-gray-200"
           />
