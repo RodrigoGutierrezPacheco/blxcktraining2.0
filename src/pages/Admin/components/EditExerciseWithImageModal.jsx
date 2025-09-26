@@ -64,7 +64,7 @@ export default function EditExerciseWithImageModal({
       if (!selectedMuscleGroup) return;
 
       const response = await fetch(
-        `http://localhost:8000/media-assets/by-folder-with-signed-urls?folder=${encodeURIComponent(selectedMuscleGroup.title)}&expirationMinutes=120`,
+        `${import.meta.env.VITE_API_URL}/media-assets/by-folder-with-signed-urls?folder=${encodeURIComponent(selectedMuscleGroup.title)}&expirationMinutes=120`,
         {
           method: "GET",
           headers: {

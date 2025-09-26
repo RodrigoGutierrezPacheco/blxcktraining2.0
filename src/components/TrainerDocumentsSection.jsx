@@ -294,7 +294,7 @@ export default function TrainerDocumentsSection({ trainerId }) {
   };
 
   return (
-    <Card className="border ml-auto mr-auto border-gray-200 w-[345px] sm:w-[360px] md:w-full h-fit">
+    <Card className="border ml-auto mr-auto border-gray-200 w-[345px] sm:w-[688px] lg:w-full h-fit">
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
           <div className="flex-1">

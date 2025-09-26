@@ -68,7 +68,7 @@ export default function ClientsSection({
   );
 
   return (
-    <Card className="border ml-auto mr-auto border-gray-200 w-[345px] sm:w-[360px] md:w-full h-fit">
+    <Card className="border ml-auto mr-auto border-gray-200 w-[345px] sm:w-[688px] lg:w-full h-fit">
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
           <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
